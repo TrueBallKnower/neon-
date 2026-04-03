@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neon Arena .io</title>
+  <style>
+    :root{
+      --bg:#050913;--panel:rgba(7,12,24,.86);--line:rgba(99,214,255,.18);--text:#ebf5ff;--muted:#87a1c0;--accent:#63d6ff;--danger:#ff6f8d;--good:#7bffbc;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow:hidden;background:radial-gradient(circle at top,#0c1731,#050913 60%);font-family:Arial,sans-serif;color:var(--text)}
+    canvas{display:block;width:100vw;height:100vh}
+    #menu,#hud,#leader,#respawn{position:fixed;z-index:10}
+    #menu{inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(8px)}
+    .panel{width:min(520px,92vw);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 20px 70px rgba(0,0,0,.4)}
+    h1{font-size:42px;letter-spacing:2px;margin-bottom:10px;background:linear-gradient(90deg,#fff,#7be3ff,#c4a3ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+    p{color:var(--muted);line-height:1.5}
+    input,button{width:100%;border:none;border-radius:12px;padding:14px 16px;margin-top:14px;font-size:15px}
+    input{background:#0f1930;color:var(--text);border:1px solid var(--line)}
+    button{background:linear-gradient(135deg,#66d9ff,#2b88ff);color:#06111c;font-weight:700;cursor:pointer}
+    .small{font-size:13px;margin-top:12px}
+    #hud{left:14px;top:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-width:220px}
+    #leader{right:14px;top:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-width:230px}
+    .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+    .hpTrack{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:6px 0 8px}
+    .hpFill{height:100%;background:linear-gradient(90deg,#ff6f8d,#ffb36f);width:100%}
+    #respawn{left:50%;top:50%;transform:translate(-50%,-50%);display:none;background:var(--panel);border:1px solid var(--line);padding:18px 22px;border-radius:16px}
+    #crosshair{position:fixed;width:18px;height:18px;pointer-events:none;z-index:9;transform:translate(-50%,-50%)}
+    #crosshair:before,#crosshair:after{content:"";position:absolute;background:#fff;box-shadow:0 0 8px var(--accent)}
+    #crosshair:before{width:2px;height:18px;left:8px;top:0}
+    #crosshair:after{height:2px;width:18px;left:0;top:8px}
+    .entry{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+    .entry:last-child{border-bottom:none}
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="crosshair"></div>
+
+  <div id="menu">
+    <div class="panel">
+      <h1>NEON ARENA</h1>
+      <p>Mini jeu multijoueur style .io. Déplace-toi, tire, ramasse des orbes et fais monter ton score.</p>
+      <input id="nameInput" maxlength="16" placeholder="Ton pseudo" value="Joueur" />
+      <button id="playBtn">Jouer en ligne</button>
+      <p class="small">Touches : WASD pour bouger, souris pour viser, clic gauche pour tirer.</p>
+    </div>
+  </div>
+
+  <div id="hud" style="display:none">
+    <div class="label">Toi</div>
+    <div id="myName">—</div>
+    <div class="hpTrack"><div class="hpFill" id="hpFill"></div></div>
+    <div id="hpText">100 / 100</div>
+    <div style="margin-top:8px">Score : <b id="scoreText">0</b></div>
+    <div>Kills : <b id="killsText">0</b></div>
+    <div>Morts : <b id="deathsText">0</b></div>
+  </div>
+
+  <div id="leader" style="display:none">
+    <div class="label">Classement</div>
+    <div id="leaderboard"></div>
+  </div>
+
+  <div id="respawn"></div>
+
+  <script src="/client.js"></script>
+</body>
+</html>
