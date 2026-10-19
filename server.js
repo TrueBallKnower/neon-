@@ -97,6 +97,7 @@ async function createApp() {
   if(payload.conflict)return res.status(409).json({...payload,error:'Partie resynchronisée.'});
   res.json(payload);
  }));
+ require('./social').registerSocial({app,db,auth,route});
  registerDuels({app,db,auth,route,rateLimit});
  app.get('/healthz',route(async(req,res)=>{await db.one('SELECT 1 AS ok');res.json({ok:true});}));
  app.use(express.static(path.join(__dirname,'public'),{setHeaders(res,file){res.setHeader('Cache-Control',file.endsWith('.html')?'no-store':'no-cache');}}));

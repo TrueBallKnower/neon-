@@ -28,7 +28,7 @@
  }
  function message(text){el('online-message').textContent=text;}
  function render(){document.body.classList.toggle('dueling',!!online.duel);el('account-form').hidden=!!account;el('signed-in').hidden=!account;el('account-greeting').textContent=account?`Salut ${account.username} ! Record classé : ${account.best}.`:'';el('online-status').textContent=online.duel?'Duel · '+account.username:online.ranked?`Classé · ${account.username}`:account?`${account.username} · mode libre`:'Mode libre';el('restart').disabled=!!online.duel;}
- function open(panel){for(const name of ['account','leaderboard','duel','mode'])el(name+'-panel').hidden=panel!==name;message('');if(!el('online-dialog').open)el('online-dialog').showModal();}
+ function open(panel){for(const name of ['account','leaderboard','duel','mode','friends'])el(name+'-panel').hidden=panel!==name;message('');if(!el('online-dialog').open)el('online-dialog').showModal();}
  function gameOf(duel){return{board:duel.me.board,score:duel.me.score,moves:duel.me.moves,won:false,spawnSeed:duel.me.spawnSeed,spawnPlan:duel.me.spawnPlan,meta:{mode:duel.mode||'classic',startedAt:duel.startsAt||duel.serverNow,endsAt:duel.endsAt,comboDeadline:duel.me.comboDeadline||null,endedAt:duel.status==='finished'?duel.serverNow:null,reason:duel.status==='finished'&&duel.winner===duel.me.id?'victory':duel.status==='finished'&&duel.winner===null?'draw':duel.reason}};}
  function statusNow(){if(!current)return null;if(current.status==='finished')return'finished';if(!current.startsAt)return'waiting';const now=Date.now()+serverOffset;return now<current.startsAt?'countdown':now>=current.endsAt?'finished':'playing';}
  function clock(){
@@ -45,9 +45,13 @@
   if(el('duel-result').textContent!==message)el('duel-result').textContent=message;
  }
  function updateDuel(duel,{load=false}={}){
+  if(current&&current.code!==duel.code)load=true;
+  if(duel.nextCode){followRematch(duel.nextCode);return;}
   if(duel.status==='finished')optimistic=null;window.FusionUI.remoteRule(gameOf(duel).meta);current=duel;online.duel=duel.code;online.ranked=false;serverOffset=duel.serverNow-Date.now();remember(duel.code);
   el('duel-hud').hidden=false;el('duel-you').textContent=duel.me.name;el('duel-opponent').textContent=duel.opponent?.name||'En attente…';el('duel-my-score').textContent=optimistic?.score??duel.me.score;el('duel-their-score').textContent=duel.opponent?.score||0;
   el('duel-mode-help').textContent=window.FusionModes.get(duel.mode).name+' · '+window.FusionModes.get(duel.mode).description;el('duel-invite').hidden=duel.status!=='waiting';el('duel-room-code').textContent=duel.code;
+  const series=duel.series;el('series-score').textContent=duel.opponent?`Série · ${duel.me.name} ${series?.wins[duel.me.id]||0} — ${series?.wins[duel.opponent.id]||0} ${duel.opponent.name} · ${series?.draws||0} égalité(s) · Manche ${series?.round||1}`:'';
+  el('duel-rematch').hidden=duel.status!=='finished'||!duel.opponent;el('duel-rematch').disabled=!!duel.rematchVotes?.includes(duel.me.id);el('duel-rematch').textContent=duel.rematchVotes?.includes(duel.me.id)?'En attente de ton adversaire…':duel.rematchVotes?.length?'Accepter la revanche':'Proposer une revanche';
   if(load){resetPrediction(gameOf(duel));window.FusionUI.load(gameOf(duel));el('duel-my-score').textContent=duel.me.score;}render();clock();
  }
  async function leave(){
@@ -106,8 +110,12 @@
  el('duel-create').onclick=()=>enter(true);el('duel-join-form').onsubmit=e=>{e.preventDefault();enter(false);};el('duel-back').onclick=()=>el('online-dialog').close();
  el('duel-copy').onclick=async()=>{const url=new URL(location.href);url.search='';url.searchParams.set('duel',online.duel);try{await navigator.clipboard.writeText(url.toString());message('Lien copié !');}catch{message('Partage ce code : '+online.duel);}};
  el('duel-leave').onclick=async()=>{if(busy)return;busy=true;try{await leave();}catch(e){el('duel-result').textContent=e.message;}finally{busy=false;}};
+ let following=false;
+ async function followRematch(code){if(following)return;following=true;try{const {duel}=await api('duels/'+code);updateDuel(duel,{load:true});}catch(e){el('duel-result').textContent=e.message;}finally{following=false;}}
+ el('duel-rematch').onclick=async()=>{if(busy)return;busy=true;try{const {duel}=await api('duels/'+online.duel+'/rematch',{});updateDuel(duel);}catch(e){el('duel-result').textContent=e.message;}finally{busy=false;}};
+ online.social={api,open,isSignedIn:()=>!!account,async enter(code){if(busy)return false;busy=true;try{if(online.duel===code){el('online-dialog').close();return true;}if(!await leave())return false;const {duel}=await api('duels/'+code+'/join',{});updateDuel(duel,{load:true});el('online-dialog').close();return true;}finally{busy=false;}}};
  setInterval(clock,100);
- setInterval(async()=>{if(document.hidden||!online.duel||busy||polling||sync.task||sync.pending.length||current?.status==='finished')return;const delay=current?.mode==='sudden'?250:1000;if(Date.now()-lastPollAt<delay)return;lastPollAt=Date.now();polling=true;const room=online.duel;try{const {duel}=await api('duels/'+room);if(room===online.duel&&!sync.task&&!sync.pending.length&&!busy)updateDuel(duel);}catch(e){el('duel-result').textContent='Connexion interrompue. Nouvelle tentative…';}finally{polling=false;}},250);
+ setInterval(async()=>{if(document.hidden||!online.duel||busy||polling||sync.task||sync.pending.length)return;const delay=current?.mode==='sudden'?250:1000;if(Date.now()-lastPollAt<delay)return;lastPollAt=Date.now();polling=true;const room=online.duel;try{const {duel}=await api('duels/'+room);if(room===online.duel&&!sync.task&&!sync.pending.length&&!busy)updateDuel(duel);}catch(e){el('duel-result').textContent='Connexion interrompue. Nouvelle tentative…';}finally{polling=false;}},250);
  api('me').then(async data=>{
   account=data.user;render();const invite=new URL(location.href).searchParams.get('duel');
   if(invite&&/^[a-f0-9]{10}$/i.test(invite)){el('duel-code').value=invite.toUpperCase();open('duel');if(!account)message('Connecte-toi via Mon compte, puis rejoins le duel.');}

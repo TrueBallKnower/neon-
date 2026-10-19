@@ -40,7 +40,7 @@ async function openDatabase() {
   function sql(text) {
     let index = 0;
     if (postgres) text = text.replace(/\?/g, () => '$' + ++index);
-    return postgres ? text.replace(/\b(users|sessions|games|duels|game_modes|mode_scores)\b/g, 'fusion.$1') : text;
+    return postgres ? text.replace(/\b(users|sessions|games|duels|game_modes|mode_scores|friendships|messages)\b/g, 'fusion.$1') : text;
   }
   function connection(client) {
     return {
@@ -82,11 +82,14 @@ async function openDatabase() {
     await db.run('CREATE TABLE IF NOT EXISTS duels(code TEXT PRIMARY KEY,host_id INTEGER NOT NULL REFERENCES users(id),guest_id INTEGER REFERENCES users(id),state TEXT NOT NULL,expires BIGINT NOT NULL)');
     await db.run('CREATE TABLE IF NOT EXISTS game_modes(user_id INTEGER PRIMARY KEY REFERENCES users(id),meta TEXT NOT NULL)');
     await db.run('CREATE TABLE IF NOT EXISTS mode_scores(user_id INTEGER NOT NULL REFERENCES users(id),mode TEXT NOT NULL,best INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(user_id,mode))');
+    await db.run('CREATE TABLE IF NOT EXISTS friendships(low_id INTEGER NOT NULL REFERENCES users(id),high_id INTEGER NOT NULL REFERENCES users(id),sender_id INTEGER NOT NULL REFERENCES users(id),accepted INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(low_id,high_id))');
+    await db.run(`CREATE TABLE IF NOT EXISTS messages(id ${id},sender_id INTEGER NOT NULL REFERENCES users(id),recipient_id INTEGER NOT NULL REFERENCES users(id),body TEXT NOT NULL,duel_code TEXT,created_at BIGINT NOT NULL)`);
+    await db.run('CREATE INDEX IF NOT EXISTS messages_pair_idx ON messages(sender_id,recipient_id,id)');
     await db.run('CREATE INDEX IF NOT EXISTS sessions_expires_idx ON sessions(expires)');
     if (postgres) {
       // Private schema: do not expose password hashes or session data through the Data API.
       await pool.query('REVOKE ALL ON SCHEMA fusion FROM PUBLIC');
-      await pool.query('ALTER TABLE fusion.users ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.sessions ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.games ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.duels ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.game_modes ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.mode_scores ENABLE ROW LEVEL SECURITY');
+      await pool.query('ALTER TABLE fusion.users ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.sessions ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.games ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.duels ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.game_modes ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.friendships ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.messages ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.mode_scores ENABLE ROW LEVEL SECURITY');
     }
   } catch (error) { await db.close(); throw error; }
   return db;

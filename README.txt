@@ -78,6 +78,22 @@ Validation Chromium : huit formats de 320x568 à 1024x768, paysage, clavier
 simulé, multitouch, CPU 4x et réseau lent. Safari réel reste à vérifier ;
 le téléchargement de WebKit était bloqué dans l’environnement de travail.
 
+AMIS, CHAT ET REVANCHES
+Amis & chat : envoyer une demande par pseudo, accepter ou refuser, puis
+ouvrir une discussion privée. Les 100 derniers messages sont affichés ;
+ils sont conservés en base. Retirer un ami coupe l’accès à la discussion.
+Le bouton Proposer un duel publie une invitation dans le chat, réservée
+aux deux joueurs. Chacun ouvre le duel depuis cette invitation.
+Après le résultat, les deux joueurs acceptent la revanche. La nouvelle
+grille repart à zéro ; les victoires et égalités de la série restent
+visibles, avec le numéro de manche, y compris après rechargement.
+Créer un autre duel démarre une nouvelle série. Les salons expirent après
+24 heures. Les messages se rafraîchissent quand le panneau Amis est ouvert ;
+il n’y a pas encore de notifications hors du chat.
+Tests : accès privé, invitation réservée, acceptation réciproque,
+revanches concurrentes sans doublons, séries et chat après redémarrage,
+parcours navigateur à deux joueurs dont un mobile, SQLite et PostgreSQL TLS.
+
 DÉVELOPPEMENT
 Node.js >=22.13 (validé avec 24.19). npm ci puis npm start.
 Sans DATABASE_URL, SQLite conserve les données dans .data/ (ignoré par Git).
