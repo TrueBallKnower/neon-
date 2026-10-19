@@ -1,0 +1,13 @@
+(()=>{
+ const {catalog,earned}=FusionSkinRules,$=id=>document.getElementById(id);
+ function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}}
+ const stored=read('fusion-skins-unlocked',[]);
+ let unlocked=new Set(['original',...(Array.isArray(stored)?stored:[]).filter(id=>catalog.some(s=>s.id===id))]),selected=read('fusion-skin','original'),lite=!!read('fusion-effects-lite',false),timer;
+ if(!unlocked.has(selected))selected='original';
+ function save(){try{localStorage.setItem('fusion-skins-unlocked',JSON.stringify([...unlocked]));localStorage.setItem('fusion-skin',JSON.stringify(selected));localStorage.setItem('fusion-effects-lite',JSON.stringify(lite));}catch{}}
+ function apply(){document.body.dataset.skin=selected;document.body.classList.toggle('effects-lite',lite);$('effects-lite').checked=lite;}
+ function render(){const list=$('skins-list');list.replaceChildren();for(const skin of catalog){const card=document.createElement('article');card.className='skin-card';card.style.setProperty('--skin-color',skin.color);const preview=document.createElement('div');preview.className='skin-preview';preview.dataset.preview=skin.id;preview.textContent='16';const title=document.createElement('h3');title.textContent=skin.name;const hint=document.createElement('p');hint.textContent=skin.hint;const button=document.createElement('button');button.type='button';button.disabled=!unlocked.has(skin.id)||selected===skin.id;button.textContent=selected===skin.id?'Équipé':unlocked.has(skin.id)?'Équiper':'À débloquer';button.onclick=()=>{selected=skin.id;apply();save();render();};card.append(preview,title,hint,button);list.append(card);}}
+ $('skins-open').onclick=()=>{FusionOnline.social.open('skins');render();};$('effects-lite').onchange=()=>{lite=$('effects-lite').checked;apply();save();};
+ window.FusionSkins={get lite(){return lite;},progress(event){const fresh=catalog.filter(s=>!unlocked.has(s.id)&&earned(s,event));if(!fresh.length)return;for(const s of fresh)unlocked.add(s.id);clearTimeout(timer);timer=setTimeout(save,300);const toast=$('skin-toast');toast.textContent='Débloqué : '+fresh.map(s=>s.name).join(', ')+' · Ouvre Skins pour l’équiper';toast.hidden=false;clearTimeout(toast.hideTimer);toast.hideTimer=setTimeout(()=>toast.hidden=true,5000);},frames(){if(lite)return[{transform:'scale(1)'},{transform:'scale(1.025)',offset:.45},{transform:'scale(1)'}];const middle={original:'scale(1.08)',aurora:'scale(1.08,.96)',pulse:'scale(1.13)',solar:'scale(1.06) rotate(4deg)',prism:'scale(1.08) rotate(-4deg)'}[selected];return[{transform:'scale(1)'},{transform:middle,offset:.45},{transform:'scale(1)'}];}};
+ window.addEventListener('pagehide',save);apply();
+})();

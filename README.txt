@@ -94,6 +94,21 @@ Tests : accès privé, invitation réservée, acceptation réciproque,
 revanches concurrentes sans doublons, séries et chat après redémarrage,
 parcours navigateur à deux joueurs dont un mobile, SQLite et PostgreSQL TLS.
 
+SKINS ET EFFETS
+Ouvrir Skins pour voir les défis et équiper un effet débloqué : Étincelle
+(disponible), Aurore (1 200 points), Pulsar (combo x8), Solaire (course 512
+en 90 s maximum), Prisme (course 1024 en 180 s maximum).
+Couleurs et transformations de fusion changent sans modifier les règles.
+Les défis sont cosmétiques, évalués pendant le jeu et sauvegardés dans le
+navigateur de cet appareil ; ils ne sont pas synchronisés avec le compte.
+Effets légers désactive les particules et réduit l’amplitude des fusions.
+Les préférences de réduction des animations restent respectées.
+Le mouvement conserve ses 180 ms : les interruptions utilisent la progression
+de l’animation sans mesurer les tuiles, les particules utilisent la géométrie
+mise en cache et le texte des tuiles inchangées n’est plus recréé à chaque coup.
+Tests : continuité sans saut, animation suspendue, zéro mesure de tuile
+pendant les coups, déblocages et limites de temps, équipement et persistance.
+
 DÉVELOPPEMENT
 Node.js >=22.13 (validé avec 24.19). npm ci puis npm start.
 Sans DATABASE_URL, SQLite conserve les données dans .data/ (ignoré par Git).

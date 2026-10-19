@@ -28,7 +28,7 @@
  }
  function message(text){el('online-message').textContent=text;}
  function render(){document.body.classList.toggle('dueling',!!online.duel);el('account-form').hidden=!!account;el('signed-in').hidden=!account;el('account-greeting').textContent=account?`Salut ${account.username} ! Record classé : ${account.best}.`:'';el('online-status').textContent=online.duel?'Duel · '+account.username:online.ranked?`Classé · ${account.username}`:account?`${account.username} · mode libre`:'Mode libre';el('restart').disabled=!!online.duel;}
- function open(panel){for(const name of ['account','leaderboard','duel','mode','friends'])el(name+'-panel').hidden=panel!==name;message('');if(!el('online-dialog').open)el('online-dialog').showModal();}
+ function open(panel){for(const name of ['account','leaderboard','duel','mode','friends','skins'])el(name+'-panel').hidden=panel!==name;message('');if(!el('online-dialog').open)el('online-dialog').showModal();}
  function gameOf(duel){return{board:duel.me.board,score:duel.me.score,moves:duel.me.moves,won:false,spawnSeed:duel.me.spawnSeed,spawnPlan:duel.me.spawnPlan,meta:{mode:duel.mode||'classic',startedAt:duel.startsAt||duel.serverNow,endsAt:duel.endsAt,comboDeadline:duel.me.comboDeadline||null,endedAt:duel.status==='finished'?duel.serverNow:null,reason:duel.status==='finished'&&duel.winner===duel.me.id?'victory':duel.status==='finished'&&duel.winner===null?'draw':duel.reason}};}
  function statusNow(){if(!current)return null;if(current.status==='finished')return'finished';if(!current.startsAt)return'waiting';const now=Date.now()+serverOffset;return now<current.startsAt?'countdown':now>=current.endsAt?'finished':'playing';}
  function clock(){
@@ -50,6 +50,7 @@
   if(duel.status==='finished')optimistic=null;window.FusionUI.remoteRule(gameOf(duel).meta);current=duel;online.duel=duel.code;online.ranked=false;serverOffset=duel.serverNow-Date.now();remember(duel.code);
   el('duel-hud').hidden=false;el('duel-you').textContent=duel.me.name;el('duel-opponent').textContent=duel.opponent?.name||'En attente…';el('duel-my-score').textContent=optimistic?.score??duel.me.score;el('duel-their-score').textContent=duel.opponent?.score||0;
   el('duel-mode-help').textContent=window.FusionModes.get(duel.mode).name+' · '+window.FusionModes.get(duel.mode).description;el('duel-invite').hidden=duel.status!=='waiting';el('duel-room-code').textContent=duel.code;
+  if(duel.status==='finished'&&duel.winner===duel.me.id&&duel.reason==='target')window.FusionSkins?.progress({score:duel.me.score,finished:true,mode:duel.mode,elapsed:(duel.finishedAt||duel.serverNow)-duel.startsAt});
   const series=duel.series;el('series-score').textContent=duel.opponent?`Série · ${duel.me.name} ${series?.wins[duel.me.id]||0} — ${series?.wins[duel.opponent.id]||0} ${duel.opponent.name} · ${series?.draws||0} égalité(s) · Manche ${series?.round||1}`:'';
   el('duel-rematch').hidden=duel.status!=='finished'||!duel.opponent;el('duel-rematch').disabled=!!duel.rematchVotes?.includes(duel.me.id);el('duel-rematch').textContent=duel.rematchVotes?.includes(duel.me.id)?'En attente de ton adversaire…':duel.rematchVotes?.length?'Accepter la revanche':'Proposer une revanche';
   if(load){resetPrediction(gameOf(duel));window.FusionUI.load(gameOf(duel));el('duel-my-score').textContent=duel.me.score;}render();clock();

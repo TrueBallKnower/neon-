@@ -17,7 +17,7 @@ function view(state,id,now=Date.now()){
   else{reason='time';if(other&&me.score!==other.score)winner=me.score>other.score?me.id:other.id;}
  }
  const series=JSON.parse(JSON.stringify(state.series||{round:1,wins:{},draws:0}));if(status==='finished'&&other){if(winner)series.wins[winner]=(series.wins[winner]||0)+1;else series.draws++;}
- return{series,rematchVotes:state.rematchVotes||[],nextCode:state.nextCode||null,code:state.code,mode:state.mode||'classic',status,serverNow:now,startsAt:state.startsAt,endsAt:state.endsAt,duration:modes.get(state.mode).duelMs,me:{...me,spawnSeed:state.seed,spawnPlan:spawnStream.plan(state.seed,me.moves)},opponent:other||null,winner,reason,forfeit:!!state.forfeit};
+ return{finishedAt:state.targetAt||null,series,rematchVotes:state.rematchVotes||[],nextCode:state.nextCode||null,code:state.code,mode:state.mode||'classic',status,serverNow:now,startsAt:state.startsAt,endsAt:state.endsAt,duration:modes.get(state.mode).duelMs,me:{...me,spawnSeed:state.seed,spawnPlan:spawnStream.plan(state.seed,me.moves)},opponent:other||null,winner,reason,forfeit:!!state.forfeit};
 }
 function registerDuels({app,db,auth,route,rateLimit}){
  const invalid=res=>res.status(404).json({error:'Duel introuvable. Vérifie le code.'});
@@ -62,7 +62,7 @@ function registerDuels({app,db,auth,route,rateLimit}){
     result=rules.move(me.board,direction);spawned=-1;
     if(result.changed){spawned=addTile(result.board,state.seed,me.moves+2);me.board=result.board;me.score+=result.gain;me.moves++;me.blocked=!rules.canMove(me.board);
      if(state.mode==='sudden'&&result.gain){if(!state.suddenArmedAt){state.suddenArmedAt=at;for(const p of state.players)p.comboDeadline=at+2000;}me.comboDeadline=at+2000;}
-     if(modes.get(state.mode).race&&me.board.some(v=>v>=modes.get(state.mode).target))state.targetWinner=me.id;
+     if(modes.get(state.mode).race&&me.board.some(v=>v>=modes.get(state.mode).target)){state.targetWinner=me.id;state.targetAt=at;}
     }
    }
    await save(tx,state);
