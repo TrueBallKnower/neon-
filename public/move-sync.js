@@ -27,7 +27,7 @@
    let delay=32;
    const task=(async()=>{
     try{
-     const snapshot=await this.request({directions:batch.map(item=>item.direction),baseMoves:batch[0].before.moves,baseBoard:batch[0].before.board});
+     const snapshot=await this.request({directions:batch.map(item=>item.direction),times:batch.map(item=>item.at??Date.now()),baseMoves:batch[0].before.moves,baseBoard:batch[0].before.board});
      if(epoch!==this.epoch)return;
      this.reconcile(snapshot);this.retryDelay=this.retryMs;this.onStatus('ready');
     }catch(error){

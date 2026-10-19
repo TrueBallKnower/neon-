@@ -6,6 +6,7 @@ const { openDatabase } = require('./database');
 const rules = require('./public/engine');
 const {registerDuels}=require('./duels');
 const spawnStream=require('./spawn-plan');
+const gameModes=require('./game-modes');
 const scrypt = promisify(crypto.scrypt);
 const hashToken = token => crypto.createHash('sha256').update(token).digest('hex');
 const route = fn => (req,res,next) => Promise.resolve(fn(req,res,next)).catch(next);
@@ -50,29 +51,47 @@ async function createApp() {
  }));
  app.post('/api/logout',route(async(req,res)=>{const token=cookie(req);if(token)await db.run('DELETE FROM sessions WHERE token=?',[hashToken(token)]);res.clearCookie('fusion_session',{path:'/'});res.json({ok:true});}));
  app.get('/api/me',route(async(req,res)=>{const found=await user(req);res.json({user:found?{username:found.username,best:found.best}:null});}));
- app.get('/api/leaderboard',route(async(req,res)=>res.json({entries:await db.all('SELECT username,best FROM users WHERE best>0 ORDER BY best DESC,username ASC LIMIT 50')})));
+ app.get('/api/leaderboard',route(async(req,res)=>{
+  if(!gameModes.validMode(req.query.mode))return res.status(400).json({error:'Mode inconnu.'});
+  const mode=gameModes.get(req.query.mode).id;
+  const entries=mode==='classic'?await db.all('SELECT username,best FROM users WHERE best>0 ORDER BY best DESC,username ASC LIMIT 50'):await db.all('SELECT users.username,mode_scores.best FROM mode_scores JOIN users ON users.id=mode_scores.user_id WHERE mode=? AND mode_scores.best>0 ORDER BY mode_scores.best DESC,users.username ASC LIMIT 50',[mode]);
+  res.json({entries,mode});
+ }));
  function spawn(board){const empty=board.map((v,i)=>v?-1:i).filter(i=>i>=0);if(!empty.length)return -1;const index=empty[crypto.randomInt(empty.length)];board[index]=crypto.randomInt(10)<9?2:4;return index;}
- async function readGame(connection,id){const row=await connection.one('SELECT * FROM games WHERE user_id=?',[id]);return row?{board:JSON.parse(row.board),score:row.score,moves:row.moves,won:!!row.won,spawnSeed:'solo:'+id,spawnPlan:spawnStream.plan('solo:'+id,row.moves)}:null;}
- app.get('/api/game',auth,route(async(req,res)=>res.json({game:await readGame(db,req.user.id)})));
+ async function readGame(connection,id){
+  const row=await connection.one('SELECT * FROM games WHERE user_id=?',[id]);if(!row)return null;
+  const meta=await gameModes.readMeta(connection,id);
+  if(meta)gameModes.expire(meta,Date.now(),gameModes.GRACE);
+  return{board:JSON.parse(row.board),score:row.score,moves:row.moves,won:!!row.won,spawnSeed:'solo:'+id,spawnPlan:spawnStream.plan('solo:'+id,row.moves),...(meta?{meta}:{})};
+ }
+ app.get('/api/game',auth,route(async(req,res)=>res.json({game:await readGame(db,req.user.id),serverNow:Date.now()})));
  app.post('/api/game',auth,route(async(req,res)=>{
-  const game=await db.transaction(async tx=>{await tx.lockUser(req.user.id);const board=Array(16).fill(0);spawn(board);spawn(board);await tx.run('INSERT INTO games(user_id,board,score,moves,won) VALUES(?,?,0,0,0) ON CONFLICT(user_id) DO UPDATE SET board=excluded.board,score=0,moves=0,won=0',[req.user.id,JSON.stringify(board)]);return readGame(tx,req.user.id);});res.json({game});
+  if(!gameModes.validMode(req.body?.mode))return res.status(400).json({error:'Mode inconnu.'});
+  const mode=gameModes.get(req.body?.mode).id;
+  const game=await db.transaction(async tx=>{await tx.lockUser(req.user.id);const board=Array(16).fill(0);spawn(board);spawn(board);await tx.run('INSERT INTO games(user_id,board,score,moves,won) VALUES(?,?,0,0,0) ON CONFLICT(user_id) DO UPDATE SET board=excluded.board,score=0,moves=0,won=0',[req.user.id,JSON.stringify(board)]);await gameModes.saveMeta(tx,req.user.id,gameModes.create(mode,Date.now()));return readGame(tx,req.user.id);});res.json({game,best:await gameModes.best(db,req.user.id,mode),serverNow:Date.now()});
  }));
  app.post('/api/move',auth,route(async(req,res)=>{
+  const times=gameModes.actionTimes(req.body,req.body.directions?.length||1,Date.now());if(!times)return res.status(400).json({error:'Horodatage invalide.'});
   const directions=spawnStream.directions(req.body);if(!directions)return res.status(400).json({error:'Directions invalides.'});
   const payload=await db.transaction(async tx=>{
    await tx.lockUser(req.user.id);
    const game=await readGame(tx,req.user.id);if(!game)return null;
+   if(game.meta?.endedAt)return{game,terminal:true,best:await gameModes.best(tx,req.user.id,game.meta.mode)};
    if(spawnStream.stale(req.body,game))return{conflict:true,game};
    let result,spawned=-1;
-   for(const direction of directions){
+   for(const [index,direction]of directions.entries()){
+    const at=times[index];
+    if(game.meta){gameModes.expire(game.meta,at);if(game.meta.endedAt)break;}
     result=rules.move(game.board,direction);spawned=-1;
-    if(result.changed){spawned=spawnStream.addTile(result.board,'solo:'+req.user.id,game.moves+2);game.board=result.board;game.score+=result.gain;game.moves++;game.won=game.won||game.board.some(v=>v>=2048);}
+    if(result.changed){spawned=spawnStream.addTile(result.board,'solo:'+req.user.id,game.moves+2);game.board=result.board;game.score+=result.gain;game.moves++;game.won=game.won||game.board.some(v=>v>=2048);if(game.meta){gameModes.fusion(game.meta,result,at);if(game.meta.mode==='rush'&&game.board.some(v=>v>=128)){game.meta.endedAt=at;game.meta.reason='target';}}}
    }
    await tx.run('UPDATE games SET board=?,score=?,moves=?,won=? WHERE user_id=?',[JSON.stringify(game.board),game.score,game.moves,+game.won,req.user.id]);
-   await tx.run('UPDATE users SET best=CASE WHEN best < ? THEN ? ELSE best END WHERE id=?',[game.score,game.score,req.user.id]);
+   if(game.meta)gameModes.expire(game.meta,Date.now(),gameModes.GRACE);
+   const mode=game.meta?.mode||'classic';
+   if(game.meta)await gameModes.saveMeta(tx,req.user.id,game.meta);
+   await gameModes.record(tx,req.user.id,mode,game.score);
    game.spawnPlan=spawnStream.plan('solo:'+req.user.id,game.moves);
-   const current=await tx.one('SELECT best FROM users WHERE id=?',[req.user.id]);
-   return {game,result,spawned,best:current.best};
+   return {game,result,spawned,best:await gameModes.best(tx,req.user.id,mode),terminal:!!game.meta?.endedAt,serverNow:Date.now()};
   });
   if(!payload)return res.status(409).json({error:'Commence une partie classée.'});
   if(payload.conflict)return res.status(409).json({...payload,error:'Partie resynchronisée.'});

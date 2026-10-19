@@ -1,7 +1,7 @@
 FUSION — 2048
 
 2048 solo avec animations, particules et SFX Web Audio.
-Les fusions réalisées à moins de 1,5 seconde d’intervalle montent le combo
+En Classique, Sprint et Course, les fusions espacées de moins de 1,5 s montent le combo
 et la hauteur/intensité du son. Effet renforcé dès x5.
 Flèches, WASD/ZQSD et glissements tactiles. Son désactivable.
 Mode libre et record local sans inscription ; comptes par pseudo et
@@ -9,12 +9,32 @@ mot de passe pour le classement. Les scores classés et les tuiles
 sont calculés par le serveur. Cela empêche les scores arbitraires,
 mais pas les bots qui jouent des parties valides.
 
+MODES DE JEU
+Ouvrir Modes pour choisir la règle, puis Solo, Solo classé ou Duel.
+- Classique : atteindre 2048 à son rythme ; duel de 5 minutes au score.
+- Mort subite : après la première fusion, fusionner à nouveau dans les
+  2 secondes. Un déplacement sans fusion ne recharge pas le chrono.
+  En solo, perdre le combo termine immédiatement la partie. En duel,
+  la première fusion de l’un des joueurs active les 2 chronos pour
+  empêcher l’attente volontaire ; le premier combo perdu fait perdre
+  le duel. Si les deux tiennent 5 minutes, le meilleur score gagne.
+- Sprint 60 s : obtenir le plus grand score en une minute.
+- Course à 128 : créer une tuile 128 ; en duel, le premier gagne.
+Les classements solo sont séparés par mode. Les chronos continuent en
+arrière-plan ou pendant l’ouverture des menus. Le créateur choisit la
+règle d’un salon ; son adversaire la reçoit automatiquement.
+Mort subite seul utilise un combo de 2 s ; les autres restent à 1,5 s.
+Les coups portent leur heure de saisie pour valider les écarts entre
+fusions sans les confondre avec un envoi groupé. Le serveur autorise
+une courte marge de réception réseau avant de confirmer l’élimination,
+sans prolonger le délai de 2 s entre les actions.
+
 DUEL EN LIGNE (1V1)
 Deux comptes distincts sont nécessaires. Ouvrir Duel 1v1, créer un salon,
 puis partager son code ou Copier le lien avec un ami. L’adversaire saisit
 ce code dans Duel 1v1 et rejoint le salon. Décompte de 3 secondes puis
-5 minutes chronométrées par le serveur ; le plus grand score gagne,
-avec égalité possible. Les deux joueurs ont la même grille initiale
+la durée du mode choisie (5 minutes ou Sprint 60 s), contrôlée par le serveur ;
+égalité possible quand le mode se termine au score. Les deux joueurs ont la même grille initiale
 et la même séquence pseudo-aléatoire de génération. Les scores adverses
 sont actualisés chaque seconde. Les scores de duel sont séparés du
 classement solo. Une grille bloquée conserve son score jusqu’à la fin.
