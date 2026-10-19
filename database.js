@@ -1,5 +1,16 @@
 const path = require('node:path');
 const fs = require('node:fs');
+const tls = require('node:tls');
+
+function databaseTlsOptions(hostname) {
+  if (process.env.DATABASE_CA_CERT) return { rejectUnauthorized: true, ca: process.env.DATABASE_CA_CERT };
+  if (hostname.endsWith('.pooler.supabase.com') || hostname.endsWith('.supabase.co')) {
+    const supabaseCa = fs.readFileSync(path.join(__dirname, 'certs/supabase-root-2021.crt'), 'utf8');
+    return { rejectUnauthorized: true, ca: [...tls.rootCertificates, supabaseCa] };
+  }
+  return { rejectUnauthorized: true };
+}
+
 
 // PostgreSQL is used on Render; SQLite keeps local development self-contained.
 async function openDatabase() {
@@ -17,7 +28,7 @@ async function openDatabase() {
     for (const key of ['sslmode', 'sslcert', 'sslkey', 'sslrootcert']) url.searchParams.delete(key);
     const { Pool } = require('pg');
     pool = new Pool({ connectionString: url.toString(), max: 5, connectionTimeoutMillis: 10000,
-      ssl: { rejectUnauthorized: true, ...(process.env.DATABASE_CA_CERT ? { ca: process.env.DATABASE_CA_CERT } : {}) } });
+      ssl: databaseTlsOptions(url.hostname) });
     pool.on('error', err => console.error('Database connection error:', err.code || 'unknown'));
   } else {
     const { DatabaseSync } = require('node:sqlite');
@@ -77,4 +88,4 @@ async function openDatabase() {
   } catch (error) { await db.close(); throw error; }
   return db;
 }
-module.exports = { openDatabase };
+module.exports = { openDatabase, databaseTlsOptions };

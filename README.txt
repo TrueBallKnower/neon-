@@ -33,10 +33,10 @@ PUBLICATION GRATUITE : RENDER + SUPABASE
    fusion. Aucun SQL à copier dans Supabase. Données persistantes dans
    PostgreSQL, même si Render redémarre. NODE_ENV=production exige
    DATABASE_URL pour éviter toute perte de données SQLite sur Render.
-6. TLS vérifie le certificat du serveur. Si Supabase utilise une autorité
-   non reconnue par Node, récupérer son certificat CA depuis les paramètres
-   officiels Supabase et ajouter le PEM en variable Render DATABASE_CA_CERT.
-   Ne jamais désactiver la vérification TLS.
+6. TLS vérifie le certificat du serveur. Le certificat public Supabase Root
+   2021 est inclus dans certs/ et utilisé pour les hôtes Supabase seulement.
+   DATABASE_CA_CERT permet de remplacer cette liste par un autre CA PEM
+   officiel si nécessaire. Ne jamais désactiver la vérification TLS.
 7. Déployer et attendre l’état Live, puis ouvrir l’adresse onrender.com.
    Vérifier inscription, connexion, partie classée et classement.
 
