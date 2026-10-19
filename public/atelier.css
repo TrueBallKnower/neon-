@@ -25,3 +25,14 @@ body[data-skin-world] #board{background:var(--world-background);border-color:var
 .tile[data-atelier="true"]:not([data-ascension="0"]) .tile-inner::before,.skin-swatch[data-atelier="true"]:not([data-ascension="0"]) .skin-face::before{display:block;content:var(--ascension-label);right:6%;top:auto;bottom:4%;font:700 8px/1 monospace;color:var(--tile-accent);background:var(--signature-ground);border-radius:3px;padding:2px 3px;opacity:1}#online-dialog .edition-favorite{min-width:44px;min-height:44px}
 
 #online-dialog #atelier-original{background:transparent;color:#bcbaa8;border-color:#5d5b4c;font-size:11px;min-height:42px;margin:8px 0 0}
+
+/* Rich royal art is pre-rendered; only this finite, post-match banner moves. */
+#royal-victory {position:fixed;z-index:1000;pointer-events:none;left:50%;top:22%;transform:translateX(-50%);width:min(86vw,440px);padding:28px 18px;text-align:center;color:#fff0c1;border:1px solid #d7b577;border-radius:8px;background:linear-gradient(135deg,#451a56,#21112f 52%,#642536);box-shadow:0 8px 36px #10071988,inset 0 0 0 4px #e2c07128;font:700 clamp(16px,4vw,26px) Georgia,serif;letter-spacing:.12em;animation:royal-arrival .7s ease-out both;}
+#royal-victory[hidden]{display:none}
+@keyframes royal-arrival {from{opacity:0;transform:translate(-50%,12px) scale(.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+#combo[data-effect="royal"] {border-color:#e2c071;background:linear-gradient(100deg,#331345,#501f3c);color:#fff0ce}
+#combo[data-effect="royal"] #combo-bar {background:linear-gradient(90deg,#8957bb,#d9aa58,#fff0bd)}
+#combo[data-effect="royal"] #combo-aura i {background:#f0cc83;border-radius:0;clip-path:polygon(50% 0,62% 35%,100% 50%,62% 65%,50% 100%,38% 65%,0 50%,38% 35%)}
+@media(prefers-reduced-motion:reduce){#royal-victory{animation:none}}
+
+.particle[data-effect="sovereign"]{border-radius:0;background:#f0cc83;clip-path:polygon(50% 0,65% 35%,100% 50%,65% 65%,50% 100%,35% 65%,0 50%,35% 35%)}

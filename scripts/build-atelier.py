@@ -59,7 +59,7 @@ entries=[
 ('chronos-golden','Golden Mechanism','chronos','gears',['#413929','#7e6c45','#b6a06b','#d3be8a','#e9ddbc'],'epic','Une mécanique si précise qu’elle peut retenir l’aube.'),
 ('chronos-silver','Silver Paradox','chronos','escapement',['#263945','#5b7788','#91a5b6','#bac8d2','#e0e7e1'],'legendary','L’instant d’après est parfois celui d’avant.'),
 ('chronos-eternal','Eternal Chronos','chronos','orrery',['#29303b','#806c61','#b99a7c','#d4c2a1','#ede1c3'],'mythic','Chaque seconde est précieuse. Certaines sont éternelles.'),
-('gold','Golden Dawn','solaris','dawn',['#704c2d','#b17d45','#d3ab65','#e6ca88','#f7e8bd'],'common','L’aube laisse de l’or sur les mains des gardiens.'),
+('gold','IMPERIAL GOLD','solaris','imperialgold',['#704c2d','#b17d45','#d3ab65','#e6ca88','#f7e8bd'],'common','L’or des douze royaumes, frappé à la main. Chaque fusion révèle un nouveau sceau impérial.'),
 ('solaris-temple','Temple of Light','solaris','temple',['#364b5a','#718e9b','#b5b7a5','#dcc8a0','#f3e5c7'],'rare','Ses colonnes ne soutiennent rien, sinon le jour.'),
 ('solaris-amber','Amber Crown','solaris','amber',['#5c382f','#a45e3e','#cc8d58','#e2b17a','#f3d6a0'],'epic','La couronne protège une flamme vieille de mille étés.'),
 ('solaris-eclipse','Eclipse Royale','solaris','solareclipse',['#241e32','#59415d','#91706f','#c49b7c','#e9cba1'],'legendary','Même le soleil s’incline devant certaines ombres.'),
@@ -102,17 +102,22 @@ for k,(id,name,collection,composition,anchors,rarity,lore) in enumerate(entries)
  audio=dict(wave=['sine','triangle','triangle','sine','square'][k%5],root=round(.70+(k%13)*.087,3),ratios=[[1,1.498,2.996],[1,1.2599,2.52],[1,1.335,2.67],[1,2.4,3.2],[1,1.189,1.782]][k%5],tail=round(.10+(k%7)*.033,3),slide=round(.8+(k%6)*.13,3),rhythm=round(.018+(k%5)*.011,3),volume=.8 if rarity in ['common','rare'] else .95)
  skin=dict(id=id,name=name,collection=collection,rarity=rarity,hint=lore,story=lore,composition=composition,art='atelier-'+id,atelier=True,signature=True,sprite=True,style='pixel' if c['surface']=='pixel' else 'rounded' if c['surface'] in ['satin','liquid'] else 'tech' if collection in ['glitch','afterlight'] else 'engraved',material=c['surface'],fx=c['fx'],sound=c['fx'],hues=[t['hue'] for t in tiles],marks=['·','✧','✦'],tiles=tiles,ink=tiles[0]['ink'],ground=tiles[0]['dark'],board=dict(background=c['palette'][0],empty=blend(c['palette'][0],c['palette'][2],.13),edge=blend(c['palette'][0],c['palette'][3],.35),accent=c['palette'][3]),animation=dict(profile=c['merge'],intensity=round(.8+(k%5)*.09,2),angle=(k%5-2)*1.6,duration=200+(k%5)*22),audio=audio,unlock=dict(type='chest',requirement=rarity))
  # Preserve the legendary gold promise as an actual obtainable skin.
- if id=='gold':skin['rarity']='legendary';skin['unlock']['requirement']='legendary'
+ if id=='gold':
+  skin['rarity']='legendary';skin['unlock']['requirement']='legendary';skin['material']='metal'
+  skin['board']={'background':'#20170c','empty':'#342614','edge':'#856129','accent':'#f0cb71'}
+  for level,t in enumerate(skin['tiles']):t.update(base=blend('#94631e','#f3cd6a',level/10),dark='#3a250e',center='#3a250e',light=blend('#ebbf59','#fff0bc',level/10),ink='#fff3ce',accent='#e8b74f',surface='metal')
  skins.append(skin)
 for c in collections.values():c['samples']=[s['id'] for s in skins if s['collection']==c['id']][:3]
 # Future event collections are deliberately separate from the twelve core worlds.
 events=[dict(id='atelier-equinox',name='Équinoxe · atelier imaginaire',type='collaboration',partner='Studio Lisière (concept fictif)',credits='Concept original Fusion, sans affiliation externe.',status='concept',startsAt=None,endsAt=None,skins=[],unlock=dict(type='event',requirement='Un événement doit être annoncé et activé avant toute récompense.'),palette=['#26354a','#d5a982'],effects='cosmic',sound='cosmic')]
 import copy
 champion=copy.deepcopy(next(s for s in skins if s['id']=='solaris-eclipse'))
-champion.update(id='king',name='SOVEREIGN',collection='champion',rarity='sovereign',hint='Le sommet ne se partage pas.',story='Une couronne d’obsidienne ne reconnaît que le premier nom gravé au sommet. Elle change de main lorsque le classement change.',composition='sovereign',art='atelier-king',fx='lightning',sound='crystal',unlock={'type':'leaderboard','requirement':'N°1 du classement classique permanent'},animation={'profile':'sovereign','intensity':1.1,'angle':0,'duration':300})
-champion['board']={'background':'#10131d','empty':'#1b1e28','edge':'#655d46','accent':'#e8d2a3'}
-for level,t in enumerate(champion['tiles']):t.update(base=blend('#1b2232','#646050',level/18),dark='#111620',center='#111620',light=blend('#b8aa86','#f2e3bd',level/10),ink='#f4e6c4',accent='#d8c29b')
-champion['audio']={'wave':'sine','root':1.18,'ratios':[1,1.498,2.996],'tail':.3,'rhythm':.065,'volume':.8}
+champion.update(id='king',name='SOVEREIGN',collection='champion',rarity='sovereign',hint='Le sommet ne se partage pas.',story='Velours pourpre, rubis de la couronne, saphirs de minuit et or ciselé. Onze insignes racontent le couronnement d’un souverain. Le trône change de main lorsque le classement change.',composition='sovereign',art='atelier-king',fx='royal',sound='royal',unlock={'type':'leaderboard','requirement':'N°1 du classement classique permanent'},animation={'profile':'sovereign','intensity':1.1,'angle':0,'duration':300})
+champion['material']='satin'
+champion['board']={'background':'#170d25','empty':'#2b173a','edge':'#947043','accent':'#f0cd84'}
+royal=['#45205f','#5e225b','#74273e','#263663','#4b2471','#842841','#283e77','#602b84','#8a304b','#493083','#71386b']
+for level,t in enumerate(champion['tiles']):t.update(base=royal[level],dark=blend(royal[level],'#0b091a',.65),center='#21112f',light=blend('#cfa45a','#fff0c0',level/10),ink='#fff0ce',accent=['#dca4ff','#ed798b','#88b5ff'][level%3],surface='satin')
+champion['audio']={'wave':'triangle','root':1.5857,'ratios':[1,1.25,1.5],'tail':.26,'rhythm':.045,'volume':.8}
 data=dict(version=1,collections=collections,skins=skins,champion=champion,events=events)
 (ROOT/'public/atelier-catalog.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
 (ROOT/'public/atelier-catalog.js').write_text('(function(root){const data='+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';if(typeof module!=="undefined")module.exports=data;else root.FusionAtelier=data;})(typeof window!=="undefined"?window:globalThis);\n')

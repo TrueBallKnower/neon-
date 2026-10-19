@@ -15,7 +15,7 @@ function advanceCombo(){const now=performance.now();comboCount=now<comboUntil?co
 let soundOn=storage.get('fusion-sound',true),sfxVolume=Math.min(1,Math.max(0,Number(storage.get('fusion-sfx-volume',.8))||0)),audio;
 const lightEffects=matchMedia('(pointer:coarse)').matches||(navigator.hardwareConcurrency||8)<=4;
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let reduced=motionPreference.matches;motionPreference.addEventListener?.('change',event=>{reduced=event.matches;if(reduced){document.getAnimations().forEach(a=>a.cancel());window.FusionSkins?.clearCombo();}});
-function unlockAudio(){try{if(!audio||audio.state==='closed')audio=new(window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});if(audio.state!=='running')audio.resume().catch(()=>{});}catch{}}
+function unlockAudio(){try{if(!audio||audio.state==='closed')audio=new(window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});if(window.FusionSkins?.selected==='king')window.FusionRoyal?.prepareVoice(audio);if(audio.state!=='running')return audio.resume().catch(()=>{});}catch{}}
 let voices=0;
 function tone(freq,time,duration,type='sine',volume=.08,slide){if(!audio||!soundOn||sfxVolume<=0||voices>=32)return;volume=Math.max(.0011,volume*sfxVolume);voices++;const osc=audio.createOscillator(),amp=audio.createGain();osc.type=type;osc.frequency.setValueAtTime(freq,time);if(slide)osc.frequency.exponentialRampToValueAtTime(slide,time+duration);amp.gain.setValueAtTime(.001,time);amp.gain.exponentialRampToValueAtTime(volume,time+.012);amp.gain.exponentialRampToValueAtTime(.001,time+duration);osc.connect(amp);amp.connect(audio.destination);osc.start(time);osc.stop(time+duration+.02);osc.onended=()=>{voices=Math.max(0,voices-1);osc.disconnect();amp.disconnect();};}
 function sfx(kind,value=2,chain=1){if(!soundOn||!audio)return;const t=audio.currentTime;
@@ -29,14 +29,14 @@ function sfx(kind,value=2,chain=1){if(!soundOn||!audio)return;const t=audio.curr
 const soundPalettes={
  fire:{wave:'sawtooth',ratios:[1,1.5,2],root:.8,tail:.18,slide:.55},water:{wave:'sine',ratios:[1,1.335,2.67],root:1.25,tail:.28,slide:1.45},ice:{wave:'triangle',ratios:[1,2.76,4.1],root:1.8,tail:.3},leaves:{wave:'triangle',ratios:[1,1.5,2.25],root:1.05,tail:.16},electric:{wave:'square',ratios:[1,1.26,2],root:1.3,tail:.1,slide:1.4},lightning:{wave:'sawtooth',ratios:[1,1.414,2.8],root:1.1,tail:.12,slide:1.9},crystal:{wave:'sine',ratios:[1,2.4,3.2],root:1.6,tail:.32},cosmic:{wave:'sine',ratios:[1,1.5,1.88],root:.95,tail:.4},shadow:{wave:'sine',ratios:[1,1.19,1.5],root:.65,tail:.25,slide:.75},ribbons:{wave:'triangle',ratios:[1,1.25,1.5],root:1.15,tail:.17},sand:{wave:'triangle',ratios:[1,1.33,1.66],root:.9,tail:.12,slide:.8},gears:{wave:'square',ratios:[1,2,3],root:1.1,tail:.09},portal:{wave:'sine',ratios:[1,1.414,2.12],root:1,tail:.3,slide:2},alchemy:{wave:'triangle',ratios:[1,1.2,1.6],root:1.4,tail:.22,slide:1.2}
 };
-function themedMerge(profile,chain=1){if(!audio||!soundOn)return;const p=profile.audio||soundPalettes[profile.sound]||soundPalettes.crystal,t=audio.currentTime,boost=Math.min(12,chain-1),f=165*p.root*2**((profile.level%7+boost*1.5)/12),volume=(.034+Math.min(profile.rank,5)*.003)*(p.volume||1);
+function themedMerge(profile,chain=1){if(!audio||!soundOn||sfxVolume<=0)return;const p=profile.audio||soundPalettes[profile.sound]||soundPalettes.crystal,t=audio.currentTime,boost=Math.min(12,chain-1),f=165*p.root*2**((profile.level%7+boost*1.5)/12),volume=(.034+Math.min(profile.rank,5)*.003)*(p.volume||1);
  p.ratios.forEach((ratio,i)=>tone(f*ratio,t+i*(p.rhythm||.035),p.tail,p.wave,volume/(1+i*.45),p.slide?f*ratio*p.slide:undefined));
  tone(profile.sound==='fire'?70:95,t,.12,'sine',.045,45);
  if(chain>1)for(let n=0;n<Math.min(3,1+Math.floor(chain/3));n++)tone(f*2**((n*2+boost)/12),t+.08+n*.045,.12,'triangle',.024);
  if(profile.rank>=4&&profile.level>=6)tone(f*3,t+.13,.32,'sine',.018);
 }
 function soundLabel(){$('sound').innerHTML=`${soundOn?'♫':'♪'} <span>SON ${soundOn?'ACTIVÉ':'COUPÉ'}</span>`;$('sound').setAttribute('aria-pressed',String(soundOn));}
-$('sound').onclick=()=>{unlockAudio();soundOn=!soundOn;storage.set('fusion-sound',soundOn);soundLabel();if(soundOn)sfx('start');};soundLabel();
+$('sound').onclick=()=>{unlockAudio();soundOn=!soundOn;storage.set('fusion-sound',soundOn);soundLabel();if(soundOn)sfx('start');else window.FusionRoyal?.stop();};soundLabel();
 for(let i=0;i<16;i++){const c=document.createElement('div');c.className='cell';$('cells').append(c);}
 function spawn(){const empty=board.map((v,i)=>v?null:i).filter(i=>i!==null);if(!empty.length)return -1;const i=empty[Math.floor(Math.random()*empty.length)];board[i]=Math.random()<.9?2:4;return i;}
 function cancelVisuals(el,known){for(const animation of known||el.getAnimations?.()||[])animation.cancel();}
@@ -84,7 +84,7 @@ function draw(merges=[],spawned=-1,result=null){
   }
   const from=positions.get(source),to={x:i%4*step,y:Math.floor(i/4)*step};
   if(keepGliding)continue;
-  if(from&&(Math.abs(from.x-to.x)>.2||Math.abs(from.y-to.y)>.2)){const animation=animateVisual(el,[{transform:`translate3d(${from.x}px,${from.y}px,0)`},{transform:`translate3d(${to.x}px,${to.y}px,0)`}],{duration:180,easing:'cubic-bezier(.2,.7,.3,1)'});if(animation)motion.set(el,{animation,from,to});}else motion.delete(el);
+  if(from&&(Math.abs(from.x-to.x)>.2||Math.abs(from.y-to.y)>.2)){const animation=animateVisual(el,[{transform:`translate3d(${from.x}px,${from.y}px,0)`},{transform:`translate3d(${to.x}px,${to.y}px,0)`}],{duration:180,easing:'cubic-bezier(.2,.7,.3,1)'});if(animation){motion.set(el,{animation,from,to});animation.onfinish=()=>{if(motion.get(el)?.animation===animation)motion.delete(el);};}}else motion.delete(el);
  }
  for(const [index,el]of old){
   if(used.has(el))continue;
@@ -123,7 +123,7 @@ function play(direction){
  unlockAudio();const result=rules.move(board,direction);
  if(!result.changed){if(!rules.canMove(board))showEnd(false);return;}
  updateRule(result,gameNow());board=result.board;score+=result.gain;best=Math.max(score,best);moves++;const added=spawn();
- draw(result.merges,added,result);sfx('move');fusionFeedback(result);
+ draw(result.merges,added,result);if(!result.gain)sfx('move');fusionFeedback(result);
  if(modeRules.get(ruleState.mode).race&&board.some(v=>v>=modeRules.get(ruleState.mode).target)){ruleState.endedAt=gameNow();ruleState.reason='target';showModeEnd();}
  else if(ruleState.mode==='classic'&&!won&&board.some(v=>v>=2048)){won=true;showEnd(true);}else if(!rules.canMove(board))showEnd(false);
  save();$('announcement').textContent=`Score ${score}. ${result.merges.length} fusion(s).`;
@@ -187,12 +187,12 @@ window.FusionUI={
   const {game,result,spawned}=payload;
   board=game.board;score=game.score;moves=game.moves;if(game.meta)ruleState={...game.meta};
   if(!duel)best=Math.max(best,payload.best||0);
-  draw(result.merges,spawned,result);sfx('move');fusionFeedback(result);
+  draw(result.merges,spawned,result);if(!result.gain)sfx('move');fusionFeedback(result);
   if(ruleState.endedAt)showModeEnd();
   else if(!duel){if(ruleState.mode==='classic'&&game.won&&!won){won=true;continuing=false;showEnd(true);}else if(!rules.canMove(board))showEnd(false);}
   else if(!rules.canMove(board))$('status').textContent='Grille bloquée. Ton score reste en jeu !';
   tickRules();
- },previewCosmetic(id,value=128,chain=5){unlockAudio();const p=window.FusionSkinRules.feedback(id,value,chain);p.enabled=true;themedMerge(p,chain);},get sfxVolume(){return sfxVolume;},setSfxVolume(value){sfxVolume=Math.min(1,Math.max(0,Number(value)||0));storage.set('fusion-sfx-volume',sfxVolume);},chestSound(stage,rarity){if(!soundOn)return;unlockAudio();if(!audio)return;const t=audio.currentTime,rank={common:1,rare:2,epic:3,legendary:4,mythic:5}[rarity]||1;
+ },previewCosmetic(id,value=128,chain=5){unlockAudio();const p=window.FusionSkinRules.feedback(id,value,chain);p.enabled=true;themedMerge(p,chain);},get soundEnabled(){return soundOn;},royalVoice(){if(!soundOn||sfxVolume<=0)return;Promise.resolve(unlockAudio()).then(()=>{if(audio&&soundOn&&sfxVolume>0)window.FusionRoyal?.announce(audio,sfxVolume);});},royalMusic(){if(!soundOn||sfxVolume<=0)return;Promise.resolve(unlockAudio()).then(()=>{if(audio&&soundOn&&sfxVolume>0)window.FusionRoyal?.soundtrack(audio,sfxVolume);});},get sfxVolume(){return sfxVolume;},setSfxVolume(value){sfxVolume=Math.min(1,Math.max(0,Number(value)||0));storage.set('fusion-sfx-volume',sfxVolume);window.FusionRoyal?.stop();},chestSound(stage,rarity){if(!soundOn)return;unlockAudio();if(!audio)return;const t=audio.currentTime,rank={common:1,rare:2,epic:3,legendary:4,mythic:5}[rarity]||1;
  if(stage==='charge'){[98,146.83,196].forEach((f,i)=>tone(f,t+i*.18,.23,'triangle',.035));tone(48,t,.5,'sine',.045,85);}
  else if(stage==='resonate'){[196,246.94,293.66].slice(0,rank).forEach((f,i)=>tone(f*1.1**rank,t+i*.12,.28,'sine',.04));}
  else if(stage==='unlock'){tone(110,t,.12,'triangle',.06,220);tone(440,t+.05,.15,'triangle',.035,880);tone(55,t,.22,'sine',.05,32);}

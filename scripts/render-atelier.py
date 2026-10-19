@@ -30,11 +30,52 @@ def compose(skin,l):
  s='';ink='#f4e6c8';# A stable, different layout per skin; growing motifs and light per value.
  if name in ['planet','pulsar','comet','eclipse','supernova']:
   for k in range(16+n):s+=C((k*37+11)%97,(k*53+7)%97,.4+(k%3)*.25,h,o=.55)
- if name=='sovereign':
-  s+=P('M6 6h88v88H6z','none',h,1.2)+P('M10 10h80v80H10z','none',a,.35)
-  s+=P('M30 11 39 22 50 6l11 16 9-11-6 23H36z',b,h,1)+C(50,16,2,ink)
-  for y in [39,50,61,72]:s+=P(f'M12 {y}l4 4-4 4-4-4zM88 {y}l4 4-4 4-4-4z','none',a,.6)
-  s+=P('M36 87h28M42 82h16','none',h,.8)+ring(50,20,20,12+n,a)
+ if name=='imperialgold':
+  # Bullion, minted sun seals and laurel; deliberately distinct from the royal regalia.
+  s+=P('M2 2h96v96H2z','none',h,2)+P('M7 7h86v86H7z','none',h,.65)
+  for x,y,w in [(0,0,44),(68,0,32),(0,83,38),(62,83,38)]:
+   s+=poly([(x,y),(x+w,y),(x+w-7,y+16),(x+4,y+16)],b,h,.7)
+   s+=P(f'M{x+4} {y+3}h{w-8}','none','#fff0ba',1,.7)
+   s+=P(f'M{x+8} {y+12}h{w-18}','none','#69400f',1,.7)
+  for flip in [False,True]:
+   s+='<g'+(' transform="translate(100 0) scale(-1 1)"' if flip else '')+'>'
+   s+=P('M17 76Q4 52 17 28','none',h,.9)
+   for k in range(4+n//3):
+    y=31+k*6;s+=P(f'M12 {y+5}q-8-5-5-9q8 2 5 9M12 {y+5}q8-4 8-8q-7 0-8 8',h,o=.65)
+   s+='</g>'
+  s+=C(50,16,9+l*.18,b,h,1)+C(50,16,6+l*.18,'none',h,.45)+star(50,16,5+l*.12,h,8)+C(50,16,2,'#fff2c3')
+  s+=C(50,86,7,b,h,.7)+P('M46 86h8M50 82v8','none',h,.6)
+  for k in range(n//2):s+=star(31+k*8,93,1.4,'#fff0be')
+ elif name=='sovereign':
+  gold=h;shadow='#68401d';cream='#fff1c1';gem=a
+  # Layered engraved frame, velvet drapery, faceted jewels and a progressing crown.
+  s+=P('M3 3h94v94H3z','none',shadow,3)+P('M4 4h92v92H4z','none',gold,1.1)+P('M8 8h84v84H8z','none',gold,.4)
+  s+=P('M8 8Q22 22 30 8L24 34Q18 25 8 28z',b,gold,.5)+P('M92 8Q78 22 70 8l6 26q6-9 16-6z',b,gold,.5)
+  for x in [12,16,84,88]:s+=P(f'M{x} 10q{-3 if x<50 else 3} 8 0 17','none',a,.55,.6)
+  # Symmetrical acanthus scrollwork, no expensive SVG filters.
+  for flip in [False,True]:
+   s+='<g'+(' transform="translate(100 0) scale(-1 1)"' if flip else '')+'>'
+   s+=P('M12 82C23 73 4 67 15 59C25 51 5 44 15 35M12 82q17 0 19 9M15 35Q24 27 18 23','none',gold,.9)
+   for y in [39,58,76]:
+    s+=P(f'M14 {y}q9-8 10-2q-7 8-10 2M13 {y+4}q-7-7-7 0q3 6 7 0','none',gold,.5)
+   s+=poly([(11,17),(15,12),(19,17),(15,23)],gem,gold,.65)+poly([(11,17),(15,12),(15,23)],cream,o=.4)
+   for y in range(30,89,6):s+=C(5.8,y,.6,cream)
+   for k in range(n//3):s+=star(23+k*6,88,1.6,gold)
+   s+='</g>'
+  crownY=12 if l<5 else 9
+  s+=P(f'M30 {crownY+4}l9 7 11-12 11 12 9-7-6 18H36z',gold,cream,.65)
+  s+=P(f'M34 {crownY+7}l5 9 11-11 11 11 5-9-4 12H38z',shadow,gold,.45)
+  s+=R(36,crownY+20,28,3,gold,1)+P(f'M38 {crownY+21}h24','none',cream,.5)
+  for x in [40,50,60]:s+=C(x,crownY+21,1.1,gem)+C(x-.3,crownY+20.7,.35,cream)
+  s+=poly([(47,crownY+11),(50,crownY+7),(53,crownY+11),(50,crownY+16)],gem,cream,.4)
+  for x,y in [(30,crownY+4),(50,crownY-1),(70,crownY+4)]:s+=C(x,y,1.5,gold)+C(x-.4,y-.5,.55,cream)
+  # Higher values acquire an orb, a halo, additional sceptres and precious stones.
+  s+=C(50,84,5+n*.12,shadow,gold,.8)+P('M46 84h8M50 79v10','none',gold,.6)
+  if l>=3:s+=P('M34 79l32 10M66 79 34 89','none',gold,.65)+C(34,79,1.2,gem)+C(66,79,1.2,gem)
+  if l>=5:s+=E(50,20,25,18,'none',gold,.5,.7)+ring(50,20,27,16+n,gold)
+  if l>=8:
+   for x,y in [(25,30),(75,30),(28,74),(72,74)]:s+=star(x,y,2,cream)+C(x,y,.8,gem)
+  s+=P('M34 94h32M40 91h20','none',cream,.6)
  elif name=='planet':
   s+=C(75,87,48,b,h,.8)+E(70,88,64,22,'none',a,1.2,.6)+P('M20 81q45-13 80 7M29 92q38-9 71 3','none',h,2,.35)
   s+=P(f'M0 {20+n}Q50 {35+n} 100 {8+n}','none',a,2,.35)+star(21,19,2+l*.2,ink)

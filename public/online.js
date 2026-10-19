@@ -47,6 +47,7 @@
  }
  function updateDuel(duel,{load=false}={}){
   const entering=online.duel!==duel.code;
+  window.FusionRoyal?.observe(duel);
   if(current&&current.code!==duel.code)load=true;
   if(duel.nextCode){followRematch(duel.nextCode);return;}
   if(duel.status==='finished')optimistic=null;window.FusionUI.remoteRule(gameOf(duel).meta);current=duel;online.duel=duel.code;online.ranked=false;serverOffset=duel.serverNow-Date.now();remember(duel.code);

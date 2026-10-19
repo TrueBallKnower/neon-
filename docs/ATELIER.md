@@ -125,3 +125,50 @@ Les vérifications de fluidité comprennent CPU ralenti 4×, 800 ms de latence r
 reprise des mouvements hors ligne et direction inversée pendant un glissement.
 Elles ne constituent pas une garantie de 60 FPS sur tout matériel. Safari/iPhone
 physique et la base de production ne sont pas accessibles à ces vérifications.
+
+## Couronnement : SOVEREIGN et IMPERIAL GOLD
+
+`gold` conserve son identifiant et sa rareté Légendaire dans les coffres ; son
+nouveau nom est **IMPERIAL GOLD**. Son illustration représente lingots biseautés,
+sceaux solaires et lauriers gravés. Les anciens propriétaires le conservent.
+SOVEREIGN reste réservé au premier classique, avec l’exception créateur existante
+pour TrueBallKnower. Ses onze étapes mêlent velours pourpre, rubis, saphir, or,
+perles et filigranes. Les compositions sont différentes de celles du skin or.
+Les feuilles SVG sont statiques, partagées entre les tuiles et sans filtre animé.
+
+SOVEREIGN possède une signature de fusion en accord majeur, des étoiles dorées
+sur les combos et un motif original de couronnement de 4,8 secondes. Le bouton
+« Écouter le couronnement » le prévisualise ; il accompagne aussi la victoire.
+`royal.js` compose ce motif une seule fois avec OfflineAudioContext, puis réutilise
+un AudioBuffer. Aucun séquenceur ou synthétiseur permanent ne tourne en partie.
+
+Une transition serveur vers `finished`, avec le joueur local gagnant et SOVEREIGN
+équipé, déclenche une bannière et **« The king has won »**, une seule fois par
+manche. Ni un chronomètre local, ni un match nul, ni une défaite, ni l’ouverture
+d’un ancien résultat ne déclenche l’annonce. Les revanches ont leur propre clé.
+Le clip synthétique de 20 Ko est fourni dans `public/audio/king-victory.mp3`, avec
+crédits et licence dans `NOTICE.txt`. Il se précharge et se décode une fois lors
+de la première interaction audio avec SOVEREIGN. Aucun service vocal externe ni
+voix système n’est nécessaire ; SpeechSynthesis sert uniquement de secours en cas
+d’échec du fichier. L’auteur peut régénérer le clip avec `scripts/build-royal-voice.sh`
+et un FFmpeg disposant de Flite. FFmpeg ne fait pas partie des dépendances du jeu.
+Le volume, la sourdine et le passage en arrière-plan arrêtent la célébration sonore.
+Le mouvement réduit désactive l’apparition animée de la bannière.
+
+Optimisations : thèmes du document écrits seulement au changement de skin ;
+textes de portefeuille écrits seulement au changement de valeur ; images,
+keyframes et descriptions de particules réutilisées ; références aux glissements
+terminés libérées. Une fusion joue sa signature sans superposer les deux notes du
+bruit de déplacement. Le glissement reste à 180 ms et ne bloque jamais l’entrée.
+
+Validation de cette mise à jour : 31 tests Node ; aperçu des 22 nouvelles tuiles ;
+partie 1v1 réelle sur serveur local avec annonce unique après abandon de l’adversaire ;
+clip décodé dans Chromium sans voix système ; motif rendu hors ligne sans écrêtage ;
+100 notifications de portefeuille sans réécriture du thème du document ;
+60 signatures de fusion audibles, distinctes et plafonnées à huit voix par fusion.
+Avec SOVEREIGN, quatre coups classés locaux en 240 ms sous ralentissement CPU ×4,
+malgré 800 ms de latence réseau simulée ; état final identique au serveur.
+Contrôles tactiles avant relâchement, reprise après 64 coups hors ligne et continuité
+d’un glissement interrompu (saut mesuré : 0 px) vérifiés. Huit formats mobiles et
+paysage vérifiés sans débordement. Ces mesures Chromium ne constituent pas une
+mesure sur un iPhone/Safari physique ; aucun appareil de ce type n’était accessible.
