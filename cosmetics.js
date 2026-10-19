@@ -1,5 +1,5 @@
 const crypto=require('node:crypto');
-const {catalog,allSkins,chests,pickRarity}=require('./public/skin-rules');
+const {catalog,allSkins,chests,pickRarity,available:skinAvailable}=require('./public/skin-rules');
 // Match only the authenticated account's unique, normalized database identity.
 const FULL_COLLECTION_ACCOUNT='trueballknower';
 async function wallet(tx,id){
@@ -7,22 +7,26 @@ async function wallet(tx,id){
  const row=await tx.one('SELECT c.coins,c.state,u.username_key FROM cosmetics c JOIN users u ON u.id=c.user_id WHERE c.user_id=?',[id]),state=JSON.parse(row.state),allSkinsAccess=row.username_key===FULL_COLLECTION_ACCOUNT;
  return{coins:Number(row.coins),...state,storedOwned:state.owned,owned:allSkinsAccess?allSkins.map(s=>s.id):state.owned,allSkinsAccess};
 }
-async function save(tx,id,w){await tx.run('UPDATE cosmetics SET coins=?,state=? WHERE user_id=?',[w.coins,JSON.stringify({owned:w.allSkinsAccess?w.storedOwned:w.owned,selected:w.selected,storyRewards:w.storyRewards||[]}),id]);}
+async function save(tx,id,w){await tx.run('UPDATE cosmetics SET coins=?,state=? WHERE user_id=?',[w.coins,JSON.stringify({owned:w.allSkinsAccess?w.storedOwned:w.owned,selected:w.selected,storyRewards:w.storyRewards||[],favorites:w.favorites||[],previousSkin:w.previousSkin||'original'}),id]);}
 async function leader(tx){return tx.one('SELECT id,username,best FROM users WHERE best>0 ORDER BY best DESC,username ASC LIMIT 1');}
-async function inventory(tx,id){const w=await wallet(tx,id),first=await leader(tx),isKing=first?.id===id;let changed=false;if(w.selected==='king'&&!isKing&&!w.allSkinsAccess){w.selected='original';changed=true;}if(changed)await save(tx,id,w);const{storedOwned,...visible}=w;return{...visible,owned:[...new Set(isKing?[...w.owned,'king']:w.owned)],isKing,leader:first?{username:first.username,best:first.best}:null};}
+async function inventory(tx,id){const w=await wallet(tx,id),first=await leader(tx),isKing=first?.id===id;let changed=false;if(w.selected==='king'&&!isKing&&!w.allSkinsAccess){w.selected=w.owned.includes(w.previousSkin)&&w.previousSkin!=='king'?w.previousSkin:'original';changed=true;}if(changed)await save(tx,id,w);const{storedOwned,...visible}=w;return{...visible,owned:[...new Set(isKing?[...w.owned,'king']:w.owned)],isKing,leader:first?{username:first.username,best:first.best}:null};}
 async function reward(tx,id,before,after){
  const earned=Math.max(0,after.moves-before.moves)+Math.max(0,Math.floor(after.score/128)-Math.floor(before.score/128));
  if(!earned)return null;
  await tx.lockUser(id);const w=await wallet(tx,id);w.coins+=earned;await save(tx,id,w);return{coins:w.coins,owned:w.owned};
 }
 function drawSkin(chest,owned,random=crypto.randomInt){
- const rarity=pickRarity(chest,random(10000)),pool=catalog.filter(s=>s.chest&&s.rarity===rarity),fresh=pool.filter(s=>!owned.includes(s.id)),available=fresh.length?fresh:pool;
+ const rarity=pickRarity(chest,random(10000)),pool=catalog.filter(s=>s.chest&&s.rarity===rarity&&skinAvailable(s)),fresh=pool.filter(s=>!owned.includes(s.id)),available=fresh.length?fresh:pool;
  return{skin:available[random(available.length)].id,rarity,duplicate:!fresh.length};
 }
 function registerCosmetics({app,db,auth,route}){
  app.get('/api/cosmetics',auth,route(async(req,res)=>res.json(await db.transaction(async tx=>{await tx.lockUser(req.user.id);return inventory(tx,req.user.id);})))) ;
  app.post('/api/cosmetics/equip',auth,route(async(req,res)=>{
-  const result=await db.transaction(async tx=>{await tx.lockUser(req.user.id);const w=await inventory(tx,req.user.id);if(!allSkins.some(s=>s.id===req.body?.skin)||!w.owned.includes(req.body.skin))return{error:'Ce skin ne t’appartient pas.',status:403};w.selected=req.body.skin;const stored=await wallet(tx,req.user.id);stored.selected=w.selected;await save(tx,req.user.id,stored);return w;});res.status(result.status||200).json(result);
+  const result=await db.transaction(async tx=>{await tx.lockUser(req.user.id);const w=await inventory(tx,req.user.id);if(!allSkins.some(s=>s.id===req.body?.skin)||!w.owned.includes(req.body.skin))return{error:'Ce skin ne t’appartient pas.',status:403};w.selected=req.body.skin;const stored=await wallet(tx,req.user.id);if(stored.selected!=='king')stored.previousSkin=stored.selected;stored.selected=w.selected;await save(tx,req.user.id,stored);return w;});res.status(result.status||200).json(result);
+ }));
+ app.post('/api/cosmetics/favorite',auth,route(async(req,res)=>{
+  const skin=req.body?.skin,on=req.body?.favorite;if(!allSkins.some(s=>s.id===skin)||typeof on!=='boolean')return res.status(400).json({error:'Favori invalide.'});
+  const result=await db.transaction(async tx=>{await tx.lockUser(req.user.id);const w=await wallet(tx,req.user.id),favorites=new Set(w.favorites||[]);if(on)favorites.add(skin);else favorites.delete(skin);w.favorites=[...favorites];await save(tx,req.user.id,w);return inventory(tx,req.user.id);});res.json(result);
  }));
  app.post('/api/cosmetics/story',auth,route(async(req,res)=>{
   const R=require('./public/story-rules'),level=req.body?.level,directions=req.body?.directions,l=R.levels[level-1];

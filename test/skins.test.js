@@ -1,45 +1,32 @@
-const {test}=require('node:test'),assert=require('node:assert/strict'),R=require('../public/skin-rules');
-test('chest rarity ranges match displayed probabilities and exclude exclusive skins',()=>{
-
- for(const chest of R.chests){assert.equal(Object.values(chest.odds).reduce((a,b)=>a+b),100);const counts={common:0,rare:0,epic:0,legendary:0};for(let roll=0;roll<10000;roll++)counts[R.pickRarity(chest,roll)]++;for(const key of Object.keys(counts))assert.equal(counts[key],chest.odds[key]*100);}
- assert.equal(R.catalog.find(s=>s.id==='gold').rarity,'legendary');assert.equal(R.catalog.find(s=>s.id==='gold').chest,true);
- assert.ok(R.catalog.filter(s=>['king','original'].includes(s.id)).every(s=>!s.chest));assert.equal(R.catalog.filter(s=>s.chest).length,32);
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),R=require('../public/skin-rules'),{drawSkin}=require('../cosmetics');
+const core=R.catalog.filter(s=>s.atelier&&s.id!=='king');
+function contrast(a,b){const lum=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0),x=lum(a),y=lum(b);return(Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
+test('60 original editions belong to twelve authored worlds, five each, beside starter and champion',()=>{
+ assert.equal(core.length,60);assert.equal(Object.keys(R.collections).length,12);assert.equal(R.catalog.length,62);assert.equal(new Set(R.allSkins.map(s=>s.id)).size,R.allSkins.length);assert.equal(new Set(core.map(s=>s.name)).size,60);assert.equal(new Set(core.map(s=>s.composition)).size,60);
+ for(const [id,c]of Object.entries(R.collections)){assert.equal(core.filter(s=>s.collection===id).length,5);assert.equal(c.palette.length,5);assert.ok(c.hint.length>70);for(const sample of c.samples)assert.equal(R.get(sample).collection,id);}
+ assert.ok(core.every(s=>!s.inspiration&&s.unlock.type==='chest'));assert.equal(R.get('king').name,'SOVEREIGN');assert.equal(R.get('gold').rarity,'legendary');
+ assert.deepEqual(require('../public/atelier-catalog'),require('../public/atelier-catalog.json'));
 });
-test('skin art varies by tile value and has distinct motifs and progression tiers',()=>{
- for(const skin of R.catalog){const a=R.tileStyle(skin.id,2),b=R.tileStyle(skin.id,2048);assert.notDeepEqual(a,b);assert.equal(a.tier,0);assert.equal(b.tier,3);assert.ok(skin.hues.length>=11);}
- assert.equal(R.tileStyle('ores',2).label,'Charbon');assert.equal(R.tileStyle('ores',2048).label,'Netherite');assert.notEqual(R.tileStyle('ores',2).level,R.tileStyle('ores',2048).level);
- assert.equal(new Set(R.catalog.map(s=>s.art)).size,R.catalog.length);
+test('all 660 value studies have real distinct SVG panels, ordered palettes and readable numeric ink',()=>{
+ const sheets=[];for(const s of core){assert.equal(s.tiles.length,11);const svg=fs.readFileSync(path.join(__dirname,'../public/atelier-art',s.id+'.svg'),'utf8');assert.match(svg,/viewBox="0 0 100 1100"/);const panels=svg.split(/<g transform="translate\(0 \d+\)">/).slice(1);assert.equal(panels.length,11);assert.equal(new Set(panels).size,11,s.id);sheets.push(crypto.createHash('sha256').update(svg).digest('hex'));assert.equal(new Set(s.tiles.map(t=>t.base)).size,11,s.id);
+  for(const [i,t]of s.tiles.entries()){assert.equal(t.value,2**(i+1));assert.ok(contrast(t.ink,t.center||t.dark)>=4.5,s.id+' '+t.value);assert.ok(t.depth>0);assert.equal(R.tileStyle(s.id,t.value).level,i);}
+ }assert.equal(new Set(sheets).size,60);
 });
-
-const {drawSkin}=require('../cosmetics');
-test('gold can actually be drawn as a legendary; King is never in a chest',()=>{const chest=R.chests[0],legend=R.catalog.filter(s=>s.chest&&s.rarity==='legendary'),index=legend.findIndex(s=>s.id==='gold');let calls=0;assert.equal(drawSkin(chest,[],()=>calls++===0?9999:index).skin,'gold');for(let roll=0;roll<10000;roll+=99){let call=0;const r=drawSkin(chest,[],max=>call++===0?roll:0);assert.notEqual(r.skin,'king');}});
-test('every illustrated collection ships eleven addressable SVG panels',()=>{const fs=require('node:fs'),path=require('node:path');for(const skin of R.catalog.filter(s=>s.sprite)){const svg=fs.readFileSync(path.join(__dirname,'../public/skin-art',skin.art+'.svg'),'utf8');assert.ok(svg.includes('viewBox="0 0 100 1100"'));assert.equal((svg.match(/transform="translate\(0 /g)||[]).length,11);}});
-
-test('signature selection retains old ids while replacing the catalogue with complete illustrated sets',()=>{
+test('larger values ascend from 2048 without cycling back to the first tile; effects never change rules',()=>{
+ for(const s of core){const last=R.tileStyle(s.id,2048),higher=R.tileStyle(s.id,4096),huge=R.tileStyle(s.id,1048576);assert.equal(higher.level,10);assert.equal(higher.ascension,1);assert.ok(huge.ascension>higher.ascension);assert.notDeepEqual(last,higher);assert.equal(huge.label,'1048576');}
  for(const id of ['original','jade','circuit','aurora','solar','pulse','prism','dragon','abyss','gold','ores','capsules','dojo','sabers','sakura','pharaoh','atlantis','candy','disco','origami','king'])assert.equal(R.get(id).id,id);
- assert.equal(R.catalog.length,34);assert.equal(new Set(R.catalog.map(s=>s.id)).size,34);assert.equal(new Set(R.catalog.map(s=>s.name)).size,34);
- const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),digests=[];
- for(const s of R.catalog.filter(s=>s.id!=='original')){const art=fs.readFileSync(path.join(__dirname,'../public/skin-art',s.art+'.svg'));digests.push(crypto.createHash('sha256').update(art).digest('hex'));const p=R.feedback(s.id,2048,100);assert.ok(R.effectNames[p.theme]);assert.ok(p.intensity<=3);assert.equal(p.enabled,!['starter','common'].includes(s.rarity));}
- assert.equal(new Set(digests).size,33);assert.ok(R.catalog.filter(s=>s.inspiration).length===17);
- assert.deepEqual(require('../public/skin-expansion'),require('../public/skin-expansion.json'));
+ assert.equal(R.tileStyle('ores',2).label,'Charbon');assert.equal(R.tileStyle('ores',2048).label,'Netherite');
 });
-test('combo intensity increases while its effects remain bounded, independent of game rules',()=>{
- const fire=R.feedback('phoenix',128,1),hot=R.feedback('phoenix',128,9),water=R.feedback('kraken',128,4);assert.equal(fire.theme,'fire');assert.equal(water.theme,'water');assert.notEqual(fire.sound,water.sound);assert.ok(hot.intensity>fire.intensity);assert.equal(R.feedback('original',2048,5).enabled,false);
+test('rarity odds cover each of 10000 draws exactly, with real mythics and no champion or archive drops',()=>{
+ assert.equal(R.catalog.filter(s=>s.chest).length,60);for(const c of R.chests){assert.equal(Object.values(c.odds).reduce((s,x)=>s+x),100);const counts=Object.fromEntries(Object.keys(c.odds).map(k=>[k,0]));for(let roll=0;roll<10000;roll++)counts[R.pickRarity(c,roll)]++;for(const [rarity,chance]of Object.entries(c.odds))assert.equal(counts[rarity],Math.round(chance*100));
+  for(const roll of [0,7000,9400,9900,9999]){let n=0;const result=drawSkin(c,core.map(s=>s.id),max=>n++===0?roll:0);assert.equal(result.duplicate,true);assert.ok(core.some(s=>s.id===result.skin));}
+ }const legends=core.filter(s=>s.rarity==='legendary'),gold=legends.findIndex(s=>s.id==='gold');let n=0;assert.equal(drawSkin(R.chests[0],[],()=>n++===0?9900:gold).skin,'gold');assert.equal(R.get('king').chest,false);for(const s of R.archive){assert.equal(s.chest,false);assert.equal(R.get(s.id).id,s.id);}
 });
-
-test('curated collections cover every active skin; archived purchases remain resolvable but never drop',()=>{
- assert.equal(R.catalog.filter(s=>s.inspiration).length,17);assert.equal(R.archive.length,106);
- for(const skin of R.catalog){assert.ok(R.collections[skin.collection]);assert.ok(!skin.retired);if(skin.inspiration)assert.ok(['games','series','films'].includes(skin.medium));}
- for(const key of Object.keys(R.collections))assert.ok(R.catalog.some(s=>s.collection===key),key);
- assert.ok(R.catalog.filter(s=>s.collection==='celestial').length===4);
- for(const skin of R.archive){assert.equal(R.get(skin.id).id,skin.id);assert.equal(skin.chest,false);assert.ok(!R.catalog.some(s=>s.id===skin.id));}
- // Owning every active skin must still produce a duplicate, never an archive.
- const owned=R.catalog.map(s=>s.id);for(const chest of R.chests)for(const roll of [0,7000,9400,9900,9999]){let n=0;const result=drawSkin(chest,owned,max=>n++===0?roll%10000:0);assert.ok(R.catalog.some(s=>s.id===result.skin));assert.equal(result.duplicate,true);}
+test('musical identities and merge profiles are distinct and combo phases are bounded',()=>{
+ assert.equal(new Set(core.map(s=>JSON.stringify(s.audio))).size,60);assert.ok(new Set(core.map(s=>JSON.stringify(R.frames(s.id)))).size>=20);
+ for(const s of core){assert.ok(R.effectNames[s.fx]);assert.ok(s.audio.tail<=.4);for(const [chain,phase]of [[1,0],[3,1],[5,2],[8,3],[12,4],[100,4]]){const p=R.feedback(s.id,128,chain);assert.equal(p.phase,phase);assert.ok(p.intensity<=3);assert.equal(p.audio,s.audio);}}
+ assert.notEqual(R.feedback('abyss-leviathan').sound,R.feedback('chronos-eternal').sound);
 });
-
-test('six art-directed worlds expose coherent lore, preview art and full-colour signature assets',()=>{
- const fs=require('node:fs'),path=require('node:path');assert.equal(Object.keys(R.collections).length,6);assert.equal(R.allSkins.length,140);assert.equal(new Set(R.allSkins.map(s=>s.id)).size,140);
- for(const [id,c] of Object.entries(R.collections)){assert.ok(c.hint.length>40);assert.ok(c.motto.length>15);assert.ok(c.motifs);assert.match(c.color,/^#[a-f0-9]{6}$/i);assert.ok(c.samples.length>=3);for(const sample of c.samples){assert.equal(R.get(sample).collection,id);assert.ok(R.catalog.includes(R.get(sample)));}}
- for(const s of R.catalog.filter(s=>s.id!=='original')){assert.ok(s.signature);assert.ok(s.style);assert.match(s.ink,/^#[a-f0-9]{6}$/i);assert.match(s.ground,/^#[a-f0-9]{6}$/i);assert.equal(s.sprite,true);const svg=fs.readFileSync(path.join(__dirname,'../public/skin-art',s.art+'.svg'),'utf8');assert.ok(svg.includes('fill="'));assert.ok(svg.includes('#'));}
- for(const id of ['dojo','dragonspheres','ores','capsules'])assert.ok(R.catalog.includes(R.get(id)));
+test('collaboration concepts are separated from core worlds and cannot masquerade as active events',()=>{
+ assert.ok(R.events.some(e=>e.type==='collaboration'&&e.credits&&e.status==='concept'));assert.deepEqual(R.activeEvents(),[]);const event={id:'test-event',status:'active',startsAt:'2026-01-01T00:00:00Z',endsAt:'2026-01-02T00:00:00Z',skins:['test-event-skin']};const eventSkin={id:'test-event-skin',unlock:{type:'event'}};assert.equal(R.available(eventSkin),false);R.events.push(event);try{assert.equal(R.available(eventSkin,Date.parse('2026-01-01T12:00:00Z')),true);assert.equal(R.available(eventSkin,Date.parse(event.endsAt)),false);assert.deepEqual(R.activeEvents(Date.parse('2026-01-01T12:00:00Z')),[event]);assert.deepEqual(R.activeEvents(Date.parse(event.endsAt)),[]);}finally{R.events.pop();}
 });

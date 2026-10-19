@@ -98,8 +98,8 @@ SKINS, PIÈCES ET COFFRES
 La collection est liée au compte et conservée en base. Les anciens déblocages
 locaux par combo/course sont remplacés par les coffres ; aucun skin payant
 n’existait dans cette version. Étincelle reste disponible sans compte.
-La sélection contient 34 éditions : 5 Communes, 8 Rares, 9 Épiques,
-10 Légendaires, Étincelle et King. Chaque collection a ses motifs SVG, ses formes, ses couleurs
+La sélection contient 60 créations réparties dans 12 collections de 5,
+Étincelle et SOVEREIGN en supplément. Chaque collection a ses motifs SVG, ses formes, ses couleurs
 par valeur et sa transformation de fusion. Aucun effet continu sur le plateau.
 Or impérial est désormais Légendaire et disponible dans les coffres. Le seuil
 de score ne le débloque plus ; les propriétaires existants le conservent.
@@ -208,59 +208,18 @@ par npm test avec vérification des budgets, des cases bloquées et des étoiles
 Contrôles navigateur : campagne complète, verrouillage, reprise, transitions
 entre modes, petits écrans et paysage. Les animations existantes sont réutilisées.
 
-ÉDITIONS SIGNATURES : DIRECTION ARTISTIQUE
-34 skins actifs (17 hommages non officiels et 17 créations originales ou
-exclusives) remplacent la sélection de 100 thèmes. 32 sont dans les coffres ;
-Étincelle et King restent exclusifs. Les probabilités de rareté ne changent pas.
-Les 106 éditions archivées restent résolues, visibles et équipables pour leurs
-propriétaires. Les reçus en attente fonctionnent encore, sans nouveau débit.
+ATELIER — ÉDITIONS D’AILLEURS
+60 créations originales réparties dans 12 collections de 5, plus Étincelle et
+SOVEREIGN (champion). Les anciennes éditions possédées et l’accès créateur
+TrueBallKnower sont conservés. Les favoris sont liés au compte et les previews
+utilisent un état séparé de la partie. Les règles et la fenêtre des combos restent
+inchangées. Les déplacements continuent de glisser pendant 180 ms.
 
-Six univers, avec palette, motifs, maxime, courte histoire et aperçus dessinés :
-- Éléments : forge, banquise, marées, vitrail et phénix.
-- Mondes oubliés : cartes stellaires, Saturne, Mars et trou noir.
-- Dark Tech : terminaux nocturnes, code, laboratoires et vaisseaux.
-- Arcade : pixels, blocs, anneaux, labyrinthes et cartoon à l’encre.
-- Sceaux antiques : or, lapis, ivoire, écailles et gravures.
-- Anime : chakra, sphères étoilées, toile de pirate et forêt peinte.
-La collection est indiquée par un bandeau teinté sur chaque carte. La rareté
-reste une information distincte. Les filtres par univers, rareté, possession,
-recherche et type d’hommage se combinent. Les listes sont paginées à 12 cartes ;
-les onze valeurs se chargent dans la galerie à la demande.
+Documentation de la direction artistique, des fichiers, profils, récompenses,
+restrictions et vérifications : docs/ATELIER.md.
 
-Les dessins sont des compositions vectorielles en couleur, et non un emblème
-répété sur un cadre. Les matières et typographies varient : pixels sans lissage,
-cartoon crème/noir, acier de terminal, papier peint, lapis et gravures d’or.
-Mines cubiques conserve ses onze minerais. Les planches sont statiques et
-partagées entre les tuiles ; aucun filtre, flou ni animation de fond en continu.
-L’animation de déplacement reste à 180 ms, sans attente ajoutée aux entrées.
+Régénérer le catalogue et les planches (optionnel, tous les assets sont inclus) :
+python3 scripts/build-atelier.py
+python3 scripts/render-atelier.py
 
-Régénération (optionnelle, assets inclus ; pas de Python en production) :
-python3 scripts/generate-skin-art.py
-La commande génère skin-expansion.js, les planches des archives puis appelle
-scripts/illustrate-signature-skins.py pour les compositions des éditions actives.
-Le choix actif et les métadonnées sont dans skin-expansion.json ; les anciennes
-définitions et tous les identifiants sont conservés. Les SVG restent des créations
-originales, les hommages sont signalés non officiels.
-
-ANIMATIONS ET AMBIANCES
-Le coffre suit les phases charge > harmonisation > déverrouillage > onde
-> révélation. Les couleurs et sons suivent le tirage confirmé par le serveur.
-Passer l’animation et réduire les mouvements ne changent ni récompense ni reçu.
-14 palettes de sons évoluent avec la valeur et le combo, sous une limite de
-32 voix. Les effets de barre Rares et supérieurs sont limités à 8 particules
-par fusion, nettoyées après 850 ms ; les effets légers les désactivent.
-
-Validation : npm test vérifie inventaires, archives, reçus, probabilités, dessins,
-collections, modes de jeu et synchronisation. Les contrôles navigateur couvrent
-les six univers, les aperçus, la recherche Naruto/Dragon Ball, l’équipement,
-les coffres, les anciens reçus et les petits écrans. Les contrôles de glissement
-et de latence restent disponibles en développement. Safari sur appareil physique
-n’est pas disponible dans cet environnement.
-
-ACCÈS COMPLET DU CRÉATEUR
-Le compte authentifié dont username_key vaut exactement trueballknower possède
-un accès calculé à toutes les éditions, archives et King compris. Ce droit ne
-modifie pas sa place au classement, ses pièces ou les probabilités des coffres.
-Le serveur vérifie l’identité en base, sans accepter de drapeau fourni par le
-client. Les droits ne sont pas ajoutés aux achats persistés ; les autres comptes
-conservent leurs règles de déblocage et de révocation King.
+Aucune dépendance n’a été ajoutée. Le serveur ne dépend pas de Python.
