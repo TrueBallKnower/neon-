@@ -109,6 +109,19 @@ mise en cache et le texte des tuiles inchangées n’est plus recréé à chaque
 Tests : continuité sans saut, animation suspendue, zéro mesure de tuile
 pendant les coups, déblocages et limites de temps, équipement et persistance.
 
+CONTINUITÉ DES ANIMATIONS
+Un geste conserve les glissements dont la destination ne change pas.
+Les tuiles consommées par une fusion terminent leur animation même si
+un nouveau coup arrive avant la fin. La géométrie du plateau est mesurée
+à l’initialisation et aux redimensionnements, pas à chaque commande.
+Le jeu garde une référence aux animations au lieu de les rechercher pour
+chaque tuile. Les réponses réseau évitent de réécrire les textes inchangés ;
+la sauvegarde locale attend une période inactive lorsque le navigateur le permet.
+Mesure Chromium mobile émulé, CPU x4, 60 coups : médiane 12,8 → 9 ms,
+p95 23,3 → 15,4 ms, 60 → 0 mesures du plateau pendant les coups.
+Ce sont des temps de traitement JavaScript, pas une garantie de fréquence
+d’affichage sur Safari ou sur tous les téléphones physiques.
+
 DÉVELOPPEMENT
 Node.js >=22.13 (validé avec 24.19). npm ci puis npm start.
 Sans DATABASE_URL, SQLite conserve les données dans .data/ (ignoré par Git).

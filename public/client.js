@@ -1,4 +1,5 @@
 const $=id=>document.getElementById(id);
+function setText(id,value){const node=$(id),text=String(value);if(node.textContent!==text)node.textContent=text;}
 const rules=window.FusionRules;
 const modeRules=window.FusionModes;
 let ruleState=modeRules.create('classic',Date.now());
@@ -33,21 +34,20 @@ function animateVisual(el,frames,timing){if(reduced||typeof el.animate!=='functi
 let boardGeometry=null;const motion=new WeakMap();
 function draw(merges=[],spawned=-1,result=null){
  const container=$('tiles'),old=new Map();
- container.querySelectorAll('.tile-ghost').forEach(el=>el.remove());
- for(const el of container.children)old.set(Number(el.dataset.index),el);
+ if(!result)container.querySelectorAll('.tile-ghost').forEach(el=>el.remove());
+ for(const el of container.children)if(!el.classList.contains('tile-ghost'))old.set(Number(el.dataset.index),el);
  const positions=new Map(),sources=new Map(),running=new Map();
- let step=0,origin;
+ // ResizeObserver invalidates this cache; inputs never force a board layout.
+ if(!boardGeometry){
+  const rect=$('board').getBoundingClientRect(),css=getComputedStyle($('board')),gap=parseFloat(getComputedStyle($('cells')).gap)||12;
+  const left=parseFloat(css.borderLeftWidth),right=parseFloat(css.borderRightWidth),padding=parseFloat(css.paddingLeft);
+  boardGeometry={gap,width:rect.width,insetX:left+padding,insetY:parseFloat(css.borderTopWidth)+parseFloat(css.paddingTop),step:(rect.width-left-right-2*padding-3*gap)/4+gap};
+ }
+ const step=boardGeometry.step;
  if(result&&!reduced&&old.size){
-  const rect=$('board').getBoundingClientRect();
-  if(!boardGeometry||boardGeometry.width!==rect.width){
-   const css=getComputedStyle($('board')),gap=parseFloat(getComputedStyle($('cells')).gap)||12;
-   const left=parseFloat(css.borderLeftWidth),right=parseFloat(css.borderRightWidth),padding=parseFloat(css.paddingLeft);
-   boardGeometry={gap,width:rect.width,insetX:left+padding,insetY:parseFloat(css.borderTopWidth)+parseFloat(css.paddingTop),step:(rect.width-left-right-2*padding-3*gap)/4+gap};
-  }
-  origin={x:rect.left+boardGeometry.insetX,y:rect.top+boardGeometry.insetY};step=boardGeometry.step;
   for(const [index,el]of old){
-   const active=el.getAnimations?.()||[];running.set(el,active);
-   const glide=motion.get(el),progress=glide?.animation.effect.getComputedTiming().progress;
+   const glide=motion.get(el);running.set(el,glide?[glide.animation]:[]);
+   const progress=glide?.animation.effect.getComputedTiming().progress;
    if(glide&&progress!==null&&progress!==undefined)positions.set(index,{x:glide.from.x+(glide.to.x-glide.from.x)*progress,y:glide.from.y+(glide.to.y-glide.from.y)*progress});
    else positions.set(index,{x:index%4*step,y:Math.floor(index/4)*step});
   }
@@ -59,7 +59,9 @@ function draw(merges=[],spawned=-1,result=null){
   const source=result?sources.get(i):i;
   let el=source===undefined?null:old.get(source);
   if(!el){el=document.createElement('div');const inner=document.createElement('div');inner.className='tile-inner';el.append(inner);}
-  used.add(el);cancelVisuals(el,running.get(el));
+  used.add(el);
+  const glide=motion.get(el),keepGliding=!!(result&&source===i&&glide&&glide.to.x===i%4*step&&glide.to.y===Math.floor(i/4)*step);
+  if(!keepGliding)cancelVisuals(el,running.get(el)|| (glide?[glide.animation]:[]));
   const moved=el.dataset.index!==String(i),changed=el.dataset.value!==String(value),className='tile'+(merges.includes(i)?' merge':i===spawned?' spawn':'');
   if(el.className!==className)el.className=className;
   if(changed){el.dataset.value=value;el.firstElementChild.textContent=value;}
@@ -71,6 +73,7 @@ function draw(merges=[],spawned=-1,result=null){
    animateVisual(inner,i===spawned?[{transform:'scale(.85)',opacity:0},{transform:'scale(1)',opacity:1}]:(window.FusionSkins?.frames()||[{transform:'scale(1)'},{transform:'scale(1.08)',offset:.45},{transform:'scale(1)'}]),{duration:i===spawned?120:160,easing:'ease-out'});
   }
   const from=positions.get(source),to={x:i%4*step,y:Math.floor(i/4)*step};
+  if(keepGliding)continue;
   if(from&&(Math.abs(from.x-to.x)>.2||Math.abs(from.y-to.y)>.2)){const animation=animateVisual(el,[{transform:`translate3d(${from.x}px,${from.y}px,0)`},{transform:`translate3d(${to.x}px,${to.y}px,0)`}],{duration:180,easing:'cubic-bezier(.2,.7,.3,1)'});if(animation)motion.set(el,{animation,from,to});}else motion.delete(el);
  }
  for(const [index,el]of old){
@@ -83,7 +86,7 @@ function draw(merges=[],spawned=-1,result=null){
    if(el.parentNode!==container)container.append(el);setTimeout(()=>el.remove(),200);
   }else el.remove();
  }
- $('score').textContent=score;$('best').textContent=best;$('moves').textContent=`${moves} MOUVEMENT${moves>1?'S':''}`;
+ setText('score',score);setText('best',best);setText('moves',`${moves} MOUVEMENT${moves>1?'S':''}`);
 }
 const sparkColors={2:'#c2eea3',4:'#8fdfd3',8:'#aacbff',16:'#f4d183',32:'#ffb17e',64:'#ff91bd',128:'#d6a0ff',256:'#b3a1ff',512:'#7be9ff',1024:'#ddff80',2048:'#bdff64'};
 function particles(index){
@@ -94,7 +97,7 @@ function particles(index){
   const p=document.createElement('i');p.className='particle';p.style.left=insetX+index%4*step+size/2+'px';p.style.top=insetY+Math.floor(index/4)*step+size/2+'px';p.style.setProperty('--color',color);const angle=n*Math.PI*2/(lightEffects?3:6);p.style.setProperty('--dx',Math.cos(angle)*45+'px');p.style.setProperty('--dy',Math.sin(angle)*45+'px');batch.append(p);setTimeout(()=>p.remove(),650);
  }$('particles').append(batch);
 }
-let saveTimer;function save(){clearTimeout(saveTimer);saveTimer=setTimeout(flushSave,200);}
+let saveTimer;function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{if(window.requestIdleCallback)requestIdleCallback(flushSave,{timeout:1500});else flushSave();},250);}
 function flushSave(){if(window.FusionOnline?.ranked||window.FusionOnline?.duel)return;storage.set('fusion-game',{board,score,moves,won,continuing,meta:ruleState});storage.set('fusion-best-'+ruleState.mode,best);if(ruleState.mode==='classic')storage.set('fusion-best',best);}
 window.addEventListener('pagehide',flushSave);
 document.addEventListener('visibilitychange',()=>{touch=null;if(document.hidden){cancelAnimationFrame(comboFrame);if(audio?.state==='running')audio.suspend().catch(()=>{});}else{draw();if(comboUntil>performance.now())animateCombo();else resetCombo();}});
@@ -167,7 +170,7 @@ window.FusionUI={
  nextMeta(result,at){const meta={...ruleState};modeRules.expire(meta,at);if(!meta.endedAt){modeRules.fusion(meta,result,at);if(modeRules.get(meta.mode).race&&result.board.some(v=>v>=modeRules.get(meta.mode).target)){meta.endedAt=at;meta.reason='target';}}return meta;},
  remoteRule(meta){if(!meta)return;const previous=ruleState.mode;if(previous!==meta.mode){ruleState={...meta};resetCombo();}else{ruleState.endsAt=meta.endsAt;ruleState.comboDeadline=Math.max(ruleState.comboDeadline||0,meta.comboDeadline||0)||null;if(meta.endedAt){ruleState.endedAt=meta.endedAt;ruleState.reason=meta.reason;}}tickRules();},
  load(game){generation++;resetCombo();locked=false;board=[...game.board];score=game.score;moves=game.moves;won=!!game.won;continuing=true;ruleState=game.meta?{...game.meta}:modeRules.create('classic',gameNow());best=Number(storage.get('fusion-best-'+ruleState.mode,0))||0;$('overlay').hidden=true;draw();tickRules();if(ruleState.endedAt)showModeEnd();},
- confirmScore(value){best=Math.max(best,value||0);$('best').textContent=best;},
+ confirmScore(value){best=Math.max(best,value||0);setText('best',best);},
  animate(payload,{duel=false}={}){
   const {game,result,spawned}=payload;
   board=game.board;score=game.score;moves=game.moves;if(game.meta)ruleState={...game.meta};
