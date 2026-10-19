@@ -161,3 +161,10 @@ Les mots de passe sont salés et hachés par scrypt ; cookies HttpOnly,
 SameSite=Lax et Secure en production. Les pseudos et records sont publics.
 Sauvegarder la base Supabase ; ne pas supprimer le projet.
 Les comptes SQLite locaux ne sont pas migrés automatiquement vers Supabase.
+
+DIAGNOSTIC DU DÉMARRAGE
+Une erreur de connexion 28P01 est réessayée trois fois, après 1, 2 puis
+4 secondes, sans modifier les identifiants. Un rejet persistant reste fatal.
+Les erreurs TLS et les migrations ne sont pas réessayées par ce mécanisme.
+Le message de démarrage inclut RENDER_GIT_COMMIT pour identifier la version.
+Un message de démarrage ne remplace pas la confirmation Live de Render.

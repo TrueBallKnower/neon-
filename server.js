@@ -104,5 +104,5 @@ async function createApp() {
  app.use((err,req,res,next)=>{if(err.type==='entity.parse.failed')return res.status(400).json({error:'JSON invalide.'});console.error('Request failed:',err.code||err.name);res.status(500).json({error:'Erreur serveur. Réessaie.'});});
  return {app,db,async close(){clearInterval(cleanup);await db.close();}};
 }
-if(require.main===module)createApp().then(({app})=>app.listen(process.env.PORT||3000,()=>console.log(`Fusion 2048 running on port ${process.env.PORT||3000}`))).catch(err=>{console.error('Startup failed:',err.code||err.message);process.exitCode=1;});
+if(require.main===module)createApp().then(({app})=>app.listen(process.env.PORT||3000,()=>console.log(`Fusion 2048 running on port ${process.env.PORT||3000} · revision ${(process.env.RENDER_GIT_COMMIT||'local').slice(0,12)}`))).catch(err=>{console.error('Startup failed:',err.code||err.message);process.exitCode=1;});
 module.exports={createApp};
