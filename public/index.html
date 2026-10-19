@@ -1,70 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Neon Arena .io</title>
-  <style>
-    :root{
-      --bg:#050913;--panel:rgba(7,12,24,.86);--line:rgba(99,214,255,.18);--text:#ebf5ff;--muted:#87a1c0;--accent:#63d6ff;--danger:#ff6f8d;--good:#7bffbc;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;overflow:hidden;background:radial-gradient(circle at top,#0c1731,#050913 60%);font-family:Arial,sans-serif;color:var(--text)}
-    canvas{display:block;width:100vw;height:100vh}
-    #menu,#hud,#leader,#respawn{position:fixed;z-index:10}
-    #menu{inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.45);backdrop-filter:blur(8px)}
-    .panel{width:min(520px,92vw);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 20px 70px rgba(0,0,0,.4)}
-    h1{font-size:42px;letter-spacing:2px;margin-bottom:10px;background:linear-gradient(90deg,#fff,#7be3ff,#c4a3ff);-webkit-background-clip:text;background-clip:text;color:transparent}
-    p{color:var(--muted);line-height:1.5}
-    input,button{width:100%;border:none;border-radius:12px;padding:14px 16px;margin-top:14px;font-size:15px}
-    input{background:#0f1930;color:var(--text);border:1px solid var(--line)}
-    button{background:linear-gradient(135deg,#66d9ff,#2b88ff);color:#06111c;font-weight:700;cursor:pointer}
-    .small{font-size:13px;margin-top:12px}
-    #hud{left:14px;top:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-width:220px}
-    #leader{right:14px;top:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 14px;min-width:230px}
-    .label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-    .hpTrack{height:10px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:6px 0 8px}
-    .hpFill{height:100%;background:linear-gradient(90deg,#ff6f8d,#ffb36f);width:100%}
-    #respawn{left:50%;top:50%;transform:translate(-50%,-50%);display:none;background:var(--panel);border:1px solid var(--line);padding:18px 22px;border-radius:16px}
-    #crosshair{position:fixed;width:18px;height:18px;pointer-events:none;z-index:9;transform:translate(-50%,-50%)}
-    #crosshair:before,#crosshair:after{content:"";position:absolute;background:#fff;box-shadow:0 0 8px var(--accent)}
-    #crosshair:before{width:2px;height:18px;left:8px;top:0}
-    #crosshair:after{height:2px;width:18px;left:0;top:8px}
-    .entry{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-    .entry:last-child{border-bottom:none}
-  </style>
-</head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101014"><title>2048 — Fusion</title><link rel="stylesheet" href="/style.css"></head>
 <body>
-  <canvas id="game"></canvas>
-  <div id="crosshair"></div>
-
-  <div id="menu">
-    <div class="panel">
-      <h1>NEON ARENA</h1>
-      <p>Mini jeu multijoueur style .io. Déplace-toi, tire, ramasse des orbes et fais monter ton score.</p>
-      <input id="nameInput" maxlength="16" placeholder="Ton pseudo" value="Joueur" />
-      <button id="playBtn">Jouer en ligne</button>
-      <p class="small">Touches : WASD pour bouger, souris pour viser, clic gauche pour tirer.</p>
-    </div>
-  </div>
-
-  <div id="hud" style="display:none">
-    <div class="label">Toi</div>
-    <div id="myName">—</div>
-    <div class="hpTrack"><div class="hpFill" id="hpFill"></div></div>
-    <div id="hpText">100 / 100</div>
-    <div style="margin-top:8px">Score : <b id="scoreText">0</b></div>
-    <div>Kills : <b id="killsText">0</b></div>
-    <div>Morts : <b id="deathsText">0</b></div>
-  </div>
-
-  <div id="leader" style="display:none">
-    <div class="label">Classement</div>
-    <div id="leaderboard"></div>
-  </div>
-
-  <div id="respawn"></div>
-
-  <script src="/client.js"></script>
-</body>
-</html>
+<header><a class="brand" href="/">◈ <span>FUSION<span class="brand-dot">.</span></span></a><span class="edition">UN CLASSIQUE. UNE AUTRE DIMENSION.</span><button id="sound" class="sound" aria-pressed="true">♫ <span>SON ACTIVÉ</span></button></header>
+<main>
+<nav class="online-nav"><button id="account-open">◎ Mon compte</button><button id="leaderboard-open">♕ Classement</button><span id="online-status">Mode libre</span></nav><section class="intro"><div class="eyebrow"><span></span> LE PUZZLE QUI MONTE EN PUISSANCE</div><h1>2048<span>.</span></h1><p>Glisse. Fusionne. Ressens le rythme.</p></section>
+<div class="game-layout"><aside class="left-panel"><div class="section-label">LE PRINCIPE</div><h2>Deux tuiles.<br>Une étincelle.</h2><p>Réunis les mêmes nombres pour créer la prochaine puissance de deux.</p><div class="example"><span>8</span><b>+</b><span>8</span><b>→</b><span class="result">16</span></div><div class="goal"><span>TON OBJECTIF</span><strong>2048 <i>↗</i></strong><p>Chaque fusion te rapproche du sommet.</p></div><div class="headphones">♫ <span>Encore mieux avec un casque.</span></div></aside>
+<section class="game" aria-label="Jeu 2048"><div class="toolbar"><div class="score-box"><span>SCORE</span><strong id="score">0</strong><span id="score-add"></span></div><div class="score-box best"><span>RECORD <i>♕</i></span><strong id="best">0</strong></div><button id="restart" class="restart" title="Nouvelle partie" aria-label="Nouvelle partie">↻</button></div><div class="board-wrap"><div id="board" role="grid" aria-label="Grille de jeu 4 par 4"><div id="cells"></div><div id="tiles"></div><div id="particles" aria-hidden="true"></div></div><div id="overlay" hidden><div class="overlay-icon">◈</div><h2 id="end-title"></h2><p id="end-text"></p><button id="end-action">Rejouer ↗</button></div></div><div id="combo" class="combo" hidden><div><strong id="combo-label">COMBO ×2</strong><span id="combo-hint">GARDE LE RYTHME</span></div><div class="combo-track"><i id="combo-bar"></i></div></div><div class="board-footer"><span><i></i> <span id="status">À toi de jouer</span></span><span id="moves">0 MOUVEMENT</span></div></section>
+<aside class="right-panel"><div class="section-label">LA MONTÉE EN PUISSANCE</div><div class="levels"><div><span class="mini" data-value="2">2</span><span>Le début de tout</span></div><div><span class="mini" data-value="16">16</span><span>Ça prend forme</span></div><div><span class="mini" data-value="128">128</span><span>Monte le volume</span></div><div><span class="mini" data-value="512">512</span><span>Plus que quelques fusions</span></div><div class="destination"><span class="mini" data-value="2048">2048</span><span>La consécration <i>✧</i></span></div></div><div class="controls"><div class="section-label">PRENDS LE CONTRÔLE</div><div class="arrows"><kbd>↑</kbd><div><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></div></div><p>Les flèches pour glisser.<br>Sur mobile, utilise ton doigt.</p></div></aside></div>
+<footer><span>FAIS UNE PAUSE. PUIS UNE AUTRE PARTIE.</span><span>Conçu pour le plaisir de fusionner <b>✧</b></span></footer>
+</main><dialog id="online-dialog"><button id="dialog-close" aria-label="Fermer">×</button><div id="account-panel"><h2>Entre dans le classement.</h2><p>Un pseudo, un compte, ton record.</p><form id="account-form"><label>Pseudo<input id="account-name" autocomplete="username" minlength="3" maxlength="20" required></label><label>Mot de passe<input id="account-password" type="password" autocomplete="current-password" maxlength="128" required></label><div class="account-buttons"><button type="submit">Se connecter</button><button type="button" id="register">Créer mon compte</button></div></form><div id="signed-in" hidden><p id="account-greeting"></p><button id="ranked-start">Jouer une partie classée</button><button id="logout">Se déconnecter</button></div></div><div id="leaderboard-panel" hidden><h2>Les meilleurs scores.</h2><p>Parties classées validées par le serveur.</p><ol id="leaderboard-list"></ol></div><p id="online-message" role="status"></p></dialog><div id="announcement" class="sr-only" aria-live="polite"></div><script src="/engine.js"></script><script src="/client.js"></script><script src="/online.js"></script>
+</body></html>

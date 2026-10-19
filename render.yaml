@@ -1,7 +1,16 @@
+# Free Render web service + external Supabase PostgreSQL storage.
 services:
   - type: web
-    name: neon-io-ready
-    env: node
+    name: fusion-2048
+    runtime: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_VERSION
+        value: 24.19.0
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false

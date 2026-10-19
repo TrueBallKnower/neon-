@@ -1,273 +1,76 @@
 const express = require('express');
-const http = require('http');
-const WebSocket = require('ws');
-const path = require('path');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const { promisify } = require('node:util');
+const { openDatabase } = require('./database');
+const rules = require('./public/engine');
+const scrypt = promisify(crypto.scrypt);
+const hashToken = token => crypto.createHash('sha256').update(token).digest('hex');
+const route = fn => (req,res,next) => Promise.resolve(fn(req,res,next)).catch(next);
 
-const app = express();
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
-
-const PORT = process.env.PORT || 3000;
-const TICK_RATE = 30;
-const MAP_W = 3200;
-const MAP_H = 3200;
-const PLAYER_RADIUS = 18;
-const BULLET_RADIUS = 5;
-const MAX_HP = 100;
-const RESPAWN_MS = 2500;
-const FOOD_COUNT = 60;
-
-app.use(express.static(path.join(__dirname, 'public')));
-
-const players = new Map();
-const bullets = [];
-const foods = [];
-let nextBulletId = 1;
-
-function rand(min, max) {
-  return min + Math.random() * (max - min);
-}
-
-function clamp(v, min, max) {
-  return Math.max(min, Math.min(max, v));
-}
-
-function spawnFood() {
-  return {
-    id: Math.random().toString(36).slice(2),
-    x: rand(50, MAP_W - 50),
-    y: rand(50, MAP_H - 50),
-    value: Math.random() < 0.15 ? 20 : 10,
-    r: Math.random() < 0.15 ? 10 : 7
-  };
-}
-
-function resetFoods() {
-  foods.length = 0;
-  for (let i = 0; i < FOOD_COUNT; i++) foods.push(spawnFood());
-}
-resetFoods();
-
-function safeSend(ws, obj) {
-  if (ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify(obj));
-  }
-}
-
-function makePlayer(id, name) {
-  return {
-    id,
-    name: (name || 'Joueur').slice(0, 16),
-    x: rand(200, MAP_W - 200),
-    y: rand(200, MAP_H - 200),
-    vx: 0,
-    vy: 0,
-    angle: 0,
-    hp: MAX_HP,
-    score: 0,
-    kills: 0,
-    deaths: 0,
-    color: `hsl(${Math.floor(rand(0, 360))} 90% 65%)`,
-    input: { up: false, down: false, left: false, right: false, shooting: false, angle: 0 },
-    shootCd: 0,
-    alive: true,
-    respawnAt: 0,
-    lastHitBy: null
-  };
-}
-
-function respawnPlayer(p) {
-  p.x = rand(200, MAP_W - 200);
-  p.y = rand(200, MAP_H - 200);
-  p.vx = 0;
-  p.vy = 0;
-  p.hp = MAX_HP;
-  p.alive = true;
-  p.lastHitBy = null;
-}
-
-function addBullet(owner) {
-  const speed = 900;
-  bullets.push({
-    id: nextBulletId++,
-    ownerId: owner.id,
-    x: owner.x + Math.cos(owner.angle) * 24,
-    y: owner.y + Math.sin(owner.angle) * 24,
-    vx: Math.cos(owner.angle) * speed,
-    vy: Math.sin(owner.angle) * speed,
-    life: 0.9,
-    r: BULLET_RADIUS,
-    damage: 20
+async function createApp() {
+ const db = await openDatabase();
+ const app = express();
+ app.disable('x-powered-by');
+ // Render places exactly one trusted reverse proxy in front of the service.
+ if(process.env.RENDER) app.set('trust proxy',1);
+ app.use(express.json({limit:'4kb'}));
+ app.use('/api',(req,res,next)=>{
+  res.set('Cache-Control','no-store');
+  if(req.method!=='GET'){
+   const origin=req.get('origin');
+   if(origin){try{if(new URL(origin).host!==req.get('host'))return res.status(403).json({error:'Origine refusée.'});}catch{return res.sendStatus(403);}}
+   if(req.get('sec-fetch-site')==='cross-site')return res.sendStatus(403);
+   if(!req.is('application/json'))return res.status(415).json({error:'JSON requis.'});
+  }next();
+ });
+ const attempts=new Map();
+ function rateLimit(req,res,next){const key=req.ip,now=Date.now();let value=attempts.get(key);if(!value||value.until<now){value={count:0,until:now+60000};attempts.set(key,value);}if(++value.count>20)return res.status(429).json({error:'Trop de tentatives. Réessaie dans une minute.'});next();}
+ const cleanup=setInterval(()=>{for(const [key,value]of attempts)if(value.until<Date.now())attempts.delete(key);db.run('DELETE FROM sessions WHERE expires < ?',[Date.now()]).catch(()=>console.error('Session cleanup failed'));},60000);cleanup.unref();
+ function cookie(req){return(req.headers.cookie||'').match(/(?:^|;\s*)fusion_session=([a-f0-9]{64})(?:;|$)/)?.[1];}
+ async function user(req){const token=cookie(req);return token?db.one('SELECT users.id,username,best FROM sessions JOIN users ON users.id=sessions.user_id WHERE token=? AND expires>?',[hashToken(token),Date.now()]):null;}
+ const auth=route(async(req,res,next)=>{req.user=await user(req);if(!req.user)return res.status(401).json({error:'Connecte-toi pour jouer en mode classé.'});next();});
+ async function session(req,res,id){const token=crypto.randomBytes(32).toString('hex');await db.run('INSERT INTO sessions(token,user_id,expires) VALUES(?,?,?)',[hashToken(token),id,Date.now()+7*86400000]);res.cookie('fusion_session',token,{httpOnly:true,sameSite:'lax',secure:process.env.NODE_ENV==='production',maxAge:7*86400000,path:'/'});}
+ app.post('/api/register',rateLimit,route(async(req,res)=>{
+  const {username,password}=req.body||{};
+  if(typeof username!=='string'||! /^[\p{L}\p{N}_-]{3,20}$/u.test(username)||typeof password!=='string'||password.length<10||password.length>128)return res.status(400).json({error:'Pseudo : 3 à 20 lettres, chiffres, _ ou -. Mot de passe : 10 à 128 caractères.'});
+  const key=username.normalize('NFKC').toLocaleLowerCase('fr'),salt=crypto.randomBytes(16).toString('hex'),hash=(await scrypt(password,salt,64)).toString('hex');
+  let found;try{found=await db.one('INSERT INTO users(username,username_key,salt,hash) VALUES(?,?,?,?) RETURNING id',[username,key,salt,hash]);}catch(e){if(e.code==='23505'||(e.code==='ERR_SQLITE_ERROR'&&String(e.message).includes('UNIQUE')))return res.status(409).json({error:'Ce pseudo est déjà pris.'});throw e;}
+  await session(req,res,found.id);res.status(201).json({user:{username,best:0}});
+ }));
+ app.post('/api/login',rateLimit,route(async(req,res)=>{
+  const {username,password}=req.body||{};
+  if(typeof username!=='string'||username.length>40||typeof password!=='string'||password.length>128)return res.status(400).json({error:'Identifiants invalides.'});
+  const found=await db.one('SELECT * FROM users WHERE username_key=?',[username.normalize('NFKC').toLocaleLowerCase('fr')]);
+  const hash=await scrypt(password,found?.salt||'invalid-login-salt',64);
+  if(!found||!crypto.timingSafeEqual(hash,Buffer.from(found.hash,'hex')))return res.status(401).json({error:'Pseudo ou mot de passe incorrect.'});
+  await session(req,res,found.id);res.json({user:{username:found.username,best:found.best}});
+ }));
+ app.post('/api/logout',route(async(req,res)=>{const token=cookie(req);if(token)await db.run('DELETE FROM sessions WHERE token=?',[hashToken(token)]);res.clearCookie('fusion_session',{path:'/'});res.json({ok:true});}));
+ app.get('/api/me',route(async(req,res)=>{const found=await user(req);res.json({user:found?{username:found.username,best:found.best}:null});}));
+ app.get('/api/leaderboard',route(async(req,res)=>res.json({entries:await db.all('SELECT username,best FROM users WHERE best>0 ORDER BY best DESC,username ASC LIMIT 50')})));
+ function spawn(board){const empty=board.map((v,i)=>v?-1:i).filter(i=>i>=0);if(!empty.length)return -1;const index=empty[crypto.randomInt(empty.length)];board[index]=crypto.randomInt(10)<9?2:4;return index;}
+ async function readGame(connection,id){const row=await connection.one('SELECT * FROM games WHERE user_id=?',[id]);return row?{board:JSON.parse(row.board),score:row.score,moves:row.moves,won:!!row.won}:null;}
+ app.get('/api/game',auth,route(async(req,res)=>res.json({game:await readGame(db,req.user.id)})));
+ app.post('/api/game',auth,route(async(req,res)=>{
+  const game=await db.transaction(async tx=>{await tx.lockUser(req.user.id);const board=Array(16).fill(0);spawn(board);spawn(board);await tx.run('INSERT INTO games(user_id,board,score,moves,won) VALUES(?,?,0,0,0) ON CONFLICT(user_id) DO UPDATE SET board=excluded.board,score=0,moves=0,won=0',[req.user.id,JSON.stringify(board)]);return readGame(tx,req.user.id);});res.json({game});
+ }));
+ app.post('/api/move',auth,route(async(req,res)=>{
+  const {direction}=req.body||{};if(!['left','right','up','down'].includes(direction))return res.status(400).json({error:'Direction invalide.'});
+  const payload=await db.transaction(async tx=>{
+   await tx.lockUser(req.user.id);
+   const game=await readGame(tx,req.user.id);if(!game)return null;
+   const result=rules.move(game.board,direction);let spawned=-1;
+   if(result.changed){spawned=spawn(result.board);game.board=result.board;game.score+=result.gain;game.moves++;game.won=game.won||game.board.some(v=>v>=2048);await tx.run('UPDATE games SET board=?,score=?,moves=?,won=? WHERE user_id=?',[JSON.stringify(game.board),game.score,game.moves,+game.won,req.user.id]);await tx.run('UPDATE users SET best=CASE WHEN best < ? THEN ? ELSE best END WHERE id=?',[game.score,game.score,req.user.id]);}
+   const current=await tx.one('SELECT best FROM users WHERE id=?',[req.user.id]);
+   return {game,result,spawned,best:current.best};
   });
+  if(!payload)return res.status(409).json({error:'Commence une partie classée.'});res.json(payload);
+ }));
+ app.get('/healthz',route(async(req,res)=>{await db.one('SELECT 1 AS ok');res.json({ok:true});}));
+ app.use(express.static(path.join(__dirname,'public')));
+ app.use((err,req,res,next)=>{if(err.type==='entity.parse.failed')return res.status(400).json({error:'JSON invalide.'});console.error('Request failed:',err.code||err.name);res.status(500).json({error:'Erreur serveur. Réessaie.'});});
+ return {app,db,async close(){clearInterval(cleanup);await db.close();}};
 }
-
-function distanceSq(a, b) {
-  const dx = a.x - b.x;
-  const dy = a.y - b.y;
-  return dx * dx + dy * dy;
-}
-
-wss.on('connection', (ws) => {
-  const id = Math.random().toString(36).slice(2);
-  let joined = false;
-
-  safeSend(ws, { type: 'hello', id, map: { w: MAP_W, h: MAP_H }, maxHp: MAX_HP });
-
-  ws.on('message', (raw) => {
-    let msg;
-    try {
-      msg = JSON.parse(raw.toString());
-    } catch {
-      return;
-    }
-
-    if (msg.type === 'join' && !joined) {
-      joined = true;
-      const p = makePlayer(id, msg.name);
-      players.set(id, { ws, data: p });
-      safeSend(ws, { type: 'joined', id });
-      return;
-    }
-
-    const entry = players.get(id);
-    if (!entry) return;
-    const p = entry.data;
-
-    if (msg.type === 'input') {
-      p.input = {
-        up: !!msg.up,
-        down: !!msg.down,
-        left: !!msg.left,
-        right: !!msg.right,
-        shooting: !!msg.shooting,
-        angle: Number(msg.angle) || 0
-      };
-    }
-  });
-
-  ws.on('close', () => {
-    players.delete(id);
-  });
-});
-
-function update(dt) {
-  for (const { data: p } of players.values()) {
-    if (!p.alive) {
-      if (Date.now() >= p.respawnAt) respawnPlayer(p);
-      continue;
-    }
-
-    let ax = 0;
-    let ay = 0;
-    if (p.input.up) ay -= 1;
-    if (p.input.down) ay += 1;
-    if (p.input.left) ax -= 1;
-    if (p.input.right) ax += 1;
-
-    const len = Math.hypot(ax, ay) || 1;
-    const speed = 320;
-    p.vx = (ax / len) * speed * (ax || ay ? 1 : 0);
-    p.vy = (ay / len) * speed * (ax || ay ? 1 : 0);
-    p.x = clamp(p.x + p.vx * dt, PLAYER_RADIUS, MAP_W - PLAYER_RADIUS);
-    p.y = clamp(p.y + p.vy * dt, PLAYER_RADIUS, MAP_H - PLAYER_RADIUS);
-    p.angle = p.input.angle;
-
-    p.shootCd -= dt;
-    if (p.input.shooting && p.shootCd <= 0) {
-      p.shootCd = 0.18;
-      addBullet(p);
-    }
-
-    for (let i = foods.length - 1; i >= 0; i--) {
-      const f = foods[i];
-      const rr = (PLAYER_RADIUS + f.r) * (PLAYER_RADIUS + f.r);
-      if (distanceSq(p, f) <= rr) {
-        p.score += f.value;
-        p.hp = Math.min(MAX_HP, p.hp + Math.round(f.value / 5));
-        foods.splice(i, 1);
-        foods.push(spawnFood());
-      }
-    }
-  }
-
-  for (let i = bullets.length - 1; i >= 0; i--) {
-    const b = bullets[i];
-    b.x += b.vx * dt;
-    b.y += b.vy * dt;
-    b.life -= dt;
-
-    if (b.life <= 0 || b.x < -50 || b.y < -50 || b.x > MAP_W + 50 || b.y > MAP_H + 50) {
-      bullets.splice(i, 1);
-      continue;
-    }
-
-    for (const { data: p } of players.values()) {
-      if (!p.alive || p.id === b.ownerId) continue;
-      const rr = (PLAYER_RADIUS + b.r) * (PLAYER_RADIUS + b.r);
-      if (distanceSq(p, b) <= rr) {
-        p.hp -= b.damage;
-        p.lastHitBy = b.ownerId;
-        bullets.splice(i, 1);
-        if (p.hp <= 0) {
-          p.alive = false;
-          p.deaths += 1;
-          p.respawnAt = Date.now() + RESPAWN_MS;
-          const killer = players.get(p.lastHitBy)?.data;
-          if (killer) {
-            killer.kills += 1;
-            killer.score += 100;
-          }
-        }
-        break;
-      }
-    }
-  }
-}
-
-function buildSnapshot() {
-  const plist = [];
-  for (const { data: p } of players.values()) {
-    plist.push({
-      id: p.id,
-      name: p.name,
-      x: Math.round(p.x),
-      y: Math.round(p.y),
-      angle: p.angle,
-      hp: p.hp,
-      maxHp: MAX_HP,
-      score: p.score,
-      kills: p.kills,
-      deaths: p.deaths,
-      color: p.color,
-      alive: p.alive,
-      respawnAt: p.respawnAt
-    });
-  }
-
-  const leaderboard = plist
-    .slice()
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 8)
-    .map((p, index) => ({ rank: index + 1, name: p.name, score: p.score, kills: p.kills }));
-
-  return {
-    type: 'state',
-    players: plist,
-    bullets: bullets.map((b) => ({ x: Math.round(b.x), y: Math.round(b.y) })),
-    foods,
-    leaderboard,
-    now: Date.now()
-  };
-}
-
-setInterval(() => {
-  update(1 / TICK_RATE);
-  const snapshot = JSON.stringify(buildSnapshot());
-  for (const { ws } of players.values()) {
-    if (ws.readyState === WebSocket.OPEN) ws.send(snapshot);
-  }
-}, 1000 / TICK_RATE);
-
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+if(require.main===module)createApp().then(({app})=>app.listen(process.env.PORT||3000,()=>console.log(`Fusion 2048 running on port ${process.env.PORT||3000}`))).catch(err=>{console.error('Startup failed:',err.code||err.message);process.exitCode=1;});
+module.exports={createApp};

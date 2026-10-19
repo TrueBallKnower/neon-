@@ -1,17 +1,18 @@
 {
-  "name": "neon-io-ready",
+  "name": "fusion-2048",
   "version": "1.0.0",
   "private": true,
-  "description": "Free deployable .io-style multiplayer game",
+  "description": "2048 avec combos sonores, comptes et classement",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.13"
   },
   "dependencies": {
     "express": "^4.19.2",
-    "ws": "^8.18.0"
+    "pg": "^8.16.3"
   }
 }
