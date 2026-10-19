@@ -9,3 +9,11 @@
 @media(pointer:coarse){.tile-inner{text-shadow:none;box-shadow:none}.tile.merge .tile-inner{box-shadow:none}.particle{box-shadow:none}.mini{text-shadow:none}.board-wrap{isolation:isolate}}
 
 .combo-track i{width:100%;transform-origin:left;will-change:transform}
+
+/* Reserve the combo space to prevent mobile scroll jumps as chains start/end. */
+#combo[hidden]{display:block;visibility:hidden}#combo:not([hidden]){visibility:visible}
+.tile.merge .tile-inner{animation:merge .22s ease-out;box-shadow:none}
+
+.tile.spawn .tile-inner,.tile.merge .tile-inner{animation:none}
+
+#duel-result{min-height:3em}#board{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}.game{overflow-anchor:none}dialog input{font-size:16px}

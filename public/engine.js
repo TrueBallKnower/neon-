@@ -20,5 +20,12 @@
   if(!empty.length)return -1;
   const index=empty[ticket.position%empty.length];board[index]=ticket.value;return index;
  }
- const api={move,canMove,spawnTicket};if(typeof module!=='undefined')module.exports=api;else root.FusionRules=api;
+ function spawnToken(seed,turn){
+  // A shared integer stream lets presentation continue through slow networks.
+  let hash=2166136261;const text=seed+':'+turn;
+  for(let i=0;i<text.length;i++)hash=Math.imul(hash^text.charCodeAt(i),16777619);
+  hash=Math.imul(hash^(hash>>>16),2246822507);hash=Math.imul(hash^(hash>>>13),3266489909);hash=(hash^(hash>>>16))>>>0;
+  return{position:hash,value:((hash>>>16)%10)<9?2:4};
+ }
+ const api={move,canMove,spawnTicket,spawnToken};if(typeof module!=='undefined')module.exports=api;else root.FusionRules=api;
 })(typeof window!=='undefined'?window:globalThis);

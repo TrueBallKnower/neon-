@@ -24,19 +24,24 @@ le duel sauvegardé à la reconnexion. Les salons expirent après 24 heures.
 Les tables sont créées automatiquement, sans configuration supplémentaire.
 
 RÉACTIVITÉ
-Les mouvements et les nouvelles tuiles sont calculés immédiatement sur
-l’appareil grâce à une réserve de tuiles fournie par le serveur. Les coups
-sont validés par lots en arrière-plan, sans attendre chaque réponse réseau.
-Le serveur recalcule les grilles, les points et le délai du duel. Les lots
-vérifient leur grille et compteur de départ pour éviter les doublons ; une
-réponse perdue déclenche une resynchronisation avec l’état officiel.
-Le tampon est borné à 32 coups ; une coupure prolongée peut donc suspendre
-la saisie ou demander de recharger la page. Les animations de déplacement
-durent 90 ms et les glissements tactiles répondent dès le franchissement
-du seuil, avant de relâcher le doigt. Effets visuels et audio allégés pour
-limiter les ralentissements sur les appareils moins puissants.
-Validation navigateur Chromium : clavier, tactile émulé, CPU ralenti 4x,
-800 ms de latence ajoutée, lots, retour à l’état serveur et réponse perdue.
+Les commandes mettent à jour le jeu immédiatement ; les tuiles glissent
+pendant 180 ms sans bloquer la commande suivante. Un geste qui interrompt
+un glissement reprend les positions affichées, sans recaler les tuiles.
+Les nœuds des tuiles sont réutilisés ; le combo conserve sa place dans
+la page pour éviter les déplacements involontaires sur mobile.
+Le toucher réagit dès le seuil de glissement, avant de lever le doigt.
+La validation serveur se fait par lots en arrière-plan. Une séquence
+partagée permet de continuer à afficher les nouvelles tuiles sans être
+limité aux 32 prochaines tuiles d’une réponse réseau. Le journal de coups
+est borné à 4096 entrées ; la reconnexion réessaie automatiquement, avec
+délai progressif. Une réponse perdue est rapprochée de l’état officiel,
+sans rejouer les coups déjà acceptés ni effacer les suivants. Les réponses
+d’une ancienne partie ne peuvent pas remplacer la nouvelle partie.
+Le serveur garde le calcul des scores et l’échéance des duels. Les coups
+non transmis avant la fin d’un duel peuvent être rejetés par le serveur.
+Tests navigateur Chromium : continuité visuelle lors d’un changement de
+direction, animation suspendue, 64 coups hors ligne puis reconnexion,
+tactile émulé, CPU ralenti 4x, latence de 800 ms et réponse réseau perdue.
 Ces simulations ne remplacent pas un test sur chaque appareil physique.
 
 DÉVELOPPEMENT

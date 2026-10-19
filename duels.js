@@ -8,7 +8,7 @@ function phase(state,now){if(state.forfeit)return'finished';if(!state.startsAt)r
 function view(state,id,now=Date.now()){
  const me=state.players.find(p=>p.id===id),other=state.players.find(p=>p.id!==id),status=phase(state,now);
  let winner=null;if(status==='finished'){if(state.forfeit)winner=state.players.find(p=>p.id!==state.forfeit)?.id||null;else if(other&&me.score!==other.score)winner=me.score>other.score?me.id:other.id;}
- return{code:state.code,status,serverNow:now,startsAt:state.startsAt,endsAt:state.endsAt,duration:DURATION,me:{...me,spawnPlan:spawnStream.plan(state.seed,me.moves)},opponent:other||null,winner,forfeit:!!state.forfeit};
+ return{code:state.code,status,serverNow:now,startsAt:state.startsAt,endsAt:state.endsAt,duration:DURATION,me:{...me,spawnSeed:state.seed,spawnPlan:spawnStream.plan(state.seed,me.moves)},opponent:other||null,winner,forfeit:!!state.forfeit};
 }
 function registerDuels({app,db,auth,route,rateLimit}){
  const invalid=res=>res.status(404).json({error:'Duel introuvable. Vérifie le code.'});

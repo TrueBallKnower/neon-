@@ -52,7 +52,7 @@ async function createApp() {
  app.get('/api/me',route(async(req,res)=>{const found=await user(req);res.json({user:found?{username:found.username,best:found.best}:null});}));
  app.get('/api/leaderboard',route(async(req,res)=>res.json({entries:await db.all('SELECT username,best FROM users WHERE best>0 ORDER BY best DESC,username ASC LIMIT 50')})));
  function spawn(board){const empty=board.map((v,i)=>v?-1:i).filter(i=>i>=0);if(!empty.length)return -1;const index=empty[crypto.randomInt(empty.length)];board[index]=crypto.randomInt(10)<9?2:4;return index;}
- async function readGame(connection,id){const row=await connection.one('SELECT * FROM games WHERE user_id=?',[id]);return row?{board:JSON.parse(row.board),score:row.score,moves:row.moves,won:!!row.won,spawnPlan:spawnStream.plan('solo:'+id,row.moves)}:null;}
+ async function readGame(connection,id){const row=await connection.one('SELECT * FROM games WHERE user_id=?',[id]);return row?{board:JSON.parse(row.board),score:row.score,moves:row.moves,won:!!row.won,spawnSeed:'solo:'+id,spawnPlan:spawnStream.plan('solo:'+id,row.moves)}:null;}
  app.get('/api/game',auth,route(async(req,res)=>res.json({game:await readGame(db,req.user.id)})));
  app.post('/api/game',auth,route(async(req,res)=>{
   const game=await db.transaction(async tx=>{await tx.lockUser(req.user.id);const board=Array(16).fill(0);spawn(board);spawn(board);await tx.run('INSERT INTO games(user_id,board,score,moves,won) VALUES(?,?,0,0,0) ON CONFLICT(user_id) DO UPDATE SET board=excluded.board,score=0,moves=0,won=0',[req.user.id,JSON.stringify(board)]);return readGame(tx,req.user.id);});res.json({game});
@@ -80,7 +80,7 @@ async function createApp() {
  }));
  registerDuels({app,db,auth,route,rateLimit});
  app.get('/healthz',route(async(req,res)=>{await db.one('SELECT 1 AS ok');res.json({ok:true});}));
- app.use(express.static(path.join(__dirname,'public')));
+ app.use(express.static(path.join(__dirname,'public'),{setHeaders(res,file){res.setHeader('Cache-Control',file.endsWith('.html')?'no-store':'no-cache');}}));
  app.use((err,req,res,next)=>{if(err.type==='entity.parse.failed')return res.status(400).json({error:'JSON invalide.'});console.error('Request failed:',err.code||err.name);res.status(500).json({error:'Erreur serveur. Réessaie.'});});
  return {app,db,async close(){clearInterval(cleanup);await db.close();}};
 }
