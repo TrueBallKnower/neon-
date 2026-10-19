@@ -66,6 +66,18 @@ direction, animation suspendue, 64 coups hors ligne puis reconnexion,
 tactile émulé, CPU ralenti 4x, latence de 800 ms et réponse réseau perdue.
 Ces simulations ne remplacent pas un test sur chaque appareil physique.
 
+SAFARI ET MOBILE
+Le plateau adapte sa taille au portrait et au paysage, avec des commandes
+accessibles au toucher et les marges des encoches. Les menus suivent la
+zone visible quand le clavier s’ouvre et restaurent le défilement à la fermeture.
+Un deuxième doigt ne coupe plus le geste principal. Un repli Touch Events
+est disponible si Pointer Events manque. Le son reprend après interruption.
+Le rendu évite les mesures des tuiles immobiles ; les effets coûteux sont
+réduits sur écran tactile. Une rotation recalcule les positions des tuiles.
+Validation Chromium : huit formats de 320x568 à 1024x768, paysage, clavier
+simulé, multitouch, CPU 4x et réseau lent. Safari réel reste à vérifier ;
+le téléchargement de WebKit était bloqué dans l’environnement de travail.
+
 DÉVELOPPEMENT
 Node.js >=22.13 (validé avec 24.19). npm ci puis npm start.
 Sans DATABASE_URL, SQLite conserve les données dans .data/ (ignoré par Git).

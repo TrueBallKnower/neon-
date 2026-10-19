@@ -18,6 +18,7 @@
  function resetPrediction(game){sync.configure(game);optimistic=null;}
  Object.defineProperty(online,'syncState',{get:()=>({pending:sync.pending.length,sending:!!sync.task})});
  window.addEventListener('online',()=>sync.resume());
+ window.addEventListener('pageshow',event=>{if(event.persisted)sync.resume();});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync.resume();});
  const readRoom=()=>{try{return localStorage.getItem('fusion-duel')}catch{return null}};
  function remember(code){try{if(localStorage.getItem('fusion-duel')===code)return;if(code)localStorage.setItem('fusion-duel',code);else localStorage.removeItem('fusion-duel');}catch{}}
@@ -26,7 +27,7 @@
   try{const response=await fetch('/api/'+url,{signal:controller.signal,method:body===undefined?'GET':'POST',headers:body===undefined?{}:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)});const data=await response.json();if(data.serverNow)serverOffset=data.serverNow-Date.now();if(!response.ok){const error=Error(data.error||'Serveur indisponible.');error.status=response.status;error.duel=data.duel;error.game=data.game;throw error;}return data;}finally{clearTimeout(timeout);}
  }
  function message(text){el('online-message').textContent=text;}
- function render(){el('account-form').hidden=!!account;el('signed-in').hidden=!account;el('account-greeting').textContent=account?`Salut ${account.username} ! Record classé : ${account.best}.`:'';el('online-status').textContent=online.duel?'Duel · '+account.username:online.ranked?`Classé · ${account.username}`:account?`${account.username} · mode libre`:'Mode libre';el('restart').disabled=!!online.duel;}
+ function render(){document.body.classList.toggle('dueling',!!online.duel);el('account-form').hidden=!!account;el('signed-in').hidden=!account;el('account-greeting').textContent=account?`Salut ${account.username} ! Record classé : ${account.best}.`:'';el('online-status').textContent=online.duel?'Duel · '+account.username:online.ranked?`Classé · ${account.username}`:account?`${account.username} · mode libre`:'Mode libre';el('restart').disabled=!!online.duel;}
  function open(panel){for(const name of ['account','leaderboard','duel','mode'])el(name+'-panel').hidden=panel!==name;message('');if(!el('online-dialog').open)el('online-dialog').showModal();}
  function gameOf(duel){return{board:duel.me.board,score:duel.me.score,moves:duel.me.moves,won:false,spawnSeed:duel.me.spawnSeed,spawnPlan:duel.me.spawnPlan,meta:{mode:duel.mode||'classic',startedAt:duel.startsAt||duel.serverNow,endsAt:duel.endsAt,comboDeadline:duel.me.comboDeadline||null,endedAt:duel.status==='finished'?duel.serverNow:null,reason:duel.status==='finished'&&duel.winner===duel.me.id?'victory':duel.status==='finished'&&duel.winner===null?'draw':duel.reason}};}
  function statusNow(){if(!current)return null;if(current.status==='finished')return'finished';if(!current.startsAt)return'waiting';const now=Date.now()+serverOffset;return now<current.startsAt?'countdown':now>=current.endsAt?'finished':'playing';}
@@ -106,7 +107,7 @@
  el('duel-copy').onclick=async()=>{const url=new URL(location.href);url.search='';url.searchParams.set('duel',online.duel);try{await navigator.clipboard.writeText(url.toString());message('Lien copié !');}catch{message('Partage ce code : '+online.duel);}};
  el('duel-leave').onclick=async()=>{if(busy)return;busy=true;try{await leave();}catch(e){el('duel-result').textContent=e.message;}finally{busy=false;}};
  setInterval(clock,100);
- setInterval(async()=>{if(!online.duel||busy||polling||sync.task||sync.pending.length||current?.status==='finished')return;const delay=current?.mode==='sudden'?250:1000;if(Date.now()-lastPollAt<delay)return;lastPollAt=Date.now();polling=true;const room=online.duel;try{const {duel}=await api('duels/'+room);if(room===online.duel&&!sync.task&&!sync.pending.length&&!busy)updateDuel(duel);}catch(e){el('duel-result').textContent='Connexion interrompue. Nouvelle tentative…';}finally{polling=false;}},250);
+ setInterval(async()=>{if(document.hidden||!online.duel||busy||polling||sync.task||sync.pending.length||current?.status==='finished')return;const delay=current?.mode==='sudden'?250:1000;if(Date.now()-lastPollAt<delay)return;lastPollAt=Date.now();polling=true;const room=online.duel;try{const {duel}=await api('duels/'+room);if(room===online.duel&&!sync.task&&!sync.pending.length&&!busy)updateDuel(duel);}catch(e){el('duel-result').textContent='Connexion interrompue. Nouvelle tentative…';}finally{polling=false;}},250);
  api('me').then(async data=>{
   account=data.user;render();const invite=new URL(location.href).searchParams.get('duel');
   if(invite&&/^[a-f0-9]{10}$/i.test(invite)){el('duel-code').value=invite.toUpperCase();open('duel');if(!account)message('Connecte-toi via Mon compte, puis rejoins le duel.');}
