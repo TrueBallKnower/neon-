@@ -88,7 +88,7 @@ function play(direction){
  if(!result.changed){if(!rules.canMove(board))showEnd(false);return;}
  updateRule(result,gameNow());board=result.board;score+=result.gain;best=Math.max(score,best);moves++;const added=spawn();
  draw(result.merges,added,result);sfx('move');fusionFeedback(result);
- if(ruleState.mode==='rush'&&board.some(v=>v>=128)){ruleState.endedAt=gameNow();ruleState.reason='target';showModeEnd();}
+ if(modeRules.get(ruleState.mode).race&&board.some(v=>v>=modeRules.get(ruleState.mode).target)){ruleState.endedAt=gameNow();ruleState.reason='target';showModeEnd();}
  else if(ruleState.mode==='classic'&&!won&&board.some(v=>v>=2048)){won=true;showEnd(true);}else if(!rules.canMove(board))showEnd(false);
  save();$('announcement').textContent=`Score ${score}. ${result.merges.length} fusion(s).`;
 }
@@ -121,8 +121,8 @@ function tickRules(){
  if(ruleState.endedAt)label+=ruleState.reason==='victory'?'Victoire !':ruleState.reason==='draw'?'Égalité':ruleState.reason==='combo'?'Combo perdu !':ruleState.reason==='target'?'Objectif atteint !':'Temps écoulé';
  else if(mode.id==='sudden')label+=ruleState.comboDeadline?Math.max(0,(ruleState.comboDeadline-gameNow())/1000).toFixed(1)+' s pour fusionner':'Première fusion → chrono de 2 s';
  else if(ruleState.endsAt)label+=Math.ceil(Math.max(0,ruleState.endsAt-gameNow())/1000)+' s restantes';
- else label+=mode.id==='rush'?'Crée une tuile 128':'À ton rythme';
- const goal=mode.id==='sudden'?'Survivre':mode.id==='sprint'?'60 s':mode.id==='rush'?'128':'2048';if($('goal-value')&&$('goal-value').textContent!==goal)$('goal-value').textContent=goal;
+ else label+=mode.race?'Crée une tuile '+mode.target:'À ton rythme';
+ const goal=mode.id==='sudden'?'Survivre':mode.id==='sprint'?'60 s':mode.race?String(mode.target):'2048';if($('goal-value')&&$('goal-value').textContent!==goal)$('goal-value').textContent=goal;
  if($('mode-state').textContent!==label)$('mode-state').textContent=label;
  if(!previous&&ruleState.endedAt){showModeEnd();save();}
 }
@@ -131,7 +131,7 @@ window.FusionUI={
  get state(){return {board:[...board],score,moves};},
  get mode(){return ruleState.mode;},
  get canMove(){tickRules();return !ruleState.endedAt;},
- nextMeta(result,at){const meta={...ruleState};modeRules.expire(meta,at);if(!meta.endedAt){modeRules.fusion(meta,result,at);if(meta.mode==='rush'&&result.board.some(v=>v>=128)){meta.endedAt=at;meta.reason='target';}}return meta;},
+ nextMeta(result,at){const meta={...ruleState};modeRules.expire(meta,at);if(!meta.endedAt){modeRules.fusion(meta,result,at);if(modeRules.get(meta.mode).race&&result.board.some(v=>v>=modeRules.get(meta.mode).target)){meta.endedAt=at;meta.reason='target';}}return meta;},
  remoteRule(meta){if(!meta)return;const previous=ruleState.mode;if(previous!==meta.mode){ruleState={...meta};resetCombo();}else{ruleState.endsAt=meta.endsAt;ruleState.comboDeadline=Math.max(ruleState.comboDeadline||0,meta.comboDeadline||0)||null;if(meta.endedAt){ruleState.endedAt=meta.endedAt;ruleState.reason=meta.reason;}}tickRules();},
  load(game){generation++;resetCombo();locked=false;board=[...game.board];score=game.score;moves=game.moves;won=!!game.won;continuing=true;ruleState=game.meta?{...game.meta}:modeRules.create('classic',gameNow());best=Number(storage.get('fusion-best-'+ruleState.mode,0))||0;$('overlay').hidden=true;draw();tickRules();if(ruleState.endedAt)showModeEnd();},
  confirmScore(value){best=Math.max(best,value||0);$('best').textContent=best;},

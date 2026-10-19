@@ -83,7 +83,7 @@ async function createApp() {
     const at=times[index];
     if(game.meta){gameModes.expire(game.meta,at);if(game.meta.endedAt)break;}
     result=rules.move(game.board,direction);spawned=-1;
-    if(result.changed){spawned=spawnStream.addTile(result.board,'solo:'+req.user.id,game.moves+2);game.board=result.board;game.score+=result.gain;game.moves++;game.won=game.won||game.board.some(v=>v>=2048);if(game.meta){gameModes.fusion(game.meta,result,at);if(game.meta.mode==='rush'&&game.board.some(v=>v>=128)){game.meta.endedAt=at;game.meta.reason='target';}}}
+    if(result.changed){spawned=spawnStream.addTile(result.board,'solo:'+req.user.id,game.moves+2);game.board=result.board;game.score+=result.gain;game.moves++;game.won=game.won||game.board.some(v=>v>=2048);if(game.meta){gameModes.fusion(game.meta,result,at);if(gameModes.get(game.meta.mode).race&&game.board.some(v=>v>=gameModes.get(game.meta.mode).target)){game.meta.endedAt=at;game.meta.reason='target';}}}
    }
    await tx.run('UPDATE games SET board=?,score=?,moves=?,won=? WHERE user_id=?',[JSON.stringify(game.board),game.score,game.moves,+game.won,req.user.id]);
    if(game.meta)gameModes.expire(game.meta,Date.now(),gameModes.GRACE);

@@ -39,8 +39,8 @@
   else if(status==='countdown')message='Prépare-toi ! Départ dans '+seconds+'…';
   else if(status==='finished'){
    if(current.status!=='finished')message='Temps écoulé · Vérification du résultat…';
-   else{message=current.winner===null?'Égalité !':current.winner===current.me.id?'Victoire ! Tu remportes le duel.':'Ton adversaire remporte le duel.';if(current.forfeit)message+=' (Abandon)';else if(current.reason==='combo')message+=current.winner===null?' Les deux combos ont expiré.':current.winner===current.me.id?' Ton adversaire a perdu son combo.':' Ton combo a expiré.';else if(current.reason==='target')message+=' Tuile 128 atteinte.';}
-  }else message=current.me.blocked?'Grille bloquée : ton score reste en jeu jusqu’à la fin.':current.mode==='sudden'?'La première fusion arme les 2 chronos : fusionne toutes les 2 s !':current.mode==='rush'?'Le premier à créer une tuile 128 gagne.':current.mode==='sprint'?'60 secondes : le plus grand score gagne.':'Le plus grand score au bout de 5 minutes gagne.';
+   else{message=current.winner===null?'Égalité !':current.winner===current.me.id?'Victoire ! Tu remportes le duel.':'Ton adversaire remporte le duel.';if(current.forfeit)message+=' (Abandon)';else if(current.reason==='combo')message+=current.winner===null?' Les deux combos ont expiré.':current.winner===current.me.id?' Ton adversaire a perdu son combo.':' Ton combo a expiré.';else if(current.reason==='target')message+=' Tuile '+window.FusionModes.get(current.mode).target+' atteinte.';}
+  }else message=current.me.blocked?'Grille bloquée : ton score reste en jeu jusqu’à la fin.':current.mode==='sudden'?'La première fusion arme les 2 chronos : fusionne toutes les 2 s !':window.FusionModes.get(current.mode).race?'Le premier à créer une tuile '+window.FusionModes.get(current.mode).target+' gagne.':current.mode==='sprint'?'60 secondes : le plus grand score gagne.':'Le plus grand score au bout de 5 minutes gagne.';
   if(el('duel-result').textContent!==message)el('duel-result').textContent=message;
  }
  function updateDuel(duel,{load=false}={}){

@@ -19,7 +19,9 @@ Ouvrir Modes pour choisir la règle, puis Solo, Solo classé ou Duel.
   empêcher l’attente volontaire ; le premier combo perdu fait perdre
   le duel. Si les deux tiennent 5 minutes, le meilleur score gagne.
 - Sprint 60 s : obtenir le plus grand score en une minute.
-- Course à 128 : créer une tuile 128 ; en duel, le premier gagne.
+- Courses à 128, 256, 512, 1024 et 2048 : atteindre la tuile choisie ;
+  en duel, le premier à cet objectif gagne. Chaque objectif a son classement
+  solo séparé. La course à 128 existante garde ses scores et salons.
 Les classements solo sont séparés par mode. Les chronos continuent en
 arrière-plan ou pendant l’ouverture des menus. Le créateur choisit la
 règle d’un salon ; son adversaire la reçoit automatiquement.

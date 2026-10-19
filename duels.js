@@ -58,7 +58,7 @@ function registerDuels({app,db,auth,route,rateLimit}){
     result=rules.move(me.board,direction);spawned=-1;
     if(result.changed){spawned=addTile(result.board,state.seed,me.moves+2);me.board=result.board;me.score+=result.gain;me.moves++;me.blocked=!rules.canMove(me.board);
      if(state.mode==='sudden'&&result.gain){if(!state.suddenArmedAt){state.suddenArmedAt=at;for(const p of state.players)p.comboDeadline=at+2000;}me.comboDeadline=at+2000;}
-     if(state.mode==='rush'&&me.board.some(v=>v>=128))state.targetWinner=me.id;
+     if(modes.get(state.mode).race&&me.board.some(v=>v>=modes.get(state.mode).target))state.targetWinner=me.id;
     }
    }
    await save(tx,state);
