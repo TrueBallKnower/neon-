@@ -2,7 +2,7 @@
  const el=id=>document.getElementById(id);let account=null,busy=false,polling=false,current=null,serverOffset=0,lastPollAt=0;
  const online=window.FusionOnline={ranked:false,duel:null};
  let lastClock=0;online.now=()=>lastClock=Math.max(lastClock,Date.now()+serverOffset);
- let selectedMode='classic';
+ let selectedMode='classic',sessionEpoch=0,sessionLoaded=false,sessionTask=false,sessionRetry=0,retryDelay=1000;
  let optimistic=null;
  function snapshot(data){return{game:data.duel?gameOf(data.duel):data.game,data,terminal:data.duel?.status==='finished'||!!data.game?.meta?.endedAt};}
  const sync=new window.FusionMoveSync({
@@ -89,9 +89,9 @@
  el('duel-mode').onchange=()=>{el('duel-mode-help').textContent=window.FusionModes.get(el('duel-mode').value).description;};
  el('leaderboard-mode').onchange=()=>el('leaderboard-open').onclick();
  el('account-open').onclick=()=>{render();open('account');};el('dialog-close').onclick=()=>el('online-dialog').close();
- async function authenticate(register){if(busy)return;busy=true;message('Connexion…');try{const data=await api(register?'register':'login',{username:el('account-name').value,password:el('account-password').value});account=data.user;el('account-password').value='';render();message('Connecté. Lance une partie classée ou ouvre Duel 1v1.');}catch(e){message(e.message);}finally{busy=false;}}
+ async function authenticate(register){if(busy)return;busy=true;message('Connexion…');try{const data=await api(register?'register':'login',{username:el('account-name').value,password:el('account-password').value});account=data.user;sessionEpoch++;sessionLoaded=true;clearTimeout(sessionRetry);el('account-password').value='';render();message('Connecté. Lance une partie classée ou ouvre Duel 1v1.');}catch(e){message(e.message);}finally{busy=false;}}
  el('account-form').onsubmit=e=>{e.preventDefault();authenticate(false);};el('register').onclick=()=>{if(el('account-form').reportValidity())authenticate(true);};
- el('logout').onclick=async()=>{if(busy)return;try{if(!await leave())return;resetPrediction();await api('logout',{});online.ranked=false;account=null;window.FusionUI.newGame(false);render();message('Déconnecté.');}catch(e){message(e.message);}};
+ el('logout').onclick=async()=>{if(busy)return;try{if(!await leave())return;resetPrediction();await api('logout',{});online.ranked=false;account=null;sessionEpoch++;sessionLoaded=true;clearTimeout(sessionRetry);window.FusionUI.newGame(false);render();message('Déconnecté.');}catch(e){message(e.message);}};
  async function start(){if(busy)return;busy=true;try{if(!await leave())return;resetPrediction();window.FusionUI.audio();const {game,best}=await api('game',{mode:el('ranked-mode').value});online.ranked=true;resetPrediction(game);window.FusionUI.load(game);window.FusionUI.confirmScore(best);render();el('online-dialog').close();}catch(e){message(e.message);}finally{busy=false;}}
  el('ranked-start').onclick=start;online.restart=()=>{if(online.duel)return;if(confirm('Recommencer ta partie classée ?'))start();};
  online.move=direction=>{
@@ -116,12 +116,16 @@
  let following=false;
  async function followRematch(code){if(following)return;following=true;try{const {duel}=await api('duels/'+code);updateDuel(duel,{load:true});}catch(e){el('duel-result').textContent=e.message;}finally{following=false;}}
  el('duel-rematch').onclick=async()=>{if(busy)return;busy=true;try{const {duel}=await api('duels/'+online.duel+'/rematch',{});updateDuel(duel);}catch(e){el('duel-result').textContent=e.message;}finally{busy=false;}};
- online.social={api,open,async prepareStory(){if(!await leave())return false;resetPrediction();online.ranked=false;render();return true;},isSignedIn:()=>!!account,async enter(code){if(busy)return false;busy=true;try{if(online.duel===code){el('online-dialog').close();return true;}if(!await leave())return false;const {duel}=await api('duels/'+code+'/join',{});updateDuel(duel,{load:true});el('online-dialog').close();return true;}finally{busy=false;}}};
+ online.social={get account(){return account?{...account}:null;},api,open,async prepareStory(){if(!await leave())return false;resetPrediction();online.ranked=false;render();return true;},isSignedIn:()=>!!account,async enter(code){if(busy)return false;busy=true;try{if(online.duel===code){el('online-dialog').close();return true;}if(!await leave())return false;const {duel}=await api('duels/'+code+'/join',{});updateDuel(duel,{load:true});el('online-dialog').close();return true;}finally{busy=false;}}};
  setInterval(clock,100);
  setInterval(async()=>{if(document.hidden||!online.duel||busy||polling||sync.task||sync.pending.length)return;const delay=current?.mode==='sudden'?250:1000;if(Date.now()-lastPollAt<delay)return;lastPollAt=Date.now();polling=true;const room=online.duel;try{const {duel}=await api('duels/'+room);if(room===online.duel&&!sync.task&&!sync.pending.length&&!busy)updateDuel(duel);}catch(e){el('duel-result').textContent='Connexion interrompue. Nouvelle tentative…';}finally{polling=false;}},250);
- api('me').then(async data=>{
+ async function hydrateSession(){
+  if(sessionLoaded||sessionTask||document.hidden)return;sessionTask=true;const epoch=sessionEpoch;
+  try{const data=await api('me');if(epoch!==sessionEpoch)return;sessionLoaded=true;
   account=data.user;render();const invite=new URL(location.href).searchParams.get('duel');
   if(invite&&/^[a-f0-9]{10}$/i.test(invite)){el('duel-code').value=invite.toUpperCase();open('duel');if(!account)message('Connecte-toi via Mon compte, puis rejoins le duel.');}
   else if(account&&readRoom()){try{const {duel}=await api('duels/'+readRoom());updateDuel(duel,{load:true});}catch{remember(null);}}
- }).catch(()=>{el('online-status').textContent='Mode libre · serveur hors ligne';});
+ }catch{if(epoch===sessionEpoch){el('online-status').textContent='Mode libre · reconnexion automatique…';clearTimeout(sessionRetry);sessionRetry=setTimeout(hydrateSession,retryDelay);retryDelay=Math.min(15000,retryDelay*2);}}finally{sessionTask=false;}
+ }
+ window.addEventListener('online',hydrateSession);document.addEventListener('visibilitychange',()=>{if(!document.hidden)hydrateSession();});hydrateSession();
 })();

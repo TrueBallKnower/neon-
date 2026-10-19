@@ -104,6 +104,7 @@ async function createApp() {
  require('./social').registerSocial({app,db,auth,route});
  registerDuels({app,db,auth,route,rateLimit});
  app.get('/healthz',route(async(req,res)=>{await db.one('SELECT 1 AS ok');res.json({ok:true});}));
+ app.use(require('./client-assets').clientAssets().middleware);
  app.use(express.static(path.join(__dirname,'public'),{setHeaders(res,file){res.setHeader('Cache-Control',file.endsWith('.html')?'no-store':'no-cache');}}));
  app.use((err,req,res,next)=>{if(err.type==='entity.parse.failed')return res.status(400).json({error:'JSON invalide.'});console.error('Request failed:',err.code||err.name);res.status(500).json({error:'Erreur serveur. Réessaie.'});});
  return {app,db,async close(){clearInterval(cleanup);await db.close();}};

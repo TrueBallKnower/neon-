@@ -207,3 +207,48 @@ reprise hors ligne, huit dimensions mobiles, atelier et victoire royale vérifi�
 Ces mesures sont faites dans Chromium simulant un mobile. Le téléchargement du
 moteur WebKit disponible a échoué dans cet environnement ; aucun résultat Safari
 physique ou taux d’images garanti sur iPhone n’est revendiqué.
+
+## Chargement mobile : jeu prioritaire et cache hors ligne
+
+`client-assets.js` assemble en mémoire un paquet de jeu, un paquet de cosmétiques
+et une feuille CSS commune. La page servie par Express demande une feuille et un
+seul script `defer`, au lieu de quatorze scripts successifs. Le catalogue et les
+anciennes éditions restent dans un paquet séparé, chargé après l’affichage du jeu
+ou immédiatement à la demande du bouton Skins. La session courante est transmise
+au module même si la connexion intervient avant son chargement. La création des
+cartes de collection attend leur ouverture. Une récompense d’histoire n’exige
+plus que le module cosmétique soit déjà disponible.
+
+Les fichiers sont compressés une fois en Brotli/gzip, avec les modules intégrés
+à Node ; aucune dépendance ni commande de construction supplémentaire. Les noms
+des paquets contiennent leur empreinte et se conservent un an. Le HTML et le
+service worker restent revalidés. Les images SVG sont également compressées,
+avec un cache serveur borné à 48 illustrations ; les anciennes URL de paquet
+redirigent vers leur version actuelle pour les onglets ouverts pendant un déploiement.
+Le transfert initial est d’environ 50 Ko en Brotli, contre environ 468 Ko pour
+l’ancienne page et ses fichiers non compressés. Le paquet de jeu est d’environ
+26 Ko en Brotli ; les 60 Ko de cosmétiques arrivent séparément.
+
+`sw.js` conserve la page publique et les fichiers nécessaires au jeu, puis les
+illustrations utilisées. Une visite déjà enregistrée peut donc ouvrir le jeu sans
+attendre le serveur, même hors ligne. Un nouveau déploiement renouvelle le cache.
+Le cache n’intercepte ni les requêtes non-GET, ni les API de comptes, scores, chats
+ou inventaires, ni le contrôle de santé. Les erreurs d’écriture du cache ne font
+pas échouer les téléchargements valides. Les données des comptes restent côté
+serveur ; seule la présentation publique du jeu est conservée par le worker.
+Si la première lecture de session échoue pendant un réveil du serveur, elle est
+réessayée avec délai progressif ; une connexion/déconnexion manuelle prend priorité
+sur les anciennes réponses en cours.
+
+Validation : 35 tests Node, dont négociation Brotli/gzip, décompression, ETag/304,
+HEAD, URL immuables, anciennes URL, compression SVG et syntaxe des paquets/worker.
+Comparaison Chromium mobile à 100 Ko/s et 150 ms de latence, serveur déjà éveillé :
+ancienne page 4 910 ms, nouvelle page 843 ms jusqu’au jeu utilisable. Un autre essai
+retarde volontairement les cosmétiques de 5 secondes : le plateau reste jouable
+avant leur arrivée. Retour hors ligne vérifié en 57 ms avec déplacement effectif ;
+collection de 13 univers/62 éditions et reconnexion d’un compte après échec réseau
+vérifiées. Huit tailles mobiles, gestes multipoints et reprise audio vérifiés.
+Ces mesures ne sont pas prises sur Safari/iPhone physique. Le cache nécessite que
+Safari ait pu enregistrer la visite ; il ne peut supprimer le réveil de Render
+Free lors de la toute première visite. L’origine publique n’a pas pu être mesurée
+depuis cet environnement, dont le proxy refuse cette destination.
