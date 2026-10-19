@@ -98,8 +98,8 @@ SKINS, PIÈCES ET COFFRES
 La collection est liée au compte et conservée en base. Les anciens déblocages
 locaux par combo/course sont remplacés par les coffres ; aucun skin payant
 n’existait dans cette version. Étincelle reste disponible sans compte.
-La collection contient 100 skins : 16 Communs, 26 Rares, 33 Épiques,
-23 Légendaires, Étincelle et King. Chaque collection a ses motifs SVG, ses formes, ses couleurs
+La collection contient 100 skins : 15 Communs, 25 Rares, 34 Épiques,
+24 Légendaires, Étincelle et King. Chaque collection a ses motifs SVG, ses formes, ses couleurs
 par valeur et sa transformation de fusion. Aucun effet continu sur le plateau.
 Or impérial est désormais Légendaire et disponible dans les coffres. Le seuil
 de score ne le débloque plus ; les propriétaires existants le conservent.
@@ -226,11 +226,11 @@ Recherche Google et pages officielles tentées mais bloquées HTTP 403 dans
 cet environnement. Aucun asset distant n’a été récupéré ou copié.
 
 ATELIER 100 : ANIMATIONS ET AMBIANCES
-79 collections nouvelles complètent les 21 existantes ; tous les anciens
-identifiants et inventaires sont conservés. 24 hommages sont explicitement
+La sélection active compte 100 skins, dont 64 hommages. Les 40 thèmes retirés
+restent en archives pour leurs propriétaires. Les hommages sont explicitement
 non officiels, notamment Zelda, Kirby, Mario, Sonic, Hollow Knight, Arcane,
 One Piece, Dragon Ball, Ghibli, Portal, Tetris, Transformers et Spider-Man.
-Les silhouettes sont dessinées dans skin-expansion.json : 79 emblèmes
+Les silhouettes sont dessinées dans skin-expansion.json : emblèmes
 originaux, des cadres par matière et onze évolutions illustrées par collection.
 Le script de génération produit aussi skin-expansion.js pour le navigateur.
 La recherche ignore les accents. La collection est paginée à 12 cartes
@@ -254,3 +254,15 @@ révocation King, CPU ralenti 4x et huit formats mobiles émulés.
 Ces contrôles ne remplacent pas un test Safari sur appareil physique.
 Nouvelle recherche Google, Wikipedia, Minecraft et NASA tentée mais bloquée
 par le réseau (HTTP 403). Toutes les illustrations ont été produites localement.
+
+COLLECTIONS ET SÉLECTION
+Huit familles : Céleste, Éléments, Rétro, Néon, Médiéval, Nature, Curiosités,
+Hommages. Chaque famille affiche la progression possédés / total ; les hommages
+se filtrent aussi par jeux vidéo, séries/anime et films. Ces filtres se combinent
+avec la rareté, la recherche et le filtre « Possédés ».
+100 skins actifs, 64 hommages et 36 créations originales/exclusives.
+40 anciens thèmes proches sont sortis des coffres : leurs fichiers, identifiants,
+inventaires et reçus restent valides. « Mes archives » n’apparaît que si le compte
+en possède ; ils restent équipables. Aucune pièce ni récompense n’est supprimée.
+Les dessins vectoriels des hommages sont originaux et signalés non officiels.
+Régénération : python3 scripts/generate-skin-art.py (données JSON → JS et SVG).

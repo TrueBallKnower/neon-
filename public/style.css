@@ -200,3 +200,48 @@ body.effects-lite .chest-orbit{animation:none!important;opacity:.2!important}@me
 [data-expanded="true"][data-material="stone"] :is(.tile-inner,.skin-face){background:repeating-linear-gradient(165deg,#0000 0 8px,#0002 8px 10px),linear-gradient(135deg,hsl(var(--skin-hue) 25% 28%),hsl(var(--skin-hue) 20% 13%));border:3px ridge hsl(var(--skin-hue) 30% 55%);border-radius:4px 11px}
 [data-expanded="true"][data-material="ceramic"] :is(.tile-inner,.skin-face){background:radial-gradient(ellipse at 20% 0,#fff4,transparent 60%),linear-gradient(145deg,hsl(var(--skin-hue) 50% 35%),hsl(var(--skin-hue) 55% 16%));border:2px solid hsl(var(--skin-hue) 60% 83%);border-radius:12%}
 #combo-aura{z-index:0}#combo>div:first-child,#combo>.combo-track{position:relative;z-index:1}
+
+/* Collection browsing stays outside the playing board; only twelve previews mount. */
+#skin-collections:not([hidden]){display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:18px 0 10px}#skin-collections button.collection-tile{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:7px;padding:14px 10px;min-width:0;color:#f0eff5;background:#191c26;border:1px solid #343848;border-radius:12px}.collection-tile strong{font-size:14px}.collection-tile span{font-size:11px;color:#b8c1d4}#skin-collections button.collection-tile[aria-pressed="true"]{border-color:#bdff64;background:#263227}#skin-collections button.collection-tile[data-collection="collabs"]{background:linear-gradient(135deg,#312344,#182836)}#collection-description{color:#b8c1d4;font-size:13px}#skin-universes:not([hidden]){display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}#online-dialog #skin-universes button{background:#242331;color:#ded8ec;border-color:#51485f;font-size:12px;padding:9px 12px}#online-dialog #skin-universes [aria-pressed="true"]{background:#bdff64;color:#101014}@media(max-width:540px){#skin-collections:not([hidden]){grid-template-columns:repeat(2,minmax(0,1fr))}}
+[data-art="assassin"]{--skin-art:url('/skin-art/assassin.svg')}
+[data-art="vaultboy"]{--skin-art:url('/skin-art/vaultboy.svg')}
+[data-art="rapture"]{--skin-art:url('/skin-art/rapture.svg')}
+[data-art="plumbob"]{--skin-art:url('/skin-art/plumbob.svg')}
+[data-art="crewmate"]{--skin-art:url('/skin-art/crewmate.svg')}
+[data-art="animalisland"]{--skin-art:url('/skin-art/animalisland.svg')}
+[data-art="inkcity"]{--skin-art:url('/skin-art/inkcity.svg')}
+[data-art="runesfire"]{--skin-art:url('/skin-art/runesfire.svg')}
+[data-art="soulbonfire"]{--skin-art:url('/skin-art/soulbonfire.svg')}
+[data-art="diamondarena"]{--skin-art:url('/skin-art/diamondarena.svg')}
+[data-art="brawlbadge"]{--skin-art:url('/skin-art/brawlbadge.svg')}
+[data-art="cupcartoon"]{--skin-art:url('/skin-art/cupcartoon.svg')}
+[data-art="celestemountain"]{--skin-art:url('/skin-art/celestemountain.svg')}
+[data-art="stardewfarm"]{--skin-art:url('/skin-art/stardewfarm.svg')}
+[data-art="terrablade"]{--skin-art:url('/skin-art/terrablade.svg')}
+[data-art="doomforge"]{--skin-art:url('/skin-art/doomforge.svg')}
+[data-art="haloring"]{--skin-art:url('/skin-art/haloring.svg')}
+[data-art="aperturehunter"]{--skin-art:url('/skin-art/aperturehunter.svg')}
+[data-art="titanwalls"]{--skin-art:url('/skin-art/titanwalls.svg')}
+[data-art="cursedseal"]{--skin-art:url('/skin-art/cursedseal.svg')}
+[data-art="heroacademy"]{--skin-art:url('/skin-art/heroacademy.svg')}
+[data-art="notebook"]{--skin-art:url('/skin-art/notebook.svg')}
+[data-art="fullmetal"]{--skin-art:url('/skin-art/fullmetal.svg')}
+[data-art="sailormoon"]{--skin-art:url('/skin-art/sailormoon.svg')}
+[data-art="piratehunter"]{--skin-art:url('/skin-art/piratehunter.svg')}
+[data-art="upside"]{--skin-art:url('/skin-art/upside.svg')}
+[data-art="dragonthrone"]{--skin-art:url('/skin-art/dragonthrone.svg')}
+[data-art="avatarbalance"]{--skin-art:url('/skin-art/avatarbalance.svg')}
+[data-art="rickportal"]{--skin-art:url('/skin-art/rickportal.svg')}
+[data-art="wednesday"]{--skin-art:url('/skin-art/wednesday.svg')}
+[data-art="wizardhouses"]{--skin-art:url('/skin-art/wizardhouses.svg')}
+[data-art="onering"]{--skin-art:url('/skin-art/onering.svg')}
+[data-art="spicedunes"]{--skin-art:url('/skin-art/spicedunes.svg')}
+[data-art="matrixcode"]{--skin-art:url('/skin-art/matrixcode.svg')}
+[data-art="jurassic"]{--skin-art:url('/skin-art/jurassic.svg')}
+[data-art="ghosttrap"]{--skin-art:url('/skin-art/ghosttrap.svg')}
+[data-art="fluxdrive"]{--skin-art:url('/skin-art/fluxdrive.svg')}
+[data-art="pandoraforest"]{--skin-art:url('/skin-art/pandoraforest.svg')}
+[data-art="spacemonolith"]{--skin-art:url('/skin-art/spacemonolith.svg')}
+[data-art="nightmare"]{--skin-art:url('/skin-art/nightmare.svg')}
+
+#skin-collections button.collection-tile[aria-pressed="true"]{background:#263227;border-color:#bdff64;color:#e7ffd0}#skin-collections .collection-tile:focus-visible{outline:2px solid #bdff64;outline-offset:2px}

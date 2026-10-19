@@ -130,7 +130,27 @@ for skin in expansion['skins']:
  seed=int(hashlib.sha256(skin['id'].encode()).hexdigest()[:8],16);panels=[]
  for level in range(11):
   hue=skin['hues'][level];rgb=colorsys.hls_to_rgb((hue%360)/360,.75,.65);accent='#'+''.join(f'{int(c*255):02x}' for c in rgb)
-  icon=skin['icon'];s=material_frame(skin['material'],level,seed)
+  icon=skin['icon'];s=''
+  if skin.get('illustration'):
+   # A full-size silhouette distinguishes the tile even at mobile board sizes.
+   # Keep the numeral zone translucent; detail increases around its perimeter.
+   s+=f'<g opacity=".32" transform="translate(10 8) scale(2.2)"><path d="{icon}" fill="{accent}" fill-opacity=".22" stroke="{accent}" stroke-width=".7"/></g>'
+   if skin['id']=='matrixcode':
+    for col in range(8):
+     for row in range(7):
+      x=6+col*12;y=9+row*12
+      s+=path(f'M{x} {y}v5h3v-3h-3' if (col+row+level)%2 else f'M{x} {y}h4v5h-4z',stroke='#85ffad',width=.6)
+   elif skin['fx'] in ['cosmic','shadow']:
+    for n in range(10+level):
+     x=(n*37+seed)%94+3;y=(n*53+seed//7)%94+3
+     s+=circle(x,y,.4+(n%3)*.3,accent,accent,.2)
+   elif skin['fx'] in ['water','sand']:
+    for y in range(12,96,17):s+=path(f'M0 {y}q12-8 25 0t25 0 25 0 25 0',stroke=accent,width=.35)
+   elif skin['fx']=='leaves':
+    s+=path('M3 90Q24 68 6 37M97 10Q76 32 94 63M7 70Q26 55 18 44M93 30Q74 45 82 56',stroke=accent,width=.9)
+   elif skin['fx'] in ['electric','lightning']:
+    s+=path('M0 28h12l6-6h16M100 72H88l-6 6H66M0 72h14l5 6h12M100 28H86l-5-6H69',stroke=accent,width=.85)
+  s+=material_frame(skin['material'],level,seed)
   # Two individually authored emblems, extra inlays and a coronet at high values.
   for x,y,angle in [(7,7,0),(66,66,180)]:
    s+=f'<g transform="translate({x} {y}) scale(.75)"><path d="{icon}" fill="{accent}" fill-opacity=".12" stroke="{accent}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>'

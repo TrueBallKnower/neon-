@@ -26,3 +26,13 @@ test('100 distinct illustrated skins retain all old ids, themes and rarity profi
 test('combo intensity increases while its effects remain bounded, independent of game rules',()=>{
  const fire=R.feedback('phoenix',128,1),hot=R.feedback('phoenix',128,9),water=R.feedback('kraken',128,4);assert.equal(fire.theme,'fire');assert.equal(water.theme,'water');assert.notEqual(fire.sound,water.sound);assert.ok(hot.intensity>fire.intensity);assert.equal(R.feedback('original',2048,5).enabled,false);
 });
+
+test('curated collections cover every active skin; archived purchases remain resolvable but never drop',()=>{
+ assert.equal(R.catalog.filter(s=>s.inspiration).length,64);assert.equal(R.archive.length,40);
+ for(const skin of R.catalog){assert.ok(R.collections[skin.collection]);assert.ok(!skin.retired);if(skin.inspiration)assert.ok(['games','series','films'].includes(skin.medium));}
+ for(const key of Object.keys(R.collections))assert.ok(R.catalog.some(s=>s.collection===key),key);
+ assert.ok(R.catalog.filter(s=>s.collection==='celestial').length>=5);
+ for(const skin of R.archive){assert.equal(R.get(skin.id).id,skin.id);assert.equal(skin.chest,false);assert.ok(!R.catalog.some(s=>s.id===skin.id));}
+ // Owning every active skin must still produce a duplicate, never an archive.
+ const owned=R.catalog.map(s=>s.id);for(const chest of R.chests)for(const roll of [0,7000,9400,9900,9999]){let n=0;const result=drawSkin(chest,owned,max=>n++===0?roll%10000:0);assert.ok(R.catalog.some(s=>s.id===result.skin));assert.equal(result.duplicate,true);}
+});

@@ -30,7 +30,9 @@
       ],
       "motion": "scale(1.08,.97)",
       "hint": "Triangles reliquaires, runes taillées et joyaux incrustés.",
-      "inspiration": "Hommage The Legend of Zelda · non officiel"
+      "inspiration": "Hommage The Legend of Zelda · non officiel",
+      "collection": "collabs",
+      "medium": "games"
     },
     {
       "id": "starvoyager",
@@ -62,7 +64,9 @@
       ],
       "motion": "scale(1.09) rotate(3deg)",
       "hint": "Étoiles arrondies et broderies de velours céleste.",
-      "inspiration": "Hommage Kirby · non officiel"
+      "inspiration": "Hommage Kirby · non officiel",
+      "collection": "collabs",
+      "medium": "games"
     },
     {
       "id": "mushroom",
@@ -94,7 +98,9 @@
       ],
       "motion": "scale(.97,1.1)",
       "hint": "Champignons bombés et émaux d’un royaume miniature.",
-      "inspiration": "Hommage Super Mario · non officiel"
+      "inspiration": "Hommage Super Mario · non officiel",
+      "collection": "collabs",
+      "medium": "games"
     },
     {
       "id": "bluevelocity",
@@ -126,7 +132,9 @@
       ],
       "motion": "scale(1.1)",
       "hint": "Éclairs profilés, rivets et carénages de course.",
-      "inspiration": "Hommage Sonic · non officiel"
+      "inspiration": "Hommage Sonic · non officiel",
+      "collection": "collabs",
+      "medium": "games"
     },
     {
       "id": "palehorn",
@@ -158,7 +166,9 @@
       ],
       "motion": "scale(1.06) rotate(-3deg)",
       "hint": "Masques cornus et ivoire gravé de couronnes sombres.",
-      "inspiration": "Hommage Hollow Knight · non officiel"
+      "inspiration": "Hommage Hollow Knight · non officiel",
+      "collection": "collabs",
+      "medium": "games"
     },
     {
       "id": "hextech",
@@ -190,7 +200,9 @@
       ],
       "motion": "scale(1.08,.97)",
       "hint": "Noyaux hexagonaux et pistes métalliques serties de gemmes.",
-      "inspiration": "Hommage Arcane · non officiel"
+      "inspiration": "Hommage Arcane · non officiel",
+      "collection": "collabs",
+      "medium": "series"
     },
     {
       "id": "strawsail",
@@ -222,7 +234,9 @@
       ],
       "motion": "scale(1.09) rotate(3deg)",
       "hint": "Voiliers gravés et coutures de toile du grand large.",
-      "inspiration": "Hommage One Piece · non officiel"
+      "inspiration": "Hommage One Piece · non officiel",
+      "collection": "collabs",
+      "medium": "series"
     },
     {
       "id": "dragonspheres",
@@ -254,7 +268,9 @@
       ],
       "motion": "scale(.97,1.1)",
       "hint": "Sphères étoilées en émail et sceaux solaires.",
-      "inspiration": "Hommage Dragon Ball · non officiel"
+      "inspiration": "Hommage Dragon Ball · non officiel",
+      "collection": "collabs",
+      "medium": "series"
     },
     {
       "id": "sunbreath",
@@ -286,7 +302,9 @@
       ],
       "motion": "scale(1.1)",
       "hint": "Soleils à rayons et plaques laquées tressées.",
-      "inspiration": "Hommage Demon Slayer · non officiel"
+      "inspiration": "Hommage Demon Slayer · non officiel",
+      "collection": "collabs",
+      "medium": "series"
     },
     {
       "id": "forestcourier",
@@ -318,7 +336,9 @@
       ],
       "motion": "scale(1.06) rotate(-3deg)",
       "hint": "Petites maisons de papier et estampes de forêt.",
-      "inspiration": "Hommage Studio Ghibli · non officiel"
+      "inspiration": "Hommage Studio Ghibli · non officiel",
+      "collection": "collabs",
+      "medium": "films"
     },
     {
       "id": "portals",
@@ -350,7 +370,9 @@
       ],
       "motion": "scale(1.08,.97)",
       "hint": "Portes elliptiques et gravures opposées dans le verre.",
-      "inspiration": "Hommage Portal · non officiel"
+      "inspiration": "Hommage Portal · non officiel",
+      "collection": "collabs",
+      "medium": "games"
     },
     {
       "id": "mazeghost",
@@ -382,7 +404,9 @@
       ],
       "motion": "scale(1.09) rotate(3deg)",
       "hint": "Fantômes en mosaïque et cadres d’arcade à pixels.",
-      "inspiration": "Hommage Pac-Man · non officiel"
+      "inspiration": "Hommage Pac-Man · non officiel",
+      "collection": "collabs",
+      "medium": "games"
     },
     {
       "id": "tetramino",
@@ -414,7 +438,9 @@
       ],
       "motion": "scale(.97,1.1)",
       "hint": "Assemblages géométriques et boutons carrés en relief.",
-      "inspiration": "Hommage Tetris · non officiel"
+      "inspiration": "Hommage Tetris · non officiel",
+      "collection": "collabs",
+      "medium": "games"
     },
     {
       "id": "automech",
@@ -446,7 +472,9 @@
       ],
       "motion": "scale(1.1)",
       "hint": "Visières angulaires et blindages de métal articulé.",
-      "inspiration": "Hommage Transformers · non officiel"
+      "inspiration": "Hommage Transformers · non officiel",
+      "collection": "collabs",
+      "medium": "films"
     },
     {
       "id": "nightwatch",
@@ -478,7 +506,9 @@
       ],
       "motion": "scale(1.06) rotate(-3deg)",
       "hint": "Ailes nocturnes et fibre noire à reflets colorés.",
-      "inspiration": "Hommage Batman · non officiel"
+      "inspiration": "Hommage Batman · non officiel",
+      "collection": "collabs",
+      "medium": "films"
     },
     {
       "id": "webweaver",
@@ -510,7 +540,9 @@
       ],
       "motion": "scale(1.08,.97)",
       "hint": "Toiles concentriques et coutures de soie brillante.",
-      "inspiration": "Hommage Spider-Man · non officiel"
+      "inspiration": "Hommage Spider-Man · non officiel",
+      "collection": "collabs",
+      "medium": "films"
     },
     {
       "id": "icepalace",
@@ -542,7 +574,9 @@
       ],
       "motion": "scale(1.09) rotate(3deg)",
       "hint": "Flocons à six branches et facettes de givre.",
-      "inspiration": "Hommage Frozen · non officiel"
+      "inspiration": "Hommage Frozen · non officiel",
+      "collection": "collabs",
+      "medium": "films"
     },
     {
       "id": "lightcycle",
@@ -574,7 +608,9 @@
       ],
       "motion": "scale(.97,1.1)",
       "hint": "Motos profilées et panneaux de carbone lumineux.",
-      "inspiration": "Hommage TRON · non officiel"
+      "inspiration": "Hommage TRON · non officiel",
+      "collection": "collabs",
+      "medium": "films"
     },
     {
       "id": "monsterhunter",
@@ -606,7 +642,9 @@
       ],
       "motion": "scale(1.1)",
       "hint": "Masques bestiaux et encoches d’armure en ivoire.",
-      "inspiration": "Hommage Monster Hunter · non officiel"
+      "inspiration": "Hommage Monster Hunter · non officiel",
+      "collection": "collabs",
+      "medium": "games"
     },
     {
       "id": "pokegarden",
@@ -638,7 +676,9 @@
       ],
       "motion": "scale(1.06) rotate(-3deg)",
       "hint": "Petits compagnons feuillus et émaux de jardin.",
-      "inspiration": "Hommage Pokémon · non officiel"
+      "inspiration": "Hommage Pokémon · non officiel",
+      "collection": "collabs",
+      "medium": "games"
     },
     {
       "id": "clockwork",
@@ -669,7 +709,8 @@
         "✧"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Cadrans, aiguilles et rouages en laiton gravé."
+      "hint": "Cadrans, aiguilles et rouages en laiton gravé.",
+      "collection": "retro"
     },
     {
       "id": "beehive",
@@ -700,7 +741,8 @@
         "✾"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Alvéoles, sceaux de miel et cire lumineuse."
+      "hint": "Alvéoles, sceaux de miel et cire lumineuse.",
+      "collection": "nature"
     },
     {
       "id": "butterfly",
@@ -731,7 +773,8 @@
         "✾"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Ailes de papillon et broderies fines sur soie."
+      "hint": "Ailes de papillon et broderies fines sur soie.",
+      "collection": "nature"
     },
     {
       "id": "carnivale",
@@ -762,7 +805,9 @@
         "✿"
       ],
       "motion": "scale(1.1)",
-      "hint": "Masques vénitiens et velours cousu de joyaux."
+      "hint": "Masques vénitiens et velours cousu de joyaux.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "alchemist",
@@ -793,7 +838,8 @@
         "✥"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Fioles et becs de verre incrustés d’alchimie."
+      "hint": "Fioles et becs de verre incrustés d’alchimie.",
+      "collection": "medieval"
     },
     {
       "id": "phoenix",
@@ -824,7 +870,8 @@
         "☼"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Ailes déployées, gravures de braise et cendres dorées."
+      "hint": "Ailes déployées, gravures de braise et cendres dorées.",
+      "collection": "elemental"
     },
     {
       "id": "kraken",
@@ -855,7 +902,8 @@
         "◎"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Tentacules symétriques et perles des profondeurs."
+      "hint": "Tentacules symétriques et perles des profondeurs.",
+      "collection": "elemental"
     },
     {
       "id": "jellyfish",
@@ -886,7 +934,8 @@
         "◎"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Ombrelles translucides et filaments gravés dans le verre."
+      "hint": "Ombrelles translucides et filaments gravés dans le verre.",
+      "collection": "elemental"
     },
     {
       "id": "coral",
@@ -917,7 +966,9 @@
         "◎"
       ],
       "motion": "scale(1.1)",
-      "hint": "Branches de corail et bordures de céramique marine."
+      "hint": "Branches de corail et bordures de céramique marine.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "nautilus",
@@ -948,7 +999,9 @@
         "◎"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Coquilles en spirale et perles de nacre."
+      "hint": "Coquilles en spirale et perles de nacre.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "samuraiarmor",
@@ -979,7 +1032,9 @@
         "✿"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Kabutos, plaques d’armure laquées et œillets dorés."
+      "hint": "Kabutos, plaques d’armure laquées et œillets dorés.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "bamboo",
@@ -1010,7 +1065,9 @@
         "✾"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Tiges segmentées et veines de bois sculpté."
+      "hint": "Tiges segmentées et veines de bois sculpté.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "bonsai",
@@ -1041,7 +1098,9 @@
         "✾"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Arbres miniatures et pots gravés dans le bois."
+      "hint": "Arbres miniatures et pots gravés dans le bois.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "lotus",
@@ -1072,7 +1131,9 @@
         "◎"
       ],
       "motion": "scale(1.1)",
-      "hint": "Pétales superposés, soie et filigranes aquatiques."
+      "hint": "Pétales superposés, soie et filigranes aquatiques.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "koi",
@@ -1103,7 +1164,9 @@
         "◎"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Carpes stylisées et broderies de soie ondulée."
+      "hint": "Carpes stylisées et broderies de soie ondulée.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "rosewindow",
@@ -1134,7 +1197,9 @@
         "✥"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Rosaces étoilées et facettes de verre coloré."
+      "hint": "Rosaces étoilées et facettes de verre coloré.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "mosaic",
@@ -1165,7 +1230,9 @@
         "✥"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Losanges emboîtés et tesselles de céramique."
+      "hint": "Losanges emboîtés et tesselles de céramique.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "porcelain",
@@ -1196,7 +1263,9 @@
         "✿"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Vases impériaux et émaux ciselés."
+      "hint": "Vases impériaux et émaux ciselés.",
+      "collection": "curiosities",
+      "retired": true
     },
     {
       "id": "terracotta",
@@ -1227,7 +1296,9 @@
         "✺"
       ],
       "motion": "scale(1.1)",
-      "hint": "Guerriers miniatures et empreintes d’argile."
+      "hint": "Guerriers miniatures et empreintes d’argile.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "desertrose",
@@ -1258,7 +1329,8 @@
         "✺"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Cristaux de sable et strates minérales sculptées."
+      "hint": "Cristaux de sable et strates minérales sculptées.",
+      "collection": "elemental"
     },
     {
       "id": "dunes",
@@ -1289,7 +1361,9 @@
         "✺"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Caravanes et dromadaires sur toile cousue."
+      "hint": "Caravanes et dromadaires sur toile cousue.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "scarab",
@@ -1320,7 +1394,9 @@
         "✺"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Scarabées ailés et incrustations de laiton."
+      "hint": "Scarabées ailés et incrustations de laiton.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "pyramid",
@@ -1351,7 +1427,9 @@
         "✵"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Pyramides nervurées et pierres célestes."
+      "hint": "Pyramides nervurées et pierres célestes.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "iceberg",
@@ -1382,7 +1460,9 @@
         "✧"
       ],
       "motion": "scale(1.1)",
-      "hint": "Blocs de glace aux arêtes cristallines."
+      "hint": "Blocs de glace aux arêtes cristallines.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "snowfox",
@@ -1413,7 +1493,8 @@
         "✧"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Renards stylisés et coutures de fourrure polaire."
+      "hint": "Renards stylisés et coutures de fourrure polaire.",
+      "collection": "nature"
     },
     {
       "id": "polarstar",
@@ -1444,7 +1525,9 @@
         "✧"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Étoiles à quatre pointes et facettes de cristal."
+      "hint": "Étoiles à quatre pointes et facettes de cristal.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "gingerbread",
@@ -1475,7 +1558,9 @@
         "✿"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Toits sucrés, glaçages et frises en relief."
+      "hint": "Toits sucrés, glaçages et frises en relief.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "peppermint",
@@ -1506,7 +1591,9 @@
         "✧"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Spirales de menthe et disques émaillés."
+      "hint": "Spirales de menthe et disques émaillés.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "cocoa",
@@ -1537,7 +1624,9 @@
         "✿"
       ],
       "motion": "scale(1.1)",
-      "hint": "Carrés de chocolat et tablettes de terre cuite."
+      "hint": "Carrés de chocolat et tablettes de terre cuite.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "macaron",
@@ -1568,7 +1657,9 @@
         "✿"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Coques doubles, ganaches et liserés sucrés."
+      "hint": "Coques doubles, ganaches et liserés sucrés.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "sushi",
@@ -1599,7 +1690,9 @@
         "◎"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Makis illustrés et textures de tissu japonais."
+      "hint": "Makis illustrés et textures de tissu japonais.",
+      "collection": "curiosities",
+      "retired": true
     },
     {
       "id": "tea",
@@ -1630,7 +1723,9 @@
         "✾"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Tasses de thé et vapeurs gravées sur porcelaine."
+      "hint": "Tasses de thé et vapeurs gravées sur porcelaine.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "cactus",
@@ -1661,7 +1756,9 @@
         "✺"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Cactus ramifiés et cadres d’argile du désert."
+      "hint": "Cactus ramifiés et cadres d’argile du désert.",
+      "collection": "nature",
+      "retired": true
     },
     {
       "id": "orchid",
@@ -1692,7 +1789,9 @@
         "✾"
       ],
       "motion": "scale(1.1)",
-      "hint": "Orchidées à cinq pétales sur velours de nuit."
+      "hint": "Orchidées à cinq pétales sur velours de nuit.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "mushroomforest",
@@ -1723,7 +1822,9 @@
         "✾"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Ombrelles de champignons et gravures de bois."
+      "hint": "Ombrelles de champignons et gravures de bois.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "sequoia",
@@ -1754,7 +1855,9 @@
         "✾"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Arbres monumentaux et veines de bois ancien."
+      "hint": "Arbres monumentaux et veines de bois ancien.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "owl",
@@ -1785,7 +1888,9 @@
         "✦"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Hiboux aux yeux cerclés et coutures de bibliothèques."
+      "hint": "Hiboux aux yeux cerclés et coutures de bibliothèques.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "wolf",
@@ -1816,7 +1921,9 @@
         "✦"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Masques de loups et incrustations de fourrure lunaire."
+      "hint": "Masques de loups et incrustations de fourrure lunaire.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "tiger",
@@ -1847,7 +1954,9 @@
         "☼"
       ],
       "motion": "scale(1.1)",
-      "hint": "Têtes de tigres, rayures et armures laquées."
+      "hint": "Têtes de tigres, rayures et armures laquées.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "peacock",
@@ -1878,7 +1987,8 @@
         "✥"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Éventails de plumes et broderies de saphir."
+      "hint": "Éventails de plumes et broderies de saphir.",
+      "collection": "nature"
     },
     {
       "id": "unicorn",
@@ -1909,7 +2019,8 @@
         "✵"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Licornes stylisées et liserés de nacre astrale."
+      "hint": "Licornes stylisées et liserés de nacre astrale.",
+      "collection": "medieval"
     },
     {
       "id": "griffin",
@@ -1940,7 +2051,9 @@
         "✿"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Griffons ailés et plaquages de laiton."
+      "hint": "Griffons ailés et plaquages de laiton.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "leviathan",
@@ -1971,7 +2084,9 @@
         "✺"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Serpents marins et incrustations de nacre orageuse."
+      "hint": "Serpents marins et incrustations de nacre orageuse.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "gargoyle",
@@ -2002,7 +2117,8 @@
         "✦"
       ],
       "motion": "scale(1.1)",
-      "hint": "Gargouilles ailées et encoches de pierre gothique."
+      "hint": "Gargouilles ailées et encoches de pierre gothique.",
+      "collection": "medieval"
     },
     {
       "id": "tarot",
@@ -2033,7 +2149,8 @@
         "✵"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Cartes en papier gravé et lunes d’éclipse."
+      "hint": "Cartes en papier gravé et lunes d’éclipse.",
+      "collection": "medieval"
     },
     {
       "id": "astrolabe",
@@ -2064,7 +2181,8 @@
         "✵"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Instruments astronomiques et anneaux de laiton."
+      "hint": "Instruments astronomiques et anneaux de laiton.",
+      "collection": "celestial"
     },
     {
       "id": "blackhole",
@@ -2077,17 +2195,17 @@
       "art": "blackhole",
       "sprite": true,
       "hues": [
-        233,
-        268,
-        298,
-        333,
-        28,
-        188,
-        158,
-        208,
-        283,
-        48,
-        253
+        245,
+        260,
+        275,
+        285,
+        215,
+        230,
+        250,
+        280,
+        310,
+        240,
+        265
       ],
       "marks": [
         "⋆",
@@ -2095,7 +2213,8 @@
         "✵"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Anneaux d’accrétion et obsidienne striée."
+      "hint": "Anneaux d’accrétion et obsidienne striée.",
+      "collection": "celestial"
     },
     {
       "id": "saturn",
@@ -2108,17 +2227,17 @@
       "art": "saturn",
       "sprite": true,
       "hues": [
-        236,
-        271,
-        301,
-        336,
-        31,
-        191,
-        161,
-        211,
-        286,
-        51,
-        256
+        40,
+        35,
+        45,
+        210,
+        30,
+        275,
+        42,
+        220,
+        35,
+        290,
+        48
       ],
       "marks": [
         "⋆",
@@ -2126,7 +2245,8 @@
         "✵"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Planètes à anneaux et prismes de verre."
+      "hint": "Planètes à anneaux et prismes de verre.",
+      "collection": "celestial"
     },
     {
       "id": "mars",
@@ -2157,7 +2277,9 @@
         "✺"
       ],
       "motion": "scale(1.1)",
-      "hint": "Dômes de colonie et blindage de carbone martien."
+      "hint": "Dômes de colonie et blindage de carbone martien.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "comet",
@@ -2170,17 +2292,17 @@
       "art": "comet",
       "sprite": true,
       "hues": [
-        242,
-        277,
-        307,
-        342,
-        37,
-        197,
-        167,
-        217,
-        292,
-        57,
-        262
+        195,
+        205,
+        215,
+        280,
+        185,
+        230,
+        200,
+        290,
+        210,
+        275,
+        190
       ],
       "marks": [
         "⋆",
@@ -2188,7 +2310,8 @@
         "✵"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Comètes facettées et sillages de cristal."
+      "hint": "Comètes facettées et sillages de cristal.",
+      "collection": "celestial"
     },
     {
       "id": "quantum",
@@ -2219,7 +2342,9 @@
         "✵"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Cubes impossibles et arêtes de métal quantique."
+      "hint": "Cubes impossibles et arêtes de métal quantique.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "tesla",
@@ -2250,7 +2375,9 @@
         "✦"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Bobines empilées et conducteurs métalliques."
+      "hint": "Bobines empilées et conducteurs métalliques.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "steampunk",
@@ -2281,7 +2408,9 @@
         "✧"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Locomotives à vapeur et châssis de laiton."
+      "hint": "Locomotives à vapeur et châssis de laiton.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "robot",
@@ -2312,7 +2441,9 @@
         "✦"
       ],
       "motion": "scale(1.1)",
-      "hint": "Petits robots et écrans de chrome riveté."
+      "hint": "Petits robots et écrans de chrome riveté.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "synthwave",
@@ -2343,7 +2474,9 @@
         "✦"
       ],
       "motion": "scale(1.06) rotate(-3deg)",
-      "hint": "Soleils striés et grilles de chrome rétro."
+      "hint": "Soleils striés et grilles de chrome rétro.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "cassette",
@@ -2374,7 +2507,8 @@
         "✿"
       ],
       "motion": "scale(1.08,.97)",
-      "hint": "Bandes magnétiques et bobines chromées."
+      "hint": "Bandes magnétiques et bobines chromées.",
+      "collection": "retro"
     },
     {
       "id": "hologram",
@@ -2405,7 +2539,9 @@
         "✵"
       ],
       "motion": "scale(1.09) rotate(3deg)",
-      "hint": "Cubes en fil de verre et prismes holographiques."
+      "hint": "Cubes en fil de verre et prismes holographiques.",
+      "retired": true,
+      "collection": "curiosities"
     },
     {
       "id": "opal",
@@ -2436,7 +2572,8 @@
         "✥"
       ],
       "motion": "scale(.97,1.1)",
-      "hint": "Gemmes hexagonales et veinures de nacre."
+      "hint": "Gemmes hexagonales et veinures de nacre.",
+      "collection": "elemental"
     },
     {
       "id": "meteorite",
@@ -2467,7 +2604,1409 @@
         "☼"
       ],
       "motion": "scale(1.1)",
-      "hint": "Fragments de météorite et strates d’obsidienne."
+      "hint": "Fragments de météorite et strates d’obsidienne.",
+      "retired": true,
+      "collection": "curiosities"
+    },
+    {
+      "id": "assassin",
+      "name": "Lame des toits",
+      "rarity": "epic",
+      "material": "canvas",
+      "fx": "shadow",
+      "sound": "shadow",
+      "icon": "M18 2 3 31l15-9 15 9zM18 12l-5 12m5-12 5 12",
+      "art": "assassin",
+      "sprite": true,
+      "hues": [
+        0,
+        44,
+        356,
+        217,
+        33,
+        10,
+        30,
+        212,
+        358,
+        215,
+        35
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Capuches, lames cachées et toits en terrasse.",
+      "inspiration": "Hommage Assassin’s Creed · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "vaultboy",
+      "name": "Abri atomique",
+      "rarity": "common",
+      "material": "engraved",
+      "fx": "electric",
+      "sound": "electric",
+      "icon": "M18 2v8M6 7l7 8m17-8-7 8M2 21h10m12 0h10M7 33l7-9m15 9-7-9M18 14a7 7 0 1 0 0 14a7 7 0 1 0 0-14",
+      "art": "vaultboy",
+      "sprite": true,
+      "hues": [
+        55,
+        219,
+        51,
+        117,
+        208,
+        65,
+        205,
+        112,
+        53,
+        115,
+        210
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Jauges rétro, sas numérotés et énergie atomique.",
+      "inspiration": "Hommage Fallout · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "rapture",
+      "name": "Phare englouti",
+      "rarity": "rare",
+      "material": "brass",
+      "fx": "water",
+      "sound": "water",
+      "icon": "M12 3h12v7H12zM10 10h16l4 24H6zM18 10v24M11 18h14M8 28h20M3 6l6 2m18 0 6-2",
+      "art": "rapture",
+      "sprite": true,
+      "hues": [
+        185,
+        44,
+        181,
+        217,
+        33,
+        195,
+        30,
+        212,
+        183,
+        215,
+        35
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Phares art déco, hublots et cités sous-marines.",
+      "inspiration": "Hommage BioShock · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "plumbob",
+      "name": "Vie en losange",
+      "rarity": "legendary",
+      "material": "glass",
+      "fx": "crystal",
+      "sound": "crystal",
+      "icon": "M18 1 29 18 18 35 7 18zM18 1v34M7 18h22",
+      "art": "plumbob",
+      "sprite": true,
+      "hues": [
+        140,
+        179,
+        136,
+        292,
+        168,
+        150,
+        165,
+        287,
+        138,
+        290,
+        170
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Losanges suspendus, maisons miniatures et fenêtres lumineuses.",
+      "inspiration": "Hommage Les Sims · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "crewmate",
+      "name": "Équipage suspect",
+      "rarity": "common",
+      "material": "enamel",
+      "fx": "cosmic",
+      "sound": "cosmic",
+      "icon": "M9 30V13C9 0 29 0 29 13v17h-7v-7h-6v7zM9 13H3v13h6M16 9h15v9H16z",
+      "art": "crewmate",
+      "sprite": true,
+      "hues": [
+        0,
+        199,
+        356,
+        287,
+        188,
+        10,
+        185,
+        282,
+        358,
+        285,
+        190
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Visières bombées, combinaisons et câbles de vaisseau.",
+      "inspiration": "Hommage Among Us · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "animalisland",
+      "name": "Île aux clochettes",
+      "rarity": "rare",
+      "material": "wood",
+      "fx": "leaves",
+      "sound": "leaves",
+      "icon": "M7 5q23-9 24 7T9 31Q0 16 7 5zM8 28 25 10M16 19v-8m0 8h9",
+      "art": "animalisland",
+      "sprite": true,
+      "hues": [
+        150,
+        49,
+        146,
+        202,
+        38,
+        160,
+        35,
+        197,
+        148,
+        200,
+        40
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Feuilles découpées, maisonnettes et sacs de clochettes.",
+      "inspiration": "Hommage Animal Crossing · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "inkcity",
+      "name": "Bataille d’encre",
+      "rarity": "epic",
+      "material": "lacquer",
+      "fx": "ribbons",
+      "sound": "ribbons",
+      "icon": "M18 2 3 22l7-3v14l8-7 8 7V19l7 3zM11 14h5v6h-5m10-6h5v6h-5",
+      "art": "inkcity",
+      "sprite": true,
+      "hues": [
+        305,
+        154,
+        301,
+        32,
+        143,
+        315,
+        140,
+        27,
+        303,
+        30,
+        145
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Calamars, éclaboussures et diagonales de peinture.",
+      "inspiration": "Hommage Splatoon · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "runesfire",
+      "name": "Cercle des runes",
+      "rarity": "rare",
+      "material": "engraved",
+      "fx": "fire",
+      "sound": "fire",
+      "icon": "M18 2v32M7 12a11 11 0 1 0 22 0M10 23a8 8 0 1 1 16 0M6 7h24M9 30h18",
+      "art": "runesfire",
+      "sprite": true,
+      "hues": [
+        45,
+        34,
+        41,
+        177,
+        23,
+        55,
+        20,
+        172,
+        43,
+        175,
+        25
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Anneaux entrelacés, fissures dorées et arbres runiques.",
+      "inspiration": "Hommage Elden Ring · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "soulbonfire",
+      "name": "Braise du veilleur",
+      "rarity": "legendary",
+      "material": "obsidian",
+      "fx": "fire",
+      "sound": "fire",
+      "icon": "M18 1v25M14 8h8M10 33l16-7M10 26l16 7M12 24q-7-6 0-13-1 7 6 8 8-7 6-13 12 16-2 20",
+      "art": "soulbonfire",
+      "sprite": true,
+      "hues": [
+        20,
+        39,
+        16,
+        7,
+        28,
+        30,
+        25,
+        2,
+        18,
+        5,
+        30
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Épées plantées, feux mourants et pierres calcinées.",
+      "inspiration": "Hommage Dark Souls · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "diamondarena",
+      "name": "Arène des couronnes",
+      "rarity": "rare",
+      "material": "brass",
+      "fx": "gears",
+      "sound": "gears",
+      "icon": "M4 9 12 17 18 4l6 13 8-8-4 22H8zM8 25h20M15 19h6v5h-6z",
+      "art": "diamondarena",
+      "sprite": true,
+      "hues": [
+        215,
+        49,
+        211,
+        287,
+        38,
+        225,
+        35,
+        282,
+        213,
+        285,
+        40
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Tours, couronnes à trois pointes et boucliers de tournoi.",
+      "inspiration": "Hommage Clash Royale · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "brawlbadge",
+      "name": "Étoile de l’arène",
+      "rarity": "common",
+      "material": "enamel",
+      "fx": "electric",
+      "sound": "electric",
+      "icon": "M18 1l6 10 11 3-8 9 1 12-10-5-10 5 1-12-8-9 11-3zM12 14h12v10H12zM15 17v3m6-3v3",
+      "art": "brawlbadge",
+      "sprite": true,
+      "hues": [
+        45,
+        4,
+        41,
+        217,
+        353,
+        55,
+        350,
+        212,
+        43,
+        215,
+        355
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Badges étoilés, crânes stylisés et éclats de duel.",
+      "inspiration": "Hommage Brawl Stars · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "cupcartoon",
+      "name": "Cartoon infernal",
+      "rarity": "common",
+      "material": "paper",
+      "fx": "ribbons",
+      "sound": "ribbons",
+      "icon": "M5 10h22v10Q27 31 16 31T5 20zM27 13q12-3 6 11h-6M15 10V2h6M4 34h24",
+      "art": "cupcartoon",
+      "sprite": true,
+      "hues": [
+        0,
+        44,
+        356,
+        217,
+        33,
+        10,
+        30,
+        212,
+        358,
+        215,
+        35
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Tasses animées, pailles rayées et pellicules des années trente.",
+      "inspiration": "Hommage Cuphead · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "celestemountain",
+      "name": "Sommet fraise",
+      "rarity": "epic",
+      "material": "pixel",
+      "fx": "ice",
+      "sound": "ice",
+      "icon": "M2 31 15 5l6 12 4-7 9 21zM11 13l4 4 4-4M22 25q-8-9-12 0 2 11 8 8z",
+      "art": "celestemountain",
+      "sprite": true,
+      "hues": [
+        345,
+        214,
+        341,
+        282,
+        203,
+        355,
+        200,
+        277,
+        343,
+        280,
+        205
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Sommets enneigés, fraises et sentiers en pixels.",
+      "inspiration": "Hommage Celeste · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "stardewfarm",
+      "name": "Ferme des étoiles",
+      "rarity": "legendary",
+      "material": "pixel",
+      "fx": "leaves",
+      "sound": "leaves",
+      "icon": "M2 17 18 3l16 14M6 15v19h24V15M14 34V22h8v12M12 9h12M3 27h5m20 0h5",
+      "art": "stardewfarm",
+      "sprite": true,
+      "hues": [
+        30,
+        149,
+        26,
+        227,
+        138,
+        40,
+        135,
+        222,
+        28,
+        225,
+        140
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Granges en pixels, récoltes et étoiles de saison.",
+      "inspiration": "Hommage Stardew Valley · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "terrablade",
+      "name": "Forêt des épées",
+      "rarity": "rare",
+      "material": "pixel",
+      "fx": "leaves",
+      "sound": "leaves",
+      "icon": "M8 31 26 3h7v7L13 30M7 21l10 9M3 31l5 4M25 9l3 3M18 13l4 4",
+      "art": "terrablade",
+      "sprite": true,
+      "hues": [
+        135,
+        199,
+        131,
+        292,
+        188,
+        145,
+        185,
+        287,
+        133,
+        290,
+        190
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Épées de pixels, minerais lumineux et lianes souterraines.",
+      "inspiration": "Hommage Terraria · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "doomforge",
+      "name": "Forge du chasseur",
+      "rarity": "legendary",
+      "material": "carbon",
+      "fx": "fire",
+      "sound": "fire",
+      "icon": "M4 4h10l4 7 4-7h10v20l-14 10L4 24zM8 12h7v8H8m13-8h7v8h-7M14 26h8",
+      "art": "doomforge",
+      "sprite": true,
+      "hues": [
+        0,
+        29,
+        356,
+        127,
+        18,
+        10,
+        15,
+        122,
+        358,
+        125,
+        20
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Visières blindées, portes industrielles et entailles incandescentes.",
+      "inspiration": "Hommage DOOM · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "haloring",
+      "name": "Anneau orbital",
+      "rarity": "common",
+      "material": "chrome",
+      "fx": "cosmic",
+      "sound": "cosmic",
+      "icon": "M2 18a16 7 0 1 0 32 0a16 7 0 1 0-32 0M8 15v9h20v-9M10 9h16v6H10z",
+      "art": "haloring",
+      "sprite": true,
+      "hues": [
+        130,
+        204,
+        126,
+        52,
+        193,
+        140,
+        190,
+        47,
+        128,
+        50,
+        195
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Anneaux orbitaux, visières ambrées et alliages militaires.",
+      "inspiration": "Hommage Halo · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "aperturehunter",
+      "name": "Chasseur de machines",
+      "rarity": "common",
+      "material": "bone",
+      "fx": "electric",
+      "sound": "electric",
+      "icon": "M4 7l9 6 5-11 5 11 9-6-4 22-10 6-10-6zM10 17h16M12 23h12M18 13v18",
+      "art": "aperturehunter",
+      "sprite": true,
+      "hues": [
+        195,
+        34,
+        191,
+        52,
+        23,
+        205,
+        20,
+        47,
+        193,
+        50,
+        25
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Masques de machines, câbles tressés et lentilles bleues.",
+      "inspiration": "Hommage Horizon · non officiel",
+      "medium": "games",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "titanwalls",
+      "name": "Au-delà des remparts",
+      "rarity": "common",
+      "material": "canvas",
+      "fx": "shadow",
+      "sound": "shadow",
+      "icon": "M18 4v29M16 9 4 3l3 22 9 6M20 9 32 3l-3 22-9 6M6 10l9 8M8 18l7 7m15-15-9 8m7 0-7 7",
+      "art": "titanwalls",
+      "sprite": true,
+      "hues": [
+        145,
+        214,
+        141,
+        32,
+        203,
+        155,
+        200,
+        27,
+        143,
+        30,
+        205
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Ailes jumelles, sangles et murailles de pierre.",
+      "inspiration": "Hommage L’Attaque des Titans · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "cursedseal",
+      "name": "Sceau maudit",
+      "rarity": "rare",
+      "material": "engraved",
+      "fx": "shadow",
+      "sound": "shadow",
+      "icon": "M18 2 33 18 18 34 3 18zM10 18q8-12 16 0-8 12-16 0M18 12v12M5 5l5 5m16 16 5 5",
+      "art": "cursedseal",
+      "sprite": true,
+      "hues": [
+        280,
+        4,
+        276,
+        222,
+        353,
+        290,
+        350,
+        217,
+        278,
+        220,
+        355
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Yeux scellés, rubans talismaniques et encres violettes.",
+      "inspiration": "Hommage Jujutsu Kaisen · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "heroacademy",
+      "name": "Académie héroïque",
+      "rarity": "rare",
+      "material": "enamel",
+      "fx": "lightning",
+      "sound": "lightning",
+      "icon": "M18 2 23 12l11 2-8 8 2 12-10-5-10 5 2-12-8-8 11-2zM18 9v12m0 4v3",
+      "art": "heroacademy",
+      "sprite": true,
+      "hues": [
+        145,
+        4,
+        141,
+        52,
+        353,
+        155,
+        350,
+        47,
+        143,
+        50,
+        355
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Insignes héroïques, éclairs et impacts de bande dessinée.",
+      "inspiration": "Hommage My Hero Academia · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "notebook",
+      "name": "Carnet de minuit",
+      "rarity": "epic",
+      "material": "paper",
+      "fx": "shadow",
+      "sound": "shadow",
+      "icon": "M6 3h24v30H6zM10 3v30M15 9h11M15 14h8M19 19v10m-4-6h8",
+      "art": "notebook",
+      "sprite": true,
+      "hues": [
+        0,
+        264,
+        356,
+        47,
+        253,
+        10,
+        250,
+        42,
+        358,
+        45,
+        255
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Carnets reliés, plumes et pommes d’un rouge profond.",
+      "inspiration": "Hommage Death Note · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "fullmetal",
+      "name": "Cercle équivalent",
+      "rarity": "rare",
+      "material": "engraved",
+      "fx": "alchemy",
+      "sound": "alchemy",
+      "icon": "M18 2a16 16 0 1 0 0 32a16 16 0 1 0 0-32M18 5 31 27H5zM5 10h26L18 32z",
+      "art": "fullmetal",
+      "sprite": true,
+      "hues": [
+        0,
+        49,
+        356,
+        217,
+        38,
+        10,
+        35,
+        212,
+        358,
+        215,
+        40
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Cercles de transmutation, gravures et bras de métal.",
+      "inspiration": "Hommage Fullmetal Alchemist · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "sailormoon",
+      "name": "Diadème lunaire",
+      "rarity": "epic",
+      "material": "silk",
+      "fx": "cosmic",
+      "sound": "cosmic",
+      "icon": "M26 3A16 16 0 1 0 33 26 13 13 0 0 1 26 3M17 12l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z",
+      "art": "sailormoon",
+      "sprite": true,
+      "hues": [
+        335,
+        49,
+        331,
+        227,
+        38,
+        345,
+        35,
+        222,
+        333,
+        225,
+        40
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Croissants dorés, nœuds de soie et diadèmes étoilés.",
+      "inspiration": "Hommage Sailor Moon · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "piratehunter",
+      "name": "Guilde des primes",
+      "rarity": "epic",
+      "material": "chrome",
+      "fx": "cosmic",
+      "sound": "cosmic",
+      "icon": "M3 11h30v15H3zM8 11V5h20v6M8 17h8m4 0h8M8 21h20M9 26v6m18-6v6",
+      "art": "piratehunter",
+      "sprite": true,
+      "hues": [
+        25,
+        219,
+        21,
+        7,
+        208,
+        35,
+        205,
+        2,
+        23,
+        5,
+        210
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Vaisseaux de chasseurs, écrans radar et affiches de primes.",
+      "inspiration": "Hommage Cowboy Bebop · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "upside",
+      "name": "L’autre côté",
+      "rarity": "epic",
+      "material": "obsidian",
+      "fx": "shadow",
+      "sound": "shadow",
+      "icon": "M18 2 22 12l11-2-7 10 7 10-11-2-4 8-4-8-11 2 7-10L3 10l11 2zM18 12v16M12 20h12",
+      "art": "upside",
+      "sprite": true,
+      "hues": [
+        0,
+        219,
+        356,
+        287,
+        208,
+        10,
+        205,
+        282,
+        358,
+        285,
+        210
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Racines inversées, guirlandes et fissures rouges.",
+      "inspiration": "Hommage Stranger Things · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "dragonthrone",
+      "name": "Trône des maisons",
+      "rarity": "epic",
+      "material": "engraved",
+      "fx": "fire",
+      "sound": "fire",
+      "icon": "M7 32V18h22v14M10 18 7 3l8 12 3-14 3 14 8-12-3 15M4 24h28M12 28h12",
+      "art": "dragonthrone",
+      "sprite": true,
+      "hues": [
+        0,
+        49,
+        356,
+        222,
+        38,
+        10,
+        35,
+        217,
+        358,
+        220,
+        40
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Trônes forgés de lames, bannières et œufs de dragon.",
+      "inspiration": "Hommage Game of Thrones · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "avatarbalance",
+      "name": "Équilibre des quatre",
+      "rarity": "legendary",
+      "material": "stone",
+      "fx": "water",
+      "sound": "water",
+      "icon": "M18 2a16 16 0 1 0 0 32a16 16 0 1 0 0-32M18 2v32M2 18h32M9 11q6-5 7 2M23 7l5 7h-6M7 25h7l-3-5M23 25q4-6 6 0",
+      "art": "avatarbalance",
+      "sprite": true,
+      "hues": [
+        195,
+        29,
+        191,
+        147,
+        18,
+        205,
+        15,
+        142,
+        193,
+        145,
+        20
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Quatre médaillons, flèches et spirales des éléments.",
+      "inspiration": "Hommage Avatar : le dernier maître de l’air · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "rickportal",
+      "name": "Garage interdimensionnel",
+      "rarity": "legendary",
+      "material": "glass",
+      "fx": "portal",
+      "sound": "portal",
+      "icon": "M18 2C2 2 1 30 18 34S37 5 18 2M18 8c-10 0-12 19 0 20s13-19 0-20M18 14q-7 0-4 10t8-5",
+      "art": "rickportal",
+      "sprite": true,
+      "hues": [
+        115,
+        189,
+        111,
+        287,
+        178,
+        125,
+        175,
+        282,
+        113,
+        285,
+        180
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Portails asymétriques, bulles acides et instruments de garage.",
+      "inspiration": "Hommage Rick et Morty · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "wednesday",
+      "name": "Manoir monochrome",
+      "rarity": "legendary",
+      "material": "velvet",
+      "fx": "shadow",
+      "sound": "shadow",
+      "icon": "M18 2 31 8v16l-13 10L5 24V8zM10 12l8 6 8-6M10 25l8-7 8 7M18 18v12",
+      "art": "wednesday",
+      "sprite": true,
+      "hues": [
+        260,
+        224,
+        256,
+        7,
+        213,
+        270,
+        210,
+        2,
+        258,
+        5,
+        215
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Cols gothiques, vitraux sombres et toiles de dentelle.",
+      "inspiration": "Hommage Mercredi · non officiel",
+      "medium": "series",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "wizardhouses",
+      "name": "École des sortilèges",
+      "rarity": "rare",
+      "material": "velvet",
+      "fx": "alchemy",
+      "sound": "alchemy",
+      "icon": "M5 10h26v14l-13 11L5 24zM18 2l-7 12h9l-5 12 13-16h-9z",
+      "art": "wizardhouses",
+      "sprite": true,
+      "hues": [
+        0,
+        49,
+        356,
+        222,
+        38,
+        10,
+        35,
+        217,
+        358,
+        220,
+        40
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Blasons, lettres cachetées et éclairs de sorcellerie.",
+      "inspiration": "Hommage Harry Potter · non officiel",
+      "medium": "films",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "onering",
+      "name": "Anneau des royaumes",
+      "rarity": "rare",
+      "material": "brass",
+      "fx": "fire",
+      "sound": "fire",
+      "icon": "M18 2a16 16 0 1 0 0 32a16 16 0 1 0 0-32M18 8a10 10 0 1 0 0 20a10 10 0 1 0 0-20M8 7l3 3m14 16 3 3M7 25l3-3M26 11l3-3",
+      "art": "onering",
+      "sprite": true,
+      "hues": [
+        45,
+        134,
+        41,
+        27,
+        123,
+        55,
+        120,
+        22,
+        43,
+        25,
+        125
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Anneaux gravés, feuilles elfiques et portes de pierre.",
+      "inspiration": "Hommage Le Seigneur des anneaux · non officiel",
+      "medium": "films",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "spicedunes",
+      "name": "Sables de l’épice",
+      "rarity": "epic",
+      "material": "sandstone",
+      "fx": "sand",
+      "sound": "sand",
+      "icon": "M2 28q8-12 16 0t16 0M5 21q13-35 26 0M11 19l7-13 7 13M18 5v19M2 33h32",
+      "art": "spicedunes",
+      "sprite": true,
+      "hues": [
+        30,
+        49,
+        26,
+        222,
+        38,
+        40,
+        35,
+        217,
+        28,
+        220,
+        40
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Vers des sables, dunes concentriques et lunes jumelles.",
+      "inspiration": "Hommage Dune · non officiel",
+      "medium": "films",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "matrixcode",
+      "name": "Pluie de code",
+      "rarity": "epic",
+      "material": "carbon",
+      "fx": "electric",
+      "sound": "electric",
+      "icon": "M4 2v10h6V2M18 2v15m9-15v10h5M4 19h6v15M16 24h6v10h-6M29 18v16M14 7h8M25 25h9",
+      "art": "matrixcode",
+      "sprite": true,
+      "hues": [
+        130,
+        154,
+        126,
+        182,
+        143,
+        140,
+        140,
+        177,
+        128,
+        180,
+        145
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Pluie de glyphes, circuits noirs et verres verts.",
+      "inspiration": "Hommage Matrix · non officiel",
+      "medium": "films",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "jurassic",
+      "name": "Parc des fossiles",
+      "rarity": "epic",
+      "material": "bone",
+      "fx": "leaves",
+      "sound": "leaves",
+      "icon": "M8 27V16l7-10h14l4 6-12 3 7 5-13-1v8l-6 6M15 23l10 8m-9-4 1 7M3 31h30M23 9h2",
+      "art": "jurassic",
+      "sprite": true,
+      "hues": [
+        140,
+        34,
+        136,
+        7,
+        23,
+        150,
+        20,
+        2,
+        138,
+        5,
+        25
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Squelettes de dinosaures, ambre et clôtures du parc.",
+      "inspiration": "Hommage Jurassic Park · non officiel",
+      "medium": "films",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "ghosttrap",
+      "name": "Piège à spectres",
+      "rarity": "rare",
+      "material": "chrome",
+      "fx": "alchemy",
+      "sound": "alchemy",
+      "icon": "M6 32V15Q6 0 18 2t12 13v17l-6-5-6 5-6-5zM11 12v5m14-5v5M12 23h12",
+      "art": "ghosttrap",
+      "sprite": true,
+      "hues": [
+        125,
+        4,
+        121,
+        52,
+        353,
+        135,
+        350,
+        47,
+        123,
+        50,
+        355
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Spectres, bobines de capture et coulures ectoplasmiques.",
+      "inspiration": "Hommage Ghostbusters · non officiel",
+      "medium": "films",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "fluxdrive",
+      "name": "Circuit temporel",
+      "rarity": "common",
+      "material": "chrome",
+      "fx": "lightning",
+      "sound": "lightning",
+      "icon": "M4 3h28v30H4zM10 9l8 9 8-9M18 18v11M7 6h4m14 0h4M8 28h4m12 0h4",
+      "art": "fluxdrive",
+      "sprite": true,
+      "hues": [
+        195,
+        29,
+        191,
+        52,
+        18,
+        205,
+        15,
+        47,
+        193,
+        50,
+        20
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Condensateurs en Y, cadrans et traînées de feu.",
+      "inspiration": "Hommage Retour vers le futur · non officiel",
+      "medium": "films",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "pandoraforest",
+      "name": "Forêt luminescente",
+      "rarity": "rare",
+      "material": "pearl",
+      "fx": "leaves",
+      "sound": "leaves",
+      "icon": "M18 2v30M18 9Q2-2 4 12t14 6M18 16Q34 1 32 17t-14 8M18 25Q2 14 6 28l12 6",
+      "art": "pandoraforest",
+      "sprite": true,
+      "hues": [
+        195,
+        279,
+        191,
+        152,
+        268,
+        205,
+        265,
+        147,
+        193,
+        150,
+        270
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Lianes bioluminescentes, graines flottantes et nervures bleues.",
+      "inspiration": "Hommage Avatar · Pandora · non officiel",
+      "medium": "films",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "spacemonolith",
+      "name": "Odyssée du monolithe",
+      "rarity": "epic",
+      "material": "obsidian",
+      "fx": "cosmic",
+      "sound": "cosmic",
+      "icon": "M11 1h14v34H11zM15 4h6M3 18h5m20 0h5M2 27l5-3m22 0 5 3",
+      "art": "spacemonolith",
+      "sprite": true,
+      "hues": [
+        215,
+        4,
+        211,
+        52,
+        353,
+        225,
+        350,
+        47,
+        213,
+        50,
+        355
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Monolithes noirs, alignements planétaires et anneaux silencieux.",
+      "inspiration": "Hommage 2001 : l’Odyssée de l’espace · non officiel",
+      "medium": "films",
+      "collection": "collabs",
+      "illustration": true
+    },
+    {
+      "id": "nightmare",
+      "name": "Noël des ombres",
+      "rarity": "epic",
+      "material": "paper",
+      "fx": "shadow",
+      "sound": "shadow",
+      "icon": "M18 2a13 13 0 1 0 0 26a13 13 0 1 0 0-26M10 11l5 3-5 3m16-6-5 3 5 3M10 22h16M13 20v4m5-4v4m5-4v4M18 28v7",
+      "art": "nightmare",
+      "sprite": true,
+      "hues": [
+        275,
+        29,
+        271,
+        7,
+        18,
+        285,
+        15,
+        2,
+        273,
+        5,
+        20
+      ],
+      "marks": [
+        "◇",
+        "✧",
+        "✦"
+      ],
+      "motion": "scale(1.08,.98)",
+      "hint": "Visages cousus, rayures et collines en spirale.",
+      "inspiration": "Hommage L’Étrange Noël de monsieur Jack · non officiel",
+      "medium": "films",
+      "collection": "collabs",
+      "illustration": true
     }
   ]
 }

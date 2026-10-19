@@ -1,5 +1,5 @@
 const crypto=require('node:crypto');
-const {catalog,chests,pickRarity}=require('./public/skin-rules');
+const {catalog,allSkins,chests,pickRarity}=require('./public/skin-rules');
 async function wallet(tx,id){await tx.run('INSERT INTO cosmetics(user_id,coins,state) VALUES(?,0,?) ON CONFLICT(user_id) DO NOTHING',[id,JSON.stringify({owned:['original'],selected:'original'})]);const row=await tx.one('SELECT coins,state FROM cosmetics WHERE user_id=?',[id]);return{coins:Number(row.coins),...JSON.parse(row.state)};}
 async function save(tx,id,w){await tx.run('UPDATE cosmetics SET coins=?,state=? WHERE user_id=?',[w.coins,JSON.stringify({owned:w.owned,selected:w.selected,storyRewards:w.storyRewards||[]}),id]);}
 async function leader(tx){return tx.one('SELECT id,username,best FROM users WHERE best>0 ORDER BY best DESC,username ASC LIMIT 1');}
@@ -16,7 +16,7 @@ function drawSkin(chest,owned,random=crypto.randomInt){
 function registerCosmetics({app,db,auth,route}){
  app.get('/api/cosmetics',auth,route(async(req,res)=>res.json(await db.transaction(async tx=>{await tx.lockUser(req.user.id);return inventory(tx,req.user.id);})))) ;
  app.post('/api/cosmetics/equip',auth,route(async(req,res)=>{
-  const result=await db.transaction(async tx=>{await tx.lockUser(req.user.id);const w=await inventory(tx,req.user.id);if(!catalog.some(s=>s.id===req.body?.skin)||!w.owned.includes(req.body.skin))return{error:'Ce skin ne t’appartient pas.',status:403};w.selected=req.body.skin;const stored={...w,owned:w.owned.filter(id=>id!=='king')};await save(tx,req.user.id,stored);return w;});res.status(result.status||200).json(result);
+  const result=await db.transaction(async tx=>{await tx.lockUser(req.user.id);const w=await inventory(tx,req.user.id);if(!allSkins.some(s=>s.id===req.body?.skin)||!w.owned.includes(req.body.skin))return{error:'Ce skin ne t’appartient pas.',status:403};w.selected=req.body.skin;const stored={...w,owned:w.owned.filter(id=>id!=='king')};await save(tx,req.user.id,stored);return w;});res.status(result.status||200).json(result);
  }));
  app.post('/api/cosmetics/story',auth,route(async(req,res)=>{
   const R=require('./public/story-rules'),level=req.body?.level,directions=req.body?.directions,l=R.levels[level-1];
