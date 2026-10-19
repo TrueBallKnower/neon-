@@ -3,7 +3,7 @@ const rules=window.FusionRules;
 const storage={get(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}},set(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}};
 let board=Array(16).fill(0),score=0,best=Number(storage.get('fusion-best',0))||0,moves=0,locked=false,won=false,continuing=false,generation=0;
 let comboCount=0,comboUntil=0,comboFrame=0;
-const COMBO_WINDOW=500;
+const COMBO_WINDOW=1500;
 function resetCombo(){comboCount=0;comboUntil=0;cancelAnimationFrame(comboFrame);$('combo').hidden=true;}
 function animateCombo(){const left=Math.max(0,comboUntil-performance.now());$('combo-bar').style.width=(left/COMBO_WINDOW*100)+'%';if(left>0)comboFrame=requestAnimationFrame(animateCombo);else resetCombo();}
 function advanceCombo(){const now=performance.now();comboCount=now<comboUntil?comboCount+1:1;comboUntil=now+COMBO_WINDOW;cancelAnimationFrame(comboFrame);$('combo').hidden=false;$('combo-label').textContent=comboCount>1?`COMBO ×${comboCount}`:'PREMIÈRE ÉTINCELLE';$('combo-hint').textContent=comboCount>=5?'EN FEU !':'ENCHAÎNE LES FUSIONS';$('combo').classList.toggle('hot',comboCount>=5);animateCombo();return comboCount;}
@@ -27,12 +27,57 @@ function particles(index){if(reduced)return;const tile=$('tiles').querySelector(
 function save(){storage.set('fusion-game',{board,score,moves,won,continuing});storage.set('fusion-best',best);}
 function showEnd(win){resetCombo();$('end-title').textContent=win?'La consécration.':'Fin de la partie.';$('end-text').textContent=win?'2048 ! Le sommet est à toi. Et si tu allais plus loin ?':`${score.toLocaleString('fr-FR')} points. Une nouvelle étincelle t’attend.`;$('end-action').textContent=win?'Continuer ↗':'Rejouer ↗';$('overlay').hidden=false;$('announcement').textContent=$('end-title').textContent;sfx(win?'win':'over');}
 function newGame(withSound=true){generation++;resetCombo();locked=false;board=Array(16).fill(0);score=0;moves=0;won=false;continuing=false;$('overlay').hidden=true;$('particles').replaceChildren();$('score-add').textContent='';$('status').textContent='À toi de jouer';spawn();const added=spawn();draw([],added);save();if(withSound){unlockAudio();sfx('start');}}
-async function play(direction){if(window.FusionOnline?.ranked)return window.FusionOnline.move(direction);if(locked||!$('overlay').hidden)return;unlockAudio();const result=rules.move(board,direction);if(!result.changed){if(!rules.canMove(board))showEnd(false);return;}locked=true;const run=generation;sfx('move');result.transitions.forEach(({from,to})=>{const el=$('tiles').querySelector(`[data-index="${from}"]`);if(el){el.style.setProperty('--x',to%4);el.style.setProperty('--y',Math.floor(to/4));}});await new Promise(r=>setTimeout(r,reduced?0:135));if(run!==generation)return;board=result.board;score+=result.gain;best=Math.max(score,best);moves++;const added=spawn();draw(result.merges,added);
- if(result.gain){const high=Math.max(...result.merges.map(i=>board[i]));const chain=advanceCombo();sfx('merge',high,chain);result.merges.forEach(particles);$('status').textContent=high>=128?'Fusion survoltée !':'Belle fusion !';const el=$('score-add');el.textContent='+'+result.gain;el.classList.remove('score-float');void el.offsetWidth;el.classList.add('score-float');}else $('status').textContent='Trouve la prochaine fusion';
- if(!won&&board.some(v=>v>=2048)){won=true;showEnd(true);}else if(!rules.canMove(board))showEnd(false);save();$('announcement').textContent=`Score ${score}. ${result.merges.length} fusion(s).`;locked=false;}
-$('restart').onclick=()=>{if(window.FusionOnline?.ranked){window.FusionOnline.restart();return;}if(moves>0&&!confirm('Recommencer cette partie ? Ton record sera conservé.'))return;newGame();};$('end-action').onclick=()=>{unlockAudio();if(won&&!continuing){continuing=true;$('overlay').hidden=true;save();}else if(window.FusionOnline?.ranked)window.FusionOnline.restart();else newGame();};
-window.addEventListener('keydown',e=>{const directions={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',a:'left',d:'right',w:'up',s:'down',q:'left',z:'up'};if(e.ctrlKey||e.metaKey||e.altKey||e.target.closest('button,input,textarea'))return;if(directions[e.key]){e.preventDefault();play(directions[e.key]);}});
+// Animate existing tiles before replacing the merged/spawned tiles. The Web
+// Animations API avoids snapping when a move follows a fresh render.
+async function slide(result){
+ if(reduced||!result.changed)return;
+ const animations=[];
+ for(const {from,to} of result.transitions){
+  const el=$('tiles').querySelector(`[data-index="${from}"]`);if(!el||from===to)continue;
+  const gap=parseFloat(getComputedStyle($('cells')).gap)||12;
+  const x=(to%4)*(el.offsetWidth+gap),y=Math.floor(to/4)*(el.offsetHeight+gap);
+  const animation=el.animate([{transform:getComputedStyle(el).transform},{transform:`translate(${x}px,${y}px)`}],{duration:190,easing:'cubic-bezier(.22,.75,.25,1)',fill:'forwards'});
+  animations.push(animation.finished.catch(()=>{}));
+ }
+ await Promise.all(animations);
+}
+let inputBusy=false,pendingDirection=null;
+async function play(direction){
+ if(inputBusy){pendingDirection=direction;return;}
+ inputBusy=true;
+ try{await performMove(direction);}finally{inputBusy=false;const next=pendingDirection;pendingDirection=null;if(next)play(next);}
+}
+async function performMove(direction){
+ if(window.FusionOnline?.ranked||window.FusionOnline?.duel)return window.FusionOnline.move(direction);
+ if(locked||!$('overlay').hidden)return;
+ unlockAudio();const result=rules.move(board,direction);
+ if(!result.changed){if(!rules.canMove(board))showEnd(false);return;}
+ locked=true;const run=generation;sfx('move');await slide(result);if(run!==generation)return;
+ board=result.board;score+=result.gain;best=Math.max(score,best);moves++;const added=spawn();draw(result.merges,added);
+ fusionFeedback(result);
+ if(!won&&board.some(v=>v>=2048)){won=true;showEnd(true);}else if(!rules.canMove(board))showEnd(false);
+ save();$('announcement').textContent=`Score ${score}. ${result.merges.length} fusion(s).`;locked=false;
+}
+function fusionFeedback(result){
+ if(result.gain){const high=Math.max(...result.merges.map(i=>board[i]));sfx('merge',high,advanceCombo());result.merges.forEach(particles);$('status').textContent=high>=128?'Fusion survoltée !':'Belle fusion !';const el=$('score-add');el.textContent='+'+result.gain;el.classList.remove('score-float');void el.offsetWidth;el.classList.add('score-float');}
+ else $('status').textContent='Trouve la prochaine fusion';
+}
+$('restart').onclick=()=>{if(window.FusionOnline?.ranked||window.FusionOnline?.duel){window.FusionOnline.restart();return;}if(moves>0&&!confirm('Recommencer cette partie ? Ton record sera conservé.'))return;newGame();};$('end-action').onclick=()=>{unlockAudio();if(won&&!continuing){continuing=true;$('overlay').hidden=true;save();}else if(window.FusionOnline?.ranked)window.FusionOnline.restart();else newGame();};
+window.addEventListener('keydown',e=>{const directions={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',a:'left',d:'right',w:'up',s:'down',q:'left',z:'up'};if(e.ctrlKey||e.metaKey||e.altKey||e.target.closest('input,textarea,select')||$('online-dialog').open)return;if(directions[e.key]){e.preventDefault();play(directions[e.key]);}});
 let touch=null;$('board').addEventListener('pointerdown',e=>{if(!e.isPrimary)return;unlockAudio();touch={x:e.clientX,y:e.clientY,id:e.pointerId};$('board').setPointerCapture(e.pointerId);});$('board').addEventListener('pointerup',e=>{if(!touch||touch.id!==e.pointerId)return;const dx=e.clientX-touch.x,dy=e.clientY-touch.y;touch=null;if(Math.max(Math.abs(dx),Math.abs(dy))<20)return;play(Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up');});$('board').addEventListener('pointercancel',()=>touch=null);
 const saved=storage.get('fusion-game',null);if(saved&&Array.isArray(saved.board)&&saved.board.length===16&&saved.board.every(v=>Number.isSafeInteger(v)&&v>=0&&(v===0||(v>=2&&Number.isInteger(Math.log2(v)))))&&saved.board.some(v=>v)&&Number.isSafeInteger(saved.score)&&saved.score>=0&&Number.isSafeInteger(saved.moves)&&saved.moves>=0){board=saved.board;score=saved.score;moves=saved.moves;won=!!saved.won;continuing=!!saved.continuing;best=Math.max(best,score);draw();if(won&&!continuing)showEnd(true);else if(!rules.canMove(board))showEnd(false);}else newGame(false);
 
-window.FusionUI={load(game){generation++;resetCombo();locked=false;board=game.board;score=game.score;moves=game.moves;won=game.won;continuing=true;$('overlay').hidden=true;draw();},async animate(payload){const {game,result,spawned}=payload;board=game.board;score=game.score;moves=game.moves;best=Math.max(best,payload.best||0);draw(result.merges,spawned);if(result.gain){const high=Math.max(...result.merges.map(i=>board[i]));sfx('merge',high,advanceCombo());result.merges.forEach(particles);$('status').textContent='Fusion classée !';}else if(result.changed)sfx('move');if(game.won&&!won){won=true;continuing=false;showEnd(true);}else if(!rules.canMove(board))showEnd(false);},audio:unlockAudio,newGame};
+window.FusionUI={
+ get state(){return {board:[...board],score,moves};},
+ load(game){generation++;pendingDirection=null;resetCombo();locked=false;board=game.board;score=game.score;moves=game.moves;won=!!game.won;continuing=true;$('overlay').hidden=true;draw();},
+ slide,
+ async animate(payload,{slid=false,duel=false}={}){
+  const {game,result,spawned}=payload;
+  if(!slid)await slide(result);
+  board=game.board;score=game.score;moves=game.moves;
+  if(!duel)best=Math.max(best,payload.best||0);
+  draw(result.merges,spawned);fusionFeedback(result);
+  if(!duel){if(game.won&&!won){won=true;continuing=false;showEnd(true);}else if(!rules.canMove(board))showEnd(false);}
+  else if(!rules.canMove(board))$('status').textContent='Grille bloquée. Ton score reste en jeu !';
+ },audio:unlockAudio,newGame
+};

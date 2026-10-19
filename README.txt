@@ -1,7 +1,7 @@
 FUSION — 2048
 
 2048 solo avec animations, particules et SFX Web Audio.
-Les fusions réalisées à moins de 500 ms d’intervalle montent le combo
+Les fusions réalisées à moins de 1,5 seconde d’intervalle montent le combo
 et la hauteur/intensité du son. Effet renforcé dès x5.
 Flèches, WASD/ZQSD et glissements tactiles. Son désactivable.
 Mode libre et record local sans inscription ; comptes par pseudo et
@@ -9,11 +9,25 @@ mot de passe pour le classement. Les scores classés et les tuiles
 sont calculés par le serveur. Cela empêche les scores arbitraires,
 mais pas les bots qui jouent des parties valides.
 
+DUEL EN LIGNE (1V1)
+Deux comptes distincts sont nécessaires. Ouvrir Duel 1v1, créer un salon,
+puis partager son code ou Copier le lien avec un ami. L’adversaire saisit
+ce code dans Duel 1v1 et rejoint le salon. Décompte de 3 secondes puis
+5 minutes chronométrées par le serveur ; le plus grand score gagne,
+avec égalité possible. Les deux joueurs ont la même grille initiale
+et la même séquence pseudo-aléatoire de génération. Les scores adverses
+sont actualisés chaque seconde. Les scores de duel sont séparés du
+classement solo. Une grille bloquée conserve son score jusqu’à la fin.
+Quitter un duel en cours compte comme un abandon. Une déconnexion
+ou un rafraîchissement ne suspend pas le chrono ; le navigateur retrouve
+le duel sauvegardé à la reconnexion. Les salons expirent après 24 heures.
+Les tables sont créées automatiquement, sans configuration supplémentaire.
+
 DÉVELOPPEMENT
 Node.js >=22.13 (validé avec 24.19). npm ci puis npm start.
 Sans DATABASE_URL, SQLite conserve les données dans .data/ (ignoré par Git).
 DATA_DIR peut changer cet emplacement. npm test vérifie les règles,
-comptes, sessions, scores, requêtes concurrentes et persistance.
+comptes, sessions, scores, requêtes concurrentes, persistance et duels.
 Le test utilise un dossier temporaire SQLite. Ne jamais lancer les tests
 avec DATABASE_URL pointant sur une base de production : ils créent des
 comptes et parties de test. Un PostgreSQL de test dédié est accepté.

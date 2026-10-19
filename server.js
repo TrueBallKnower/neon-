@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const { promisify } = require('node:util');
 const { openDatabase } = require('./database');
 const rules = require('./public/engine');
+const {registerDuels}=require('./duels');
 const scrypt = promisify(crypto.scrypt);
 const hashToken = token => crypto.createHash('sha256').update(token).digest('hex');
 const route = fn => (req,res,next) => Promise.resolve(fn(req,res,next)).catch(next);
@@ -67,6 +68,7 @@ async function createApp() {
   });
   if(!payload)return res.status(409).json({error:'Commence une partie classée.'});res.json(payload);
  }));
+ registerDuels({app,db,auth,route,rateLimit});
  app.get('/healthz',route(async(req,res)=>{await db.one('SELECT 1 AS ok');res.json({ok:true});}));
  app.use(express.static(path.join(__dirname,'public')));
  app.use((err,req,res,next)=>{if(err.type==='entity.parse.failed')return res.status(400).json({error:'JSON invalide.'});console.error('Request failed:',err.code||err.name);res.status(500).json({error:'Erreur serveur. Réessaie.'});});

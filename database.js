@@ -40,7 +40,7 @@ async function openDatabase() {
   function sql(text) {
     let index = 0;
     if (postgres) text = text.replace(/\?/g, () => '$' + ++index);
-    return postgres ? text.replace(/\b(users|sessions|games)\b/g, 'fusion.$1') : text;
+    return postgres ? text.replace(/\b(users|sessions|games|duels)\b/g, 'fusion.$1') : text;
   }
   function connection(client) {
     return {
@@ -79,11 +79,12 @@ async function openDatabase() {
     await db.run(`CREATE TABLE IF NOT EXISTS users(id ${id}, username TEXT NOT NULL, username_key TEXT NOT NULL UNIQUE, salt TEXT NOT NULL, hash TEXT NOT NULL, best INTEGER NOT NULL DEFAULT 0)`);
     await db.run('CREATE TABLE IF NOT EXISTS sessions(token TEXT PRIMARY KEY,user_id INTEGER NOT NULL REFERENCES users(id),expires BIGINT NOT NULL)');
     await db.run('CREATE TABLE IF NOT EXISTS games(user_id INTEGER PRIMARY KEY REFERENCES users(id),board TEXT NOT NULL,score INTEGER NOT NULL,moves INTEGER NOT NULL,won INTEGER NOT NULL DEFAULT 0)');
+    await db.run('CREATE TABLE IF NOT EXISTS duels(code TEXT PRIMARY KEY,host_id INTEGER NOT NULL REFERENCES users(id),guest_id INTEGER REFERENCES users(id),state TEXT NOT NULL,expires BIGINT NOT NULL)');
     await db.run('CREATE INDEX IF NOT EXISTS sessions_expires_idx ON sessions(expires)');
     if (postgres) {
       // Private schema: do not expose password hashes or session data through the Data API.
       await pool.query('REVOKE ALL ON SCHEMA fusion FROM PUBLIC');
-      await pool.query('ALTER TABLE fusion.users ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.sessions ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.games ENABLE ROW LEVEL SECURITY');
+      await pool.query('ALTER TABLE fusion.users ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.sessions ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.games ENABLE ROW LEVEL SECURITY; ALTER TABLE fusion.duels ENABLE ROW LEVEL SECURITY');
     }
   } catch (error) { await db.close(); throw error; }
   return db;
