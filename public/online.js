@@ -54,10 +54,26 @@
   if(statusNow()!=='finished'&&!confirm('Quitter le duel ? Tu abandonneras cette partie.'))return false;
   await api('duels/'+online.duel+'/leave',{});resetPrediction();online.duel=null;current=null;remember(null);el('duel-hud').hidden=true;el('duel-invite').hidden=true;window.FusionUI.newGame(false);render();return true;
  }
- for(const [id,mode]of Object.entries(window.FusionModes.definitions)){
-  for(const target of ['ranked-mode','duel-mode','leaderboard-mode']){const option=document.createElement('option');option.value=id;option.textContent=mode.name;el(target).append(option);}
-  const card=document.createElement('button');card.type='button';card.className='mode-card';card.dataset.mode=id;card.setAttribute('aria-pressed',String(id===selectedMode));const title=document.createElement('strong'),description=document.createElement('span');title.textContent=mode.name;description.textContent=mode.description;card.append(title,description);card.onclick=()=>{selectedMode=id;for(const node of el('mode-cards').children)node.setAttribute('aria-pressed',String(node.dataset.mode===id));el('ranked-mode').value=id;el('duel-mode').value=id;el('leaderboard-mode').value=id;};el('mode-cards').append(card);
+ let lastRace='rush512';
+ const raceCard=document.createElement('button');raceCard.type='button';raceCard.className='mode-card';raceCard.dataset.category='race';raceCard.setAttribute('aria-expanded','false');raceCard.setAttribute('aria-controls','race-section');raceCard.setAttribute('aria-pressed','false');
+ const raceTitle=document.createElement('strong'),raceDescription=document.createElement('span');raceTitle.textContent='Course';raceDescription.textContent='Choisis ton objectif, de 128 à 2048.';raceCard.append(raceTitle,raceDescription);
+ function selectMode(id){
+  selectedMode=id;const mode=window.FusionModes.get(id);
+  for(const node of el('mode-cards').children)node.setAttribute('aria-pressed',String(node===raceCard?!!mode.race:node.dataset.mode===id));
+  for(const node of el('race-targets').children)node.setAttribute('aria-pressed',String(node.dataset.mode===id));
+  for(const target of ['ranked-mode','duel-mode','leaderboard-mode'])el(target).value=id;
+  if(mode.race){lastRace=id;raceDescription.textContent='Objectif sélectionné : '+mode.target;}else{el('race-section').hidden=true;raceCard.setAttribute('aria-expanded','false');}
  }
+ for(const target of ['ranked-mode','duel-mode','leaderboard-mode']){
+  const races=document.createElement('optgroup');races.label='Courses · objectif';
+  for(const [id,mode]of Object.entries(window.FusionModes.definitions)){const option=document.createElement('option');option.value=id;option.textContent=mode.race?String(mode.target):mode.name;if(mode.race)races.append(option);else el(target).append(option);}
+  el(target).append(races);
+ }
+ for(const [id,mode]of Object.entries(window.FusionModes.definitions)){
+  if(mode.race){const button=document.createElement('button');button.type='button';button.className='race-target';button.dataset.mode=id;button.textContent=mode.target;button.setAttribute('aria-pressed','false');button.onclick=()=>selectMode(id);el('race-targets').append(button);continue;}
+  const card=document.createElement('button');card.type='button';card.className='mode-card';card.dataset.mode=id;card.setAttribute('aria-pressed',String(id===selectedMode));const title=document.createElement('strong'),description=document.createElement('span');title.textContent=mode.name;description.textContent=mode.description;card.append(title,description);card.onclick=()=>selectMode(id);el('mode-cards').append(card);
+ }
+ raceCard.onclick=()=>{const expand=el('race-section').hidden;selectMode(lastRace);el('race-section').hidden=!expand;raceCard.setAttribute('aria-expanded',String(expand));};el('mode-cards').append(raceCard);
  el('modes-open').onclick=()=>open('mode');
  el('free-start').onclick=async()=>{if(busy)return;busy=true;try{if(!await leave())return;resetPrediction();online.ranked=false;window.FusionUI.newGame(true,selectedMode);render();el('online-dialog').close();}catch(error){message(error.message);}finally{busy=false;}};
  el('mode-ranked').onclick=()=>{open('account');if(!account)message('Connecte-toi pour jouer en mode classé.');};
