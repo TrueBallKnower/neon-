@@ -6,6 +6,7 @@ const { openDatabase } = require('./database');
 const rules = require('./public/engine');
 const {registerDuels}=require('./duels');
 const spawnStream=require('./spawn-plan');
+const cosmetics=require('./cosmetics');
 const gameModes=require('./game-modes');
 const scrypt = promisify(crypto.scrypt);
 const hashToken = token => crypto.createHash('sha256').update(token).digest('hex');
@@ -78,6 +79,7 @@ async function createApp() {
    const game=await readGame(tx,req.user.id);if(!game)return null;
    if(game.meta?.endedAt)return{game,terminal:true,best:await gameModes.best(tx,req.user.id,game.meta.mode)};
    if(spawnStream.stale(req.body,game))return{conflict:true,game};
+   const before={moves:game.moves,score:game.score};
    let result,spawned=-1;
    for(const [index,direction]of directions.entries()){
     const at=times[index];
@@ -90,13 +92,15 @@ async function createApp() {
    const mode=game.meta?.mode||'classic';
    if(game.meta)await gameModes.saveMeta(tx,req.user.id,game.meta);
    await gameModes.record(tx,req.user.id,mode,game.score);
+   const wallet=await cosmetics.reward(tx,req.user.id,before,game,{classic:mode==='classic'});
    game.spawnPlan=spawnStream.plan('solo:'+req.user.id,game.moves);
-   return {game,result,spawned,best:await gameModes.best(tx,req.user.id,mode),terminal:!!game.meta?.endedAt,serverNow:Date.now()};
+   return {wallet,game,result,spawned,best:await gameModes.best(tx,req.user.id,mode),terminal:!!game.meta?.endedAt,serverNow:Date.now()};
   });
   if(!payload)return res.status(409).json({error:'Commence une partie classée.'});
   if(payload.conflict)return res.status(409).json({...payload,error:'Partie resynchronisée.'});
   res.json(payload);
  }));
+ cosmetics.registerCosmetics({app,db,auth,route});
  require('./social').registerSocial({app,db,auth,route});
  registerDuels({app,db,auth,route,rateLimit});
  app.get('/healthz',route(async(req,res)=>{await db.one('SELECT 1 AS ok');res.json({ok:true});}));

@@ -64,7 +64,7 @@ function draw(merges=[],spawned=-1,result=null){
   if(!keepGliding)cancelVisuals(el,running.get(el)|| (glide?[glide.animation]:[]));
   const moved=el.dataset.index!==String(i),changed=el.dataset.value!==String(value),className='tile'+(merges.includes(i)?' merge':i===spawned?' spawn':'');
   if(el.className!==className)el.className=className;
-  if(changed){el.dataset.value=value;el.firstElementChild.textContent=value;}
+  if(changed){el.dataset.value=value;el.firstElementChild.textContent=value;window.FusionSkins?.paint(el,value);}
   if(moved){el.dataset.index=i;el.style.setProperty('--x',i%4);el.style.setProperty('--y',Math.floor(i/4));}
   if(moved||changed){el.setAttribute('role','gridcell');el.setAttribute('aria-label',`${value}, ligne ${Math.floor(i/4)+1}, colonne ${i%4+1}`);}if(!result)cancelVisuals(el.firstElementChild);
   if(el.parentNode!==container)container.append(el);
@@ -182,5 +182,5 @@ window.FusionUI={
   else if(!duel){if(ruleState.mode==='classic'&&game.won&&!won){won=true;continuing=false;showEnd(true);}else if(!rules.canMove(board))showEnd(false);}
   else if(!rules.canMove(board))$('status').textContent='Grille bloquée. Ton score reste en jeu !';
   tickRules();
- },audio:unlockAudio,newGame
+ },chestSound(stage,rarity){if(!soundOn)return;unlockAudio();if(!audio)return;const t=audio.currentTime;if(stage==='charge'){[98,146.83,196,293.66].forEach((f,i)=>tone(f,t+i*.22,.3,'triangle',.045));tone(55,t,.7,'sine',.06,110);}else{const boost=rarity==='legendary'?1.5:rarity==='epic'?1.25:1;[261.63,329.63,392,523.25,659.25,783.99].forEach((f,i)=>tone(f*boost,t+i*.065,.42,'triangle',.055));tone(65,t,.35,'sine',.1,32);}},audio:unlockAudio,newGame
 };

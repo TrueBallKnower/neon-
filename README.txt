@@ -94,20 +94,37 @@ Tests : accès privé, invitation réservée, acceptation réciproque,
 revanches concurrentes sans doublons, séries et chat après redémarrage,
 parcours navigateur à deux joueurs dont un mobile, SQLite et PostgreSQL TLS.
 
-SKINS ET EFFETS
-Ouvrir Skins pour voir les défis et équiper un effet débloqué : Étincelle
-(disponible), Aurore (1 200 points), Pulsar (combo x8), Solaire (course 512
-en 90 s maximum), Prisme (course 1024 en 180 s maximum).
-Couleurs et transformations de fusion changent sans modifier les règles.
-Les défis sont cosmétiques, évalués pendant le jeu et sauvegardés dans le
-navigateur de cet appareil ; ils ne sont pas synchronisés avec le compte.
-Effets légers désactive les particules et réduit l’amplitude des fusions.
-Les préférences de réduction des animations restent respectées.
-Le mouvement conserve ses 180 ms : les interruptions utilisent la progression
-de l’animation sans mesurer les tuiles, les particules utilisent la géométrie
-mise en cache et le texte des tuiles inchangées n’est plus recréé à chaque coup.
-Tests : continuité sans saut, animation suspendue, zéro mesure de tuile
-pendant les coups, déblocages et limites de temps, équipement et persistance.
+SKINS, PIÈCES ET COFFRES
+La collection est liée au compte et conservée en base. Les anciens déblocages
+locaux par combo/course sont remplacés par les coffres ; aucun skin payant
+n’existait dans cette version. Étincelle reste disponible sans compte.
+Commun : Jardin de jade, Circuit rétro. Rare : Aurore boréale, Forge solaire.
+Épique : Atlas cosmique, Vitrail royal. Légendaire : Dragon ancestral,
+Abysses vivants. Chaque collection a ses motifs SVG, ses formes, ses couleurs
+par valeur et sa transformation de fusion. Aucun effet continu sur le plateau.
+Or impérial : 100 000 points dans une partie classique classée vérifiée.
+King : le seul premier du classement classique (score positif, puis pseudo
+croissant pour départager, comme le classement). Droit calculé côté serveur,
+retiré au prochain contrôle client (toutes les 5 s en page visible). En cas
+de perte de connexion pendant le contrôle, King est masqué par précaution.
+Pièces : 1 par coup valide et 1 par tranche de 128 points en classé et duel.
+En histoire, la première victoire vérifiée d’un niveau donne 20 + 2 x niveau
+pièces. Son parcours est rejoué par le serveur ; la récompense n’est versée
+qu’une fois par niveau et compte. Le mode libre local ne verse pas de pièces.
+Coffre explorateur : 80 pièces ; Commun 70 %, Rare 24 %, Épique 5 %, Légendaire 1 %.
+Coffre royal : 240 pièces ; 35 %, 45 %, 18 %, 2 % dans le même ordre.
+Coffre astral : 800 pièces ; 0 %, 35 %, 50 %, 15 % dans le même ordre.
+Un coffre donne un skin. Un nouveau skin est choisi en priorité dans la
+rareté tirée ; si tous sont possédés, le doublon rembourse 35 % du prix.
+Or, King et Étincelle sont exclus des tirages. Aucun achat en argent réel.
+Tirages cryptographiques côté serveur, débit et récompense dans une seule
+transaction ; reçu idempotent pour reprendre une ouverture dont la réponse
+a été perdue. Inventaire, sélection et pièces sont synchronisés entre appareils.
+La scène de coffre utilise des sons progressifs, un couvercle animé, des rayons
+et des particules bornées. Effets légers et réduction des animations respectés.
+Tests : probabilités exactes, contrôle des gains, seuil Or, révocation King,
+concurrence, reprise sans double débit, persistance SQLite/PostgreSQL TLS,
+révélation mobile et dessins distincts pour les valeurs de 2 à 2048.
 
 CONTINUITÉ DES ANIMATIONS
 Un geste conserve les glissements dont la destination ne change pas.
@@ -121,6 +138,7 @@ Mesure Chromium mobile émulé, CPU x4, 60 coups : médiane 12,8 → 9 ms,
 p95 23,3 → 15,4 ms, 60 → 0 mesures du plateau pendant les coups.
 Ce sont des temps de traitement JavaScript, pas une garantie de fréquence
 d’affichage sur Safari ou sur tous les téléphones physiques.
+
 
 DÉVELOPPEMENT
 Node.js >=22.13 (validé avec 24.19). npm ci puis npm start.

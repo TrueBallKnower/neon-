@@ -5,6 +5,7 @@ const spawnStream=require('./spawn-plan');
 const {addTile}=spawnStream;
 const modes=require('./game-modes');
 const {friends}=require('./social');
+const cosmetics=require('./cosmetics');
 function player(id,name,seed){const board=Array(16).fill(0);addTile(board,seed,0);addTile(board,seed,1);return{id,name,board,score:0,moves:0,blocked:false};}
 function eliminated(state,now,grace=modes.GRACE){return state.mode==='sudden'?state.players.filter(p=>p.lostAt||(p.comboDeadline&&now>=p.comboDeadline+grace)).sort((a,b)=>a.comboDeadline-b.comboDeadline):[];}
 function phase(state,now){if(state.forfeit||state.targetWinner||eliminated(state,now).length)return'finished';if(!state.startsAt)return'waiting';if(now<state.startsAt)return'countdown';if(now>=state.endsAt)return'finished';return'playing';}
@@ -54,6 +55,7 @@ function registerDuels({app,db,auth,route,rateLimit}){
    if(!me)return{error:'Tu ne participes pas à ce duel.',status:403};
    const status=phase(state,Date.now());if(status!=='playing')return{error:status==='countdown'?'Le duel commence bientôt.':'Le duel est terminé ou attend un adversaire.',status:409,duel:view(state,req.user.id)};
    if(spawnStream.stale(req.body,me))return{error:'Partie resynchronisée.',status:409,duel:view(state,req.user.id)};
+   const before={score:me.score,moves:me.moves};
    let result,spawned=-1;
    for(const [index,direction]of directions.entries()){
     const at=times[index];
@@ -66,7 +68,8 @@ function registerDuels({app,db,auth,route,rateLimit}){
     }
    }
    await save(tx,state);
-   return{duel:view(state,req.user.id),game:{board:me.board,score:me.score,moves:me.moves,won:false},result,spawned};
+   const wallet=await cosmetics.reward(tx,req.user.id,before,me);
+   return{wallet,duel:view(state,req.user.id),game:{board:me.board,score:me.score,moves:me.moves,won:false},result,spawned};
   });if(!payload)return invalid(res);if(payload.error)return res.status(payload.status).json(payload);res.json(payload);
  }));
  app.post('/api/duels/:code/rematch',auth,route(async(req,res)=>{
