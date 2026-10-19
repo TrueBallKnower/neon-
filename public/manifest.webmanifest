@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "Fusion 2048",
+  "short_name": "Fusion 2048",
+  "description": "Glisse, fusionne et garde le rythme. Le jeu 2048 de Fusion.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#101014",
+  "theme_color": "#101014",
+  "icons": [
+    {"src": "/icons/fusion-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/icons/fusion-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/icons/fusion-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

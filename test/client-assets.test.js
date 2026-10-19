@@ -3,7 +3,7 @@ const built=require('../client-assets').clientAssets();
 test('first-load shell requests one deferred game bundle, excluding the cosmetic catalog',()=>{
  const html=built.assets.get('/').body.toString(),core=built.assets.get(built.playPath),skins=built.assets.get(built.skinPath);
  assert.equal((html.match(/<script /g)||[]).length,1);assert.match(html,/<script defer src="\/assets\/play\.[a-f0-9]+\.js">/);assert.equal((html.match(/rel="stylesheet"/g)||[]).length,1);
- assert.ok(core.br.length<30000);assert.ok(!core.body.includes(Buffer.from('nebula-supernova')));assert.ok(skins.body.includes(Buffer.from('nebula-supernova')));
+ assert.ok(core.br.length<34000);assert.ok(!core.body.includes(Buffer.from('nebula-supernova')));assert.ok(skins.body.includes(Buffer.from('nebula-supernova')));
  for(const [name,item]of built.assets){assert.deepEqual(zlib.brotliDecompressSync(item.br),item.body);assert.deepEqual(zlib.gunzipSync(item.gzip),item.body);if(name.endsWith('.js'))new vm.Script(item.body.toString());}
 });
 test('only hashed assets receive immutable caching; service worker excludes private APIs',()=>{

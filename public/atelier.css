@@ -40,3 +40,8 @@ body[data-skin-world] #board{background:var(--world-background);border-color:var
 /* Keep skin repaints inside each composited tile on mobile Safari. */
 .tile[data-atelier="true"] .tile-inner {contain:paint;isolation:isolate}
 @media(pointer:coarse){.particle{box-shadow:none}#combo-bar{will-change:transform}.tile-inner{text-shadow:none}}
+
+/* Mobile board: one paint surface; sixteen text-only cells remain for VoiceOver. */
+#board-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;contain:strict}
+body[data-renderer="canvas"] #tiles{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap}
+body[data-renderer="canvas"] #particles{display:none}

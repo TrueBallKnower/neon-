@@ -22,7 +22,7 @@ function animateCombo(){
 function advanceCombo(){const now=performance.now();comboCount=now<comboUntil?comboCount+1:1;comboUntil=now+comboWindow();comboAnimation?.cancel();$('combo').hidden=false;$('combo-label').textContent=comboCount>1?`COMBO ×${comboCount}`:'PREMIÈRE ÉTINCELLE';$('combo-hint').textContent=comboCount>=5?'EN FEU !':'ENCHAÎNE LES FUSIONS';$('combo').classList.toggle('hot',comboCount>=5);animateCombo();return comboCount;}
 let soundOn=storage.get('fusion-sound',true),sfxVolume=Math.min(1,Math.max(0,Number(storage.get('fusion-sfx-volume',.8))||0)),audio;
 const lightEffects=matchMedia('(pointer:coarse)').matches||(navigator.hardwareConcurrency||8)<=4;
-const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let reduced=motionPreference.matches;motionPreference.addEventListener?.('change',event=>{reduced=event.matches;if(reduced){document.getAnimations().forEach(a=>a.cancel());window.FusionSkins?.clearCombo();}});
+const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let reduced=motionPreference.matches;motionPreference.addEventListener?.('change',event=>{reduced=event.matches;mobileRenderer?.setReduced(reduced);if(reduced){document.getAnimations().forEach(a=>a.cancel());window.FusionSkins?.clearCombo();}});
 function prepareAudio(){if(!soundOn||sfxVolume<=0||document.hidden)return;try{if(!audio||audio.state==='closed')audio=new(window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});}catch{}}
 // Warm a suspended context at idle; a gesture still owns playback/resume on iOS.
 if(window.requestIdleCallback)requestIdleCallback(prepareAudio,{timeout:2000});else setTimeout(prepareAudio,350);
@@ -52,11 +52,13 @@ for(let i=0;i<16;i++){const c=document.createElement('div');c.className='cell';$
 function spawn(){const empty=board.map((v,i)=>v?null:i).filter(i=>i!==null);if(!empty.length)return -1;const i=empty[Math.floor(Math.random()*empty.length)];board[i]=Math.random()<.9?2:4;return i;}
 function cancelVisuals(el,known){for(const animation of known||el.getAnimations?.()||[])animation.cancel();}
 function animateVisual(el,frames,timing){if(reduced||typeof el.animate!=='function')return;try{return el.animate(frames,timing);}catch{}}
+const mobileRenderer=window.FusionCanvas?.create($('board'))||null;if(!mobileRenderer)document.body.dataset.renderer='dom';
 let boardGeometry=null;const motion=new WeakMap(),tilePool=[],pooledTiles=new WeakSet(),ghostTiles=new Set(),ghostExpiry=new WeakMap();
 function acquireTile(){const el=tilePool.pop();if(el){pooledTiles.delete(el);return el;}const tile=document.createElement('div'),inner=document.createElement('div');inner.className='tile-inner';tile.append(inner);return tile;}
 function releaseTile(el){if(pooledTiles.has(el))return;clearTimeout(ghostExpiry.get(el));ghostExpiry.delete(el);ghostTiles.delete(el);cancelVisuals(el);cancelVisuals(el.firstElementChild);motion.delete(el);el.remove();delete el.dataset.index;if(tilePool.length<32){pooledTiles.add(el);tilePool.push(el);}}
 
 function draw(merges=[],spawned=-1,result=null){
+ if(mobileRenderer){mobileRenderer.update({board,result,spawned,reduced});setText('score',score);setText('best',best);setText('moves',`${moves} MOUVEMENT${moves>1?'S':''}`);return;}
  const container=$('tiles'),old=new Map();
  if(!result)for(const el of ghostTiles)releaseTile(el);
  for(const el of container.children)if(!el.classList.contains('tile-ghost'))old.set(Number(el.dataset.index),el);
@@ -115,6 +117,7 @@ function draw(merges=[],spawned=-1,result=null){
 }
 const sparkColors={2:'#c2eea3',4:'#8fdfd3',8:'#aacbff',16:'#f4d183',32:'#ffb17e',64:'#ff91bd',128:'#d6a0ff',256:'#b3a1ff',512:'#7be9ff',1024:'#ddff80',2048:'#bdff64'};
 function particles(index){
+ if(mobileRenderer){const p=window.FusionSkins?.particle?.(board[index]);mobileRenderer.burst(index,p?.color||sparkColors[board[index]]||'#bdff64');return;}
  if(reduced||!boardGeometry||window.FusionSkins?.lite)return;
  const {step,insetX,insetY,gap}=boardGeometry;
  const style=window.FusionSkins?.particle?.(board[index]);const size=step-gap,color=style?.color||sparkColors[board[index]]||'#bdff64',batch=document.createDocumentFragment();
@@ -125,7 +128,7 @@ function particles(index){
 let saveTimer;function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{if(window.requestIdleCallback)requestIdleCallback(flushSave,{timeout:1500});else flushSave();},250);}
 function flushSave(){if(window.FusionStory?.active)return;if(window.FusionOnline?.ranked||window.FusionOnline?.duel)return;storage.set('fusion-game',{board,score,moves,won,continuing,meta:ruleState});storage.set('fusion-best-'+ruleState.mode,best);if(ruleState.mode==='classic')storage.set('fusion-best',best);}
 window.addEventListener('pagehide',flushSave);
-document.addEventListener('visibilitychange',()=>{touch=null;if(document.hidden){comboAnimation?.cancel();clearTimeout(comboExpiry);if(audio?.state==='running')audio.suspend().catch(()=>{});}else{draw();if(comboUntil>performance.now())animateCombo();else resetCombo();}});
+document.addEventListener('visibilitychange',()=>{touch=null;mobileRenderer?.visibility(document.hidden);if(document.hidden){comboAnimation?.cancel();clearTimeout(comboExpiry);if(audio?.state==='running')audio.suspend().catch(()=>{});}else{draw();if(comboUntil>performance.now())animateCombo();else resetCombo();}});
 window.addEventListener('pageshow',event=>{if(event.persisted){touch=null;draw();tickRules();}});
 function showEnd(win){resetCombo();$('end-title').textContent=win?'La consécration.':'Fin de la partie.';$('end-text').textContent=win?'2048 ! Le sommet est à toi. Et si tu allais plus loin ?':`${score.toLocaleString('fr-FR')} points. Une nouvelle étincelle t’attend.`;$('end-action').textContent=win?'Continuer ↗':'Rejouer ↗';$('overlay').hidden=false;$('announcement').textContent=$('end-title').textContent;sfx(win?'win':'over');}
 function newGame(withSound=true,mode=ruleState.mode){window.FusionStory?.stop();ruleState=modeRules.create(mode,Date.now());best=Number(storage.get('fusion-best-'+mode,mode==='classic'?storage.get('fusion-best',0):0))||0;generation++;resetCombo();locked=false;board=Array(16).fill(0);score=0;moves=0;won=false;continuing=false;$('overlay').hidden=true;$('particles').replaceChildren();$('score-add').textContent='';$('status').textContent='À toi de jouer';spawn();const added=spawn();draw([],added);tickRules();save();if(withSound){unlockAudio();sfx('start');}}
@@ -163,7 +166,7 @@ if(window.PointerEvent){
 }
 window.addEventListener('blur',()=>{touch=null;});
 let boardResizeFrame;
-function resizeBoard(){cancelAnimationFrame(boardResizeFrame);boardResizeFrame=requestAnimationFrame(()=>{const width=$('board').getBoundingClientRect().width;if(boardGeometry&&Math.abs(boardGeometry.width-width)>.5){touch=null;boardGeometry=null;draw();}});}
+function resizeBoard(){if(mobileRenderer){mobileRenderer.resize();return;}cancelAnimationFrame(boardResizeFrame);boardResizeFrame=requestAnimationFrame(()=>{const width=$('board').getBoundingClientRect().width;if(boardGeometry&&Math.abs(boardGeometry.width-width)>.5){touch=null;boardGeometry=null;draw();}});}
 if(window.ResizeObserver)new ResizeObserver(resizeBoard).observe($('board'));else window.addEventListener('resize',resizeBoard);
 const saved=storage.get('fusion-game',null);if(saved&&Array.isArray(saved.board)&&saved.board.length===16&&saved.board.every(v=>Number.isSafeInteger(v)&&v>=0&&(v===0||(v>=2&&Number.isInteger(Math.log2(v)))))&&saved.board.some(v=>v)&&Number.isSafeInteger(saved.score)&&saved.score>=0&&Number.isSafeInteger(saved.moves)&&saved.moves>=0){board=saved.board;score=saved.score;moves=saved.moves;ruleState=saved.meta||modeRules.create('classic',Date.now());won=!!saved.won;continuing=!!saved.continuing;best=Math.max(best,score);draw();if(won&&!continuing)showEnd(true);else if(!rules.canMove(board))showEnd(false);}else newGame(false);
 
@@ -191,6 +194,7 @@ function tickRules(){
 }
 setInterval(tickRules,100);tickRules();
 window.FusionUI={
+ renderState(){return mobileRenderer?.inspect()||{renderer:'dom'};},refreshSkin(){mobileRenderer?.skinChanged();},
  get state(){return {board:[...board],score,moves};},
  get mode(){return ruleState.mode;},
  get canMove(){tickRules();return !ruleState.endedAt;},

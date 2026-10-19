@@ -8,7 +8,7 @@ self.addEventListener('fetch',event=>{
  if(request.mode==='navigate'){
   event.respondWith((async()=>{const cache=await caches.open(VERSION),shell=await cache.match('/');return shell||fetch(request);})());return;
  }
- if(!/^\/(assets\/|atelier-art\/|skin-art\/|audio\/)/.test(url.pathname))return;
+ if(!/^\/(assets\/|atelier-art\/|skin-art\/|audio\/|icons\/|manifest\.webmanifest$)/.test(url.pathname))return;
  event.respondWith((async()=>{const cache=await caches.open(VERSION),hit=await cache.match(request);if(hit)return hit;
   const response=await fetch(request);if(response.ok)event.waitUntil((async()=>{
    await cache.put(request,response.clone());

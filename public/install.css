@@ -1,0 +1,12 @@
+.phone-install{max-width:440px;margin:22px auto 0;border:1px solid #ffffff1c;border-radius:12px;background:#17171e;color:#bbb8c8;font-size:12px;line-height:1.65}
+.phone-install summary{padding:12px 15px;min-height:44px;cursor:pointer;touch-action:manipulation;color:#e5e1ec;font-weight:600}
+.phone-install summary:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:10px}
+.phone-install .install-content{padding:0 15px 14px}
+.phone-install p{margin:8px 0;font-size:12px;color:#bbb8c8}
+.phone-install ol{padding-left:22px;margin:10px 0}
+.phone-install li{padding:3px 0}
+.phone-install strong{color:#eeeaf4}
+.phone-install .install-status{color:var(--accent,#bdff64);font-size:11px}
+.phone-install button{min-height:44px;border:1px solid #6e8d4a;border-radius:8px;padding:8px 15px;background:#26341c;color:#dcffb1;font-weight:600}
+.phone-install [hidden]{display:none!important}
+@media(max-width:650px),(pointer:coarse) and (max-width:1024px){.phone-install{margin-top:18px;margin-bottom:16px}.phone-install summary{font-size:11px}}

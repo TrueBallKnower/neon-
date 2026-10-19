@@ -9,13 +9,14 @@ function clientAssets(){
  const skins=['skin-expansion.js','atelier-catalog.js','skin-rules.js','skins.js'].map(read).join('\n;\n');
  const skinPath=asset('/assets/skins.'+hash(skins)+'.js',skins,'application/javascript; charset=utf-8');
  const bootstrap=read('boot.js').replaceAll('__SKINS_ASSET__',skinPath);
- const play=['mobile.js','engine.js','modes.js','client.js','move-sync.js','royal.js','online.js','social.js','story-rules.js','story.js'].map(read).join('\n;\n')+'\n;\n'+bootstrap;
+ const play=['mobile.js','engine.js','modes.js','canvas-motion.js','canvas-renderer.js','client.js','move-sync.js','royal.js','online.js','social.js','story-rules.js','story.js','install.js'].map(read).join('\n;\n')+'\n;\n'+bootstrap;
  const playPath=asset('/assets/play.'+hash(play)+'.js',play,'application/javascript; charset=utf-8');
- const css=read('style.css')+'\n'+read('atelier.css');
+ const css=read('style.css')+'\n'+read('atelier.css')+'\n'+read('install.css');
  const cssPath=asset('/assets/app.'+hash(css)+'.css',css,'text/css; charset=utf-8');
  const html=read('index.html').replace(/<link rel="stylesheet"[^>]*>/g,'').replace(/<script src="[^\"]+"><\/script>/g,'').replace('</head>',`<link rel="stylesheet" href="${cssPath}"><script defer src="${playPath}"></script></head>`);
  asset('/',html,'text/html; charset=utf-8',false);
- const version=hash(play+skins+css+html+read('sw.js')+(process.env.RENDER_GIT_COMMIT||'')),worker=read('sw.js').replaceAll('__SHELL_VERSION__',version).replace('__SHELL_ASSETS__',JSON.stringify(['/',playPath,cssPath]));
+ const installFiles=['/manifest.webmanifest','/icons/fusion-180.png','/icons/fusion-192.png','/icons/fusion-512.png','/icons/fusion-maskable-512.png'];
+ const version=hash(play+skins+css+html+read('manifest.webmanifest')+read('sw.js')+(process.env.RENDER_GIT_COMMIT||'')),worker=read('sw.js').replaceAll('__SHELL_VERSION__',version).replace('__SHELL_ASSETS__',JSON.stringify(['/',playPath,cssPath,...installFiles]));
  asset('/sw.js',worker,'application/javascript; charset=utf-8',false);
  function middleware(req,res,next){
   if(!['GET','HEAD'].includes(req.method))return next();

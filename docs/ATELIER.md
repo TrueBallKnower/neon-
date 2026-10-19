@@ -252,3 +252,60 @@ Ces mesures ne sont pas prises sur Safari/iPhone physique. Le cache nécessite q
 Safari ait pu enregistrer la visite ; il ne peut supprimer le réveil de Render
 Free lors de la toute première visite. L’origine publique n’a pas pu être mesurée
 depuis cet environnement, dont le proxy refuse cette destination.
+
+## Rendu mobile Canvas et app gratuite
+
+`canvas-motion.js` gère uniquement la présentation : positions interpolées,
+glissement de 180 ms, fusion et apparition des nouvelles tuiles. Les coups du
+moteur logique restent synchrones et n’attendent jamais l’animation. Une seconde
+direction repart de la position visible interpolée ; les anciennes silhouettes
+de fusion sont plafonnées à seize et supprimées à tout changement de partie.
+Le mouvement réduit et la reprise après arrière-plan placent les tuiles à leur
+position finale. Le renderer arrête les requêtes d’images quand la scène est stable.
+
+`canvas-renderer.js` sélectionne cette voie sur écran tactile. Il conserve les
+seize cases fixes (dont glace, murs et balises de l’histoire) et remplace les
+tuiles mobiles HTML par un seul Canvas transparent. Une grille de seize cellules
+textuelles accessibles garde valeurs et coordonnées pour VoiceOver. Une absence
+de contexte 2D reprend le renderer HTML ; `?renderer=dom` permet aussi de comparer.
+Les SVG sont chargés une fois à une taille explicite puis découpés en petites
+textures, numéros compris ; le renderer réutilise ces bitmaps pendant les glisses.
+Le cache est borné à 64 textures et quatre atlas ; la densité est limitée à 2,
+y compris sur écran iPhone à densité 3. Les particules mobiles sont dessinées sur
+le même Canvas. Aucun style ou métrique de mise en page n’est lu dans une entrée.
+Le Canvas se redessine après changement de skin, taille, retour de page ou
+restauration de son contexte ; les sons existants restent indépendants du rendu.
+
+Le paquet initial inclut ces deux modules ; les catalogues restent différés.
+`manifest.webmanifest`, les métadonnées Apple, les icônes PNG incluses et le panneau
+« Jouer comme une app · gratuit » permettent une installation depuis Safari sans
+App Store ni compte développeur payant. Le service worker conserve aussi les
+fichiers d’installation ; les comptes, scores et messages restent hors du cache.
+Voir `docs/IPHONE.md` pour les étapes d’installation et les limites du stockage iOS.
+
+Validation de cette version : 39 tests Node, dont continuité à l’interruption,
+absence de modification des snapshots logiques, suppression des ghosts à un nouveau
+chargement, mouvement réduit et monotonie de l’interpolation. Contrôles navigateur :
+gestes réels simulés avant relâchement sous CPU ×4 ; aucune lecture de géométrie à
+l’entrée ; densité 3 plafonnée à 2 ; boucle arrêtée au repos ; portrait 320 à 430 px
+et paysage ; six skins dont Dragon archivé et grands nombres ; cellules VoiceOver ;
+glace au niveau 7, murs et balise au niveau 8 ; fallback HTML réellement testé en
+renvoyant `null` à la création d’un contexte 2D.
+
+Comparaison série sur le même scénario de 79 coups avec SOVEREIGN, largeur 390 px,
+densité 3 et CPU ralenti ×4 (Chromium) : entrée médiane 17,7 → 7,0 ms ; entrée au
+95e percentile 40,1 → 14,4 ms ; intervalle d’images au 95e percentile 33,4 → 16,8 ms.
+Les lectures de timeline passent de 149 à zéro et les écritures de style de 3 870
+à 1 512 sur ce scénario. Ce sont des mesures comparatives émulées, sans garantie
+de fréquence d’images sur un iPhone physique ou avec le mode économie d’énergie iOS.
+Le scénario réseau vérifie les coups classés et duels avec 800 ms de latence,
+la récupération d’un accusé perdu et l’accord avec l’état serveur. Le jeu Canvas
+est utilisable avant l’arrivée du catalogue retardé de cinq secondes et s’ouvre
+hors ligne après mise en cache. Aucun coût ou service supplémentaire n’est ajouté.
+
+Les vérifications navigateur sont conservées dans `scripts/check-iphone.cjs` et
+`scripts/profile-iphone.cjs`. Elles nécessitent Playwright/Chromium pour le poste de
+validation seulement (module configurable via `PLAYWRIGHT_MODULE`, exécutable via
+`FUSION_BROWSER_PATH`). Elles suppriment la liaison DATABASE_URL dans leur processus,
+utilisent un répertoire SQLite temporaire et ne touchent jamais à la base de production.
+Le module de jeu livré au téléphone n’ajoute aucune dépendance Playwright.
