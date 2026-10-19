@@ -102,7 +102,8 @@ Commun : Jardin de jade, Circuit rétro. Rare : Aurore boréale, Forge solaire.
 Épique : Atlas cosmique, Vitrail royal. Légendaire : Dragon ancestral,
 Abysses vivants. Chaque collection a ses motifs SVG, ses formes, ses couleurs
 par valeur et sa transformation de fusion. Aucun effet continu sur le plateau.
-Or impérial : 100 000 points dans une partie classique classée vérifiée.
+Or impérial est désormais Légendaire et disponible dans les coffres. Le seuil
+de score ne le débloque plus ; les propriétaires existants le conservent.
 King : le seul premier du classement classique (score positif, puis pseudo
 croissant pour départager, comme le classement). Droit calculé côté serveur,
 retiré au prochain contrôle client (toutes les 5 s en page visible). En cas
@@ -116,13 +117,13 @@ Coffre royal : 240 pièces ; 35 %, 45 %, 18 %, 2 % dans le même ordre.
 Coffre astral : 800 pièces ; 0 %, 35 %, 50 %, 15 % dans le même ordre.
 Un coffre donne un skin. Un nouveau skin est choisi en priorité dans la
 rareté tirée ; si tous sont possédés, le doublon rembourse 35 % du prix.
-Or, King et Étincelle sont exclus des tirages. Aucun achat en argent réel.
+King et Étincelle sont exclus des tirages. Aucun achat en argent réel.
 Tirages cryptographiques côté serveur, débit et récompense dans une seule
 transaction ; reçu idempotent pour reprendre une ouverture dont la réponse
 a été perdue. Inventaire, sélection et pièces sont synchronisés entre appareils.
 La scène de coffre utilise des sons progressifs, un couvercle animé, des rayons
 et des particules bornées. Effets légers et réduction des animations respectés.
-Tests : probabilités exactes, contrôle des gains, seuil Or, révocation King,
+Tests : probabilités exactes, contrôle des gains, tirage Or, révocation King,
 concurrence, reprise sans double débit, persistance SQLite/PostgreSQL TLS,
 révélation mobile et dessins distincts pour les valeurs de 2 à 2048.
 
@@ -207,3 +208,21 @@ Les 18 chemins de victoire de test/fixtures/story-solutions.json sont rejoués
 par npm test avec vérification des budgets, des cases bloquées et des étoiles.
 Contrôles navigateur : campagne complète, verrouillage, reprise, transitions
 entre modes, petits écrans et paysage. Les animations existantes sont réutilisées.
+
+COLLECTIONS ILLUSTRÉES
+21 skins, dont 19 dans les coffres : quatre Communs, quatre Rares,
+six Épiques et cinq Légendaires. Probabilités de rareté inchangées.
+Nouveautés : Mines cubiques, Capsules de poche, Dōjō des éléments,
+Voie des sabres, Samouraï du sakura, Trésors du pharaon, Cité d’Atlantide,
+Confiserie céleste, Disco vinyle et Origami impérial.
+Les hommages Minecraft, Pokémon, Naruto et Star Wars sont des créations
+originales non officielles, sans collaboration ou licence annoncée.
+Mines cubiques : 2 charbon, 4 fer, 8 cuivre, 16 or, 32 redstone, 64 lapis,
+128 diamant, 256 émeraude, 512 améthyste, 1024 obsidienne, 2048 netherite.
+Dix planches SVG de onze panneaux donnent un dessin distinct à chaque valeur.
+La galerie complète se charge à l’ouverture ; filtre par rareté, possession
+ou hommage. Les contrôles de King ne referment plus une galerie inchangée.
+Recréer ces dessins : python3 scripts/generate-skin-art.py (optionnel,
+les SVG sont déjà inclus ; le serveur n’utilise pas Python).
+Recherche Google et pages officielles tentées mais bloquées HTTP 403 dans
+cet environnement. Aucun asset distant n’a été récupéré ou copié.

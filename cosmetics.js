@@ -1,13 +1,17 @@
 const crypto=require('node:crypto');
-const {catalog,chests,GOLD_SCORE,pickRarity}=require('./public/skin-rules');
+const {catalog,chests,pickRarity}=require('./public/skin-rules');
 async function wallet(tx,id){await tx.run('INSERT INTO cosmetics(user_id,coins,state) VALUES(?,0,?) ON CONFLICT(user_id) DO NOTHING',[id,JSON.stringify({owned:['original'],selected:'original'})]);const row=await tx.one('SELECT coins,state FROM cosmetics WHERE user_id=?',[id]);return{coins:Number(row.coins),...JSON.parse(row.state)};}
 async function save(tx,id,w){await tx.run('UPDATE cosmetics SET coins=?,state=? WHERE user_id=?',[w.coins,JSON.stringify({owned:w.owned,selected:w.selected,storyRewards:w.storyRewards||[]}),id]);}
 async function leader(tx){return tx.one('SELECT id,username,best FROM users WHERE best>0 ORDER BY best DESC,username ASC LIMIT 1');}
-async function inventory(tx,id){const w=await wallet(tx,id),first=await leader(tx),isKing=first?.id===id;const user=await tx.one('SELECT best FROM users WHERE id=?',[id]);let changed=false;if(user.best>=GOLD_SCORE&&!w.owned.includes('gold')){w.owned.push('gold');changed=true;}if(w.selected==='king'&&!isKing){w.selected='original';changed=true;}if(changed)await save(tx,id,w);return{...w,owned:isKing?[...w.owned,'king']:w.owned,isKing,leader:first?{username:first.username,best:first.best}:null};}
-async function reward(tx,id,before,after,{classic=false}={}){
+async function inventory(tx,id){const w=await wallet(tx,id),first=await leader(tx),isKing=first?.id===id;let changed=false;if(w.selected==='king'&&!isKing){w.selected='original';changed=true;}if(changed)await save(tx,id,w);return{...w,owned:isKing?[...w.owned,'king']:w.owned,isKing,leader:first?{username:first.username,best:first.best}:null};}
+async function reward(tx,id,before,after){
  const earned=Math.max(0,after.moves-before.moves)+Math.max(0,Math.floor(after.score/128)-Math.floor(before.score/128));
- if(!earned&&!(classic&&after.score>=GOLD_SCORE))return null;
- await tx.lockUser(id);const w=await wallet(tx,id);w.coins+=earned;if(classic&&after.score>=GOLD_SCORE&&!w.owned.includes('gold'))w.owned.push('gold');await save(tx,id,w);return{coins:w.coins,owned:w.owned};
+ if(!earned)return null;
+ await tx.lockUser(id);const w=await wallet(tx,id);w.coins+=earned;await save(tx,id,w);return{coins:w.coins,owned:w.owned};
+}
+function drawSkin(chest,owned,random=crypto.randomInt){
+ const rarity=pickRarity(chest,random(10000)),pool=catalog.filter(s=>s.chest&&s.rarity===rarity),fresh=pool.filter(s=>!owned.includes(s.id)),available=fresh.length?fresh:pool;
+ return{skin:available[random(available.length)].id,rarity,duplicate:!fresh.length};
 }
 function registerCosmetics({app,db,auth,route}){
  app.get('/api/cosmetics',auth,route(async(req,res)=>res.json(await db.transaction(async tx=>{await tx.lockUser(req.user.id);return inventory(tx,req.user.id);})))) ;
@@ -28,10 +32,10 @@ function registerCosmetics({app,db,auth,route}){
    const receipt=await tx.one('SELECT kind,result FROM chest_receipts WHERE user_id=? AND request_id=?',[req.user.id,requestId]);
    if(receipt){if(receipt.kind!==chest.id)return{error:'Cette ouverture concerne un autre coffre.',status:409};return{reward:JSON.parse(receipt.result),inventory:await inventory(tx,req.user.id)};}
    const w=await wallet(tx,req.user.id);if(w.coins<chest.price)return{error:'Pas assez de pièces. Continue à jouer en classé ou en duel.',status:409};
-   const rarity=pickRarity(chest,crypto.randomInt(10000)),pool=catalog.filter(s=>s.chest&&s.rarity===rarity),fresh=pool.filter(s=>!w.owned.includes(s.id)),skin=(fresh.length?fresh:pool)[crypto.randomInt((fresh.length?fresh:pool).length)],duplicate=!fresh.length,refund=duplicate?Math.floor(chest.price*.35):0;
-   w.coins=w.coins-chest.price+refund;if(!duplicate)w.owned.push(skin.id);await save(tx,req.user.id,w);
-   const reward={skin:skin.id,rarity,duplicate,refund,chest:chest.id,requestId};await tx.run('INSERT INTO chest_receipts(user_id,request_id,kind,result,created_at) VALUES(?,?,?,?,?)',[req.user.id,requestId,chest.id,JSON.stringify(reward),Date.now()]);return{reward,inventory:await inventory(tx,req.user.id)};
+   const {rarity,skin,duplicate}=drawSkin(chest,w.owned),refund=duplicate?Math.floor(chest.price*.35):0;
+   w.coins=w.coins-chest.price+refund;if(!duplicate)w.owned.push(skin);await save(tx,req.user.id,w);
+   const reward={skin,rarity,duplicate,refund,chest:chest.id,requestId};await tx.run('INSERT INTO chest_receipts(user_id,request_id,kind,result,created_at) VALUES(?,?,?,?,?)',[req.user.id,requestId,chest.id,JSON.stringify(reward),Date.now()]);return{reward,inventory:await inventory(tx,req.user.id)};
   });res.status(result.status||200).json(result);
  }));
 }
-module.exports={registerCosmetics,reward,inventory};
+module.exports={registerCosmetics,reward,inventory,drawSkin};

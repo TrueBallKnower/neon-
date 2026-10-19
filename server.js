@@ -92,7 +92,7 @@ async function createApp() {
    const mode=game.meta?.mode||'classic';
    if(game.meta)await gameModes.saveMeta(tx,req.user.id,game.meta);
    await gameModes.record(tx,req.user.id,mode,game.score);
-   const wallet=await cosmetics.reward(tx,req.user.id,before,game,{classic:mode==='classic'});
+   const wallet=await cosmetics.reward(tx,req.user.id,before,game);
    game.spawnPlan=spawnStream.plan('solo:'+req.user.id,game.moves);
    return {wallet,game,result,spawned,best:await gameModes.best(tx,req.user.id,mode),terminal:!!game.meta?.endedAt,serverNow:Date.now()};
   });

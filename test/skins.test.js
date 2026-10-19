@@ -1,10 +1,16 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),R=require('../public/skin-rules');
 test('chest rarity ranges match displayed probabilities and exclude exclusive skins',()=>{
- assert.equal(R.GOLD_SCORE,100000);
+
  for(const chest of R.chests){assert.equal(Object.values(chest.odds).reduce((a,b)=>a+b),100);const counts={common:0,rare:0,epic:0,legendary:0};for(let roll=0;roll<10000;roll++)counts[R.pickRarity(chest,roll)]++;for(const key of Object.keys(counts))assert.equal(counts[key],chest.odds[key]*100);}
- assert.ok(R.catalog.filter(s=>['king','gold','original'].includes(s.id)).every(s=>!s.chest));assert.equal(R.catalog.filter(s=>s.chest).length,8);
+ assert.equal(R.catalog.find(s=>s.id==='gold').rarity,'legendary');assert.equal(R.catalog.find(s=>s.id==='gold').chest,true);
+ assert.ok(R.catalog.filter(s=>['king','original'].includes(s.id)).every(s=>!s.chest));assert.equal(R.catalog.filter(s=>s.chest).length,19);
 });
 test('skin art varies by tile value and has distinct motifs and progression tiers',()=>{
  for(const skin of R.catalog){const a=R.tileStyle(skin.id,2),b=R.tileStyle(skin.id,2048);assert.notDeepEqual(a,b);assert.equal(a.tier,0);assert.equal(b.tier,3);assert.ok(skin.hues.length>=11);}
+ assert.equal(R.tileStyle('ores',2).label,'Charbon');assert.equal(R.tileStyle('ores',2048).label,'Netherite');assert.notEqual(R.tileStyle('ores',2).level,R.tileStyle('ores',2048).level);
  assert.equal(new Set(R.catalog.map(s=>s.art)).size,R.catalog.length);
 });
+
+const {drawSkin}=require('../cosmetics');
+test('gold can actually be drawn as a legendary; King is never in a chest',()=>{const chest=R.chests[0],legend=R.catalog.filter(s=>s.chest&&s.rarity==='legendary'),index=legend.findIndex(s=>s.id==='gold');let calls=0;assert.equal(drawSkin(chest,[],()=>calls++===0?9999:index).skin,'gold');for(let roll=0;roll<10000;roll+=99){let call=0;const r=drawSkin(chest,[],max=>call++===0?roll:0);assert.notEqual(r.skin,'king');}});
+test('every illustrated collection ships eleven addressable SVG panels',()=>{const fs=require('node:fs'),path=require('node:path');for(const skin of R.catalog.filter(s=>s.sprite)){const svg=fs.readFileSync(path.join(__dirname,'../public/skin-art',skin.art+'.svg'),'utf8');assert.ok(svg.includes('viewBox="0 0 100 1100"'));assert.equal((svg.match(/transform="translate\(0 /g)||[]).length,11);}});
