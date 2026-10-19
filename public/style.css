@@ -245,3 +245,35 @@ body.effects-lite .chest-orbit{animation:none!important;opacity:.2!important}@me
 [data-art="nightmare"]{--skin-art:url('/skin-art/nightmare.svg')}
 
 #skin-collections button.collection-tile[aria-pressed="true"]{background:#263227;border-color:#bdff64;color:#e7ffd0}#skin-collections .collection-tile:focus-visible{outline:2px solid #bdff64;outline-offset:2px}
+
+/* Signature editions: the art fills the tile, with no generic HSL skin laid over it.
+   Static vector sheets only: no filter, blur or perpetual animation on the board. */
+.tile[data-signature="true"] .tile-inner,.skin-swatch[data-signature="true"] .skin-face{background:var(--signature-ground);border:1px solid #ffffff30;border-radius:9px;color:var(--signature-ink);font-family:Georgia,serif;box-shadow:inset 0 1px #fff3,0 2px 0 #0003;text-shadow:0 1px 2px var(--signature-ground),0 -1px 2px var(--signature-ground),1px 0 2px var(--signature-ground),-1px 0 2px var(--signature-ground);font-weight:800}
+.tile[data-signature="true"][data-skin-tier] .tile-inner{border-width:1px}
+.tile[data-signature="true"] .tile-inner::after,.skin-swatch[data-signature="true"] .skin-face::after{opacity:1;background-size:100% 1100%;background-position:center calc(var(--skin-level) * 10%);mix-blend-mode:normal}
+.tile[data-signature="true"] .tile-inner::before,.skin-swatch[data-signature="true"] .skin-face::before{display:none}
+.tile[data-drawing="pixel"] .tile-inner,.skin-swatch[data-drawing="pixel"] .skin-face{font-family:monospace;border-radius:2px;image-rendering:pixelated;font-weight:900}
+.tile[data-drawing="tech"] .tile-inner,.skin-swatch[data-drawing="tech"] .skin-face{font-family:monospace;border-radius:4px;letter-spacing:-1px}
+.tile[data-drawing="rounded"] .tile-inner,.skin-swatch[data-drawing="rounded"] .skin-face,.tile[data-drawing="anime"] .tile-inner,.skin-swatch[data-drawing="anime"] .skin-face{font-family:Arial,sans-serif;border-radius:17%;font-weight:900}
+.tile[data-drawing="cartoon"] .tile-inner,.skin-swatch[data-drawing="cartoon"] .skin-face{font-family:Georgia,serif;border-radius:18% 8%;font-weight:900}
+#skin-collections:not([hidden]){grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+#skin-collections button.collection-tile{position:relative;overflow:hidden;min-height:130px;background:var(--collection-ground);border-color:color-mix(in srgb,var(--collection-color) 35%,transparent);color:var(--collection-color);padding:12px;gap:5px}
+#skin-collections button.collection-tile[aria-pressed="true"]{background:var(--collection-ground);border-color:var(--collection-color);box-shadow:inset 0 -3px var(--collection-color)}
+#skin-collections .collection-tile strong{position:relative;color:var(--collection-color);font-size:14px}
+#skin-collections .collection-tile>span:not(.collection-art){color:#dbd8d3;font-size:11px}
+.collection-art{display:flex;gap:4px;margin-bottom:4px;align-self:stretch;pointer-events:none}
+.collection-art>.skin-swatch{width:calc((100% - 8px)/3);max-width:54px;display:block}
+#skin-collections .collection-art .skin-face{border-radius:4px}
+#collection-description{padding:18px;border-left:3px solid var(--collection-color);background:var(--collection-ground);border-radius:0 12px 12px 0;margin:16px 0 20px;color:#d4ced4;line-height:1.6}
+#collection-description strong{display:block;color:var(--collection-color);font:22px Georgia,serif;line-height:1.3;margin-bottom:9px}
+#collection-description span{display:block;font-size:13px}#collection-description small{display:block;color:var(--collection-color);font-size:11px;margin-top:10px;letter-spacing:.6px}
+#skins-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+#skins-list .skin-card{background:linear-gradient(160deg,var(--collection-ground),#15151e);border-color:color-mix(in srgb,var(--collection-color) 40%,transparent);padding:18px;overflow:hidden}
+.skin-collection-badge{display:block;margin:-18px -18px 12px;padding:10px 18px;border-bottom:1px solid color-mix(in srgb,var(--collection-color) 25%,transparent);background:color-mix(in srgb,var(--collection-color) 9%,transparent);color:var(--collection-color);font-size:13px;letter-spacing:.8px}
+#skins-list .skin-card .skin-sample{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+#skins-list .skin-card .skin-face{font-size:24px}#skins-list .skin-card .skin-swatch:is([data-value="1024"],[data-value="2048"]) .skin-face{font-size:20px}
+#skins-list .skin-card h3{font:24px Georgia,serif;margin:16px 0 7px;color:#f1e9da}#skins-list .skin-card p{font-size:13px;line-height:1.65;min-height:0;color:#cbc4cd}
+#skins-list .skin-provenance{display:block;font-size:10px;line-height:1.6;color:var(--collection-color)}
+#skins-list .skin-gallery .skin-sample{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:600px){#skin-collections:not([hidden]){grid-template-columns:repeat(2,minmax(0,1fr))}#skins-list{grid-template-columns:1fr}#skins-list .skin-card .skin-face{font-size:25px}#skins-list .skin-card .skin-swatch[data-value="2048"] .skin-face{font-size:21px}}
+[data-art="pulse"]{--skin-art:url('/skin-art/pulse.svg')}

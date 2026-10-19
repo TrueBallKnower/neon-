@@ -162,3 +162,7 @@ for skin in expansion['skins']:
   for n in range(1+level%4):s+=circle(40+n*6,5,1,accent,accent,.5)
   panels.append(f'<g transform="translate(0 {level*100})">'+s+'</g>')
  (root/'public/skin-art'/(skin['art']+'.svg')).write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 1100"><g fill="none" stroke="white" stroke-width=".85">'+''.join(panels)+'</g></svg>')
+
+# Signature editions replace the generic emblem sheets for the curated active set.
+import runpy
+runpy.run_path(str(root/"scripts/illustrate-signature-skins.py"),run_name="__main__")

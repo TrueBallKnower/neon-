@@ -98,8 +98,8 @@ SKINS, PIÈCES ET COFFRES
 La collection est liée au compte et conservée en base. Les anciens déblocages
 locaux par combo/course sont remplacés par les coffres ; aucun skin payant
 n’existait dans cette version. Étincelle reste disponible sans compte.
-La collection contient 100 skins : 15 Communs, 25 Rares, 34 Épiques,
-24 Légendaires, Étincelle et King. Chaque collection a ses motifs SVG, ses formes, ses couleurs
+La sélection contient 34 éditions : 5 Communes, 8 Rares, 9 Épiques,
+10 Légendaires, Étincelle et King. Chaque collection a ses motifs SVG, ses formes, ses couleurs
 par valeur et sa transformation de fusion. Aucun effet continu sur le plateau.
 Or impérial est désormais Légendaire et disponible dans les coffres. Le seuil
 de score ne le débloque plus ; les propriétaires existants le conservent.
@@ -208,61 +208,51 @@ par npm test avec vérification des budgets, des cases bloquées et des étoiles
 Contrôles navigateur : campagne complète, verrouillage, reprise, transitions
 entre modes, petits écrans et paysage. Les animations existantes sont réutilisées.
 
-COLLECTIONS ILLUSTRÉES
-100 skins, dont 98 dans les coffres. Probabilités de rareté inchangées.
-Nouveautés : Mines cubiques, Capsules de poche, Dōjō des éléments,
-Voie des sabres, Samouraï du sakura, Trésors du pharaon, Cité d’Atlantide,
-Confiserie céleste, Disco vinyle et Origami impérial.
-Les hommages Minecraft, Pokémon, Naruto et Star Wars sont des créations
-originales non officielles, sans collaboration ou licence annoncée.
-Mines cubiques : 2 charbon, 4 fer, 8 cuivre, 16 or, 32 redstone, 64 lapis,
-128 diamant, 256 émeraude, 512 améthyste, 1024 obsidienne, 2048 netherite.
-Dix planches SVG de onze panneaux donnent un dessin distinct à chaque valeur.
-La galerie complète se charge à l’ouverture ; filtre par rareté, possession
-ou hommage. Les contrôles de King ne referment plus une galerie inchangée.
-Recréer ces dessins : python3 scripts/generate-skin-art.py (optionnel,
-les SVG sont déjà inclus ; le serveur n’utilise pas Python).
-Recherche Google et pages officielles tentées mais bloquées HTTP 403 dans
-cet environnement. Aucun asset distant n’a été récupéré ou copié.
+ÉDITIONS SIGNATURES : DIRECTION ARTISTIQUE
+34 skins actifs (17 hommages non officiels et 17 créations originales ou
+exclusives) remplacent la sélection de 100 thèmes. 32 sont dans les coffres ;
+Étincelle et King restent exclusifs. Les probabilités de rareté ne changent pas.
+Les 106 éditions archivées restent résolues, visibles et équipables pour leurs
+propriétaires. Les reçus en attente fonctionnent encore, sans nouveau débit.
 
-ATELIER 100 : ANIMATIONS ET AMBIANCES
-La sélection active compte 100 skins, dont 64 hommages. Les 40 thèmes retirés
-restent en archives pour leurs propriétaires. Les hommages sont explicitement
-non officiels, notamment Zelda, Kirby, Mario, Sonic, Hollow Knight, Arcane,
-One Piece, Dragon Ball, Ghibli, Portal, Tetris, Transformers et Spider-Man.
-Les silhouettes sont dessinées dans skin-expansion.json : emblèmes
-originaux, des cadres par matière et onze évolutions illustrées par collection.
-Le script de génération produit aussi skin-expansion.js pour le navigateur.
-La recherche ignore les accents. La collection est paginée à 12 cartes
-pour éviter de charger 100 cartes et leurs dessins sur un téléphone.
+Six univers, avec palette, motifs, maxime, courte histoire et aperçus dessinés :
+- Éléments : forge, banquise, marées, vitrail et phénix.
+- Mondes oubliés : cartes stellaires, Saturne, Mars et trou noir.
+- Dark Tech : terminaux nocturnes, code, laboratoires et vaisseaux.
+- Arcade : pixels, blocs, anneaux, labyrinthes et cartoon à l’encre.
+- Sceaux antiques : or, lapis, ivoire, écailles et gravures.
+- Anime : chakra, sphères étoilées, toile de pirate et forêt peinte.
+La collection est indiquée par un bandeau teinté sur chaque carte. La rareté
+reste une information distincte. Les filtres par univers, rareté, possession,
+recherche et type d’hommage se combinent. Les listes sont paginées à 12 cartes ;
+les onze valeurs se chargent dans la galerie à la demande.
+
+Les dessins sont des compositions vectorielles en couleur, et non un emblème
+répété sur un cadre. Les matières et typographies varient : pixels sans lissage,
+cartoon crème/noir, acier de terminal, papier peint, lapis et gravures d’or.
+Mines cubiques conserve ses onze minerais. Les planches sont statiques et
+partagées entre les tuiles ; aucun filtre, flou ni animation de fond en continu.
+L’animation de déplacement reste à 180 ms, sans attente ajoutée aux entrées.
+
+Régénération (optionnelle, assets inclus ; pas de Python en production) :
+python3 scripts/generate-skin-art.py
+La commande génère skin-expansion.js, les planches des archives puis appelle
+scripts/illustrate-signature-skins.py pour les compositions des éditions actives.
+Le choix actif et les métadonnées sont dans skin-expansion.json ; les anciennes
+définitions et tous les identifiants sont conservés. Les SVG restent des créations
+originales, les hommages sont signalés non officiels.
+
+ANIMATIONS ET AMBIANCES
 Le coffre suit les phases charge > harmonisation > déverrouillage > onde
-> révélation. Durées, couleurs et sons dépendent du tirage confirmé par le
-serveur. Passer l’animation devient disponible après cette confirmation.
-Fermer le panneau ou réduire les animations termine la séquence visuelle
-sans changer la récompense ni le reçu d’achat.
-14 palettes de sons : braises, marées, givre, feuilles, impulsions, orage,
-prismes, orbites, ombres, rubans, sable, rouages, portails, alchimie.
-Les sons évoluent avec la valeur fusionnée et le combo, sous une limite
-globale de 32 voix. Les effets de barre sont réservés aux skins Rares et
-supérieurs : au plus 8 particules par fusion, nettoyées après 850 ms,
-sans boucle JavaScript supplémentaire. Le glissement reste à 180 ms.
-Effets légers et réduction des animations désactivent les particules.
-Validation : parcours mobile des 100 skins, pagination/recherche, sons
-rendus hors ligne (14 signaux distincts et non saturés, silence en mode muet),
-barres de feu/eau, ouverture par phases, passage, reprise après réponse perdue,
-révocation King, CPU ralenti 4x et huit formats mobiles émulés.
-Ces contrôles ne remplacent pas un test Safari sur appareil physique.
-Nouvelle recherche Google, Wikipedia, Minecraft et NASA tentée mais bloquée
-par le réseau (HTTP 403). Toutes les illustrations ont été produites localement.
+> révélation. Les couleurs et sons suivent le tirage confirmé par le serveur.
+Passer l’animation et réduire les mouvements ne changent ni récompense ni reçu.
+14 palettes de sons évoluent avec la valeur et le combo, sous une limite de
+32 voix. Les effets de barre Rares et supérieurs sont limités à 8 particules
+par fusion, nettoyées après 850 ms ; les effets légers les désactivent.
 
-COLLECTIONS ET SÉLECTION
-Huit familles : Céleste, Éléments, Rétro, Néon, Médiéval, Nature, Curiosités,
-Hommages. Chaque famille affiche la progression possédés / total ; les hommages
-se filtrent aussi par jeux vidéo, séries/anime et films. Ces filtres se combinent
-avec la rareté, la recherche et le filtre « Possédés ».
-100 skins actifs, 64 hommages et 36 créations originales/exclusives.
-40 anciens thèmes proches sont sortis des coffres : leurs fichiers, identifiants,
-inventaires et reçus restent valides. « Mes archives » n’apparaît que si le compte
-en possède ; ils restent équipables. Aucune pièce ni récompense n’est supprimée.
-Les dessins vectoriels des hommages sont originaux et signalés non officiels.
-Régénération : python3 scripts/generate-skin-art.py (données JSON → JS et SVG).
+Validation : npm test vérifie inventaires, archives, reçus, probabilités, dessins,
+collections, modes de jeu et synchronisation. Les contrôles navigateur couvrent
+les six univers, les aperçus, la recherche Naruto/Dragon Ball, l’équipement,
+les coffres, les anciens reçus et les petits écrans. Les contrôles de glissement
+et de latence restent disponibles en développement. Safari sur appareil physique
+n’est pas disponible dans cet environnement.
