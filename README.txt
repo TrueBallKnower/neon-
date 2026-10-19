@@ -168,3 +168,24 @@ Une erreur de connexion 28P01 est réessayée trois fois, après 1, 2 puis
 Les erreurs TLS et les migrations ne sont pas réessayées par ce mécanisme.
 Le message de démarrage inclut RENDER_GIT_COMMIT pour identifier la version.
 Un message de démarrage ne remplace pas la confirmation Live de Render.
+
+MODE HISTOIRE — LES FRAGMENTS DE L’AURORE
+Modes > Histoire ouvre une campagne solo de 18 niveaux, en trois chapitres.
+Aider Luma à rallumer le Jardin des étincelles, les Ruines de cristal puis
+le Cœur de l’aurore. Chaque victoire débloque le niveau suivant ; les
+anciens niveaux restent rejouables pour améliorer leurs une à trois étoiles.
+Objectifs : créer une tuile, gagner des points, compter les fusions,
+collecter plusieurs tuiles précises, libérer la glace ou rejoindre une balise.
+Les rochers coupent les lignes et restent fixes. La glace bloque une case
+jusqu’à une fusion orthogonalement adjacente. Une balise demande une tuile
+assez grande sur sa case. Les niveaux ont un budget de coups ; trois défis
+ajoutent un chrono. Les chronos continuent sur la carte et en arrière-plan.
+Les essais partagent une séquence déterministe de nouvelles tuiles : on peut
+apprendre un chemin et le refaire. Pas de vies payantes ni d’attente imposée.
+Étoiles et partie en cours sont locales à cet appareil/navigateur, sans compte.
+Reprendre depuis la carte après un rechargement. Les règles des obstacles
+restent isolées des parties classiques, classées et des duels.
+Les 18 chemins de victoire de test/fixtures/story-solutions.json sont rejoués
+par npm test avec vérification des budgets, des cases bloquées et des étoiles.
+Contrôles navigateur : campagne complète, verrouillage, reprise, transitions
+entre modes, petits écrans et paysage. Les animations existantes sont réutilisées.

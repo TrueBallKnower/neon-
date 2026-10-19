@@ -98,15 +98,16 @@ function particles(index){
  }$('particles').append(batch);
 }
 let saveTimer;function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{if(window.requestIdleCallback)requestIdleCallback(flushSave,{timeout:1500});else flushSave();},250);}
-function flushSave(){if(window.FusionOnline?.ranked||window.FusionOnline?.duel)return;storage.set('fusion-game',{board,score,moves,won,continuing,meta:ruleState});storage.set('fusion-best-'+ruleState.mode,best);if(ruleState.mode==='classic')storage.set('fusion-best',best);}
+function flushSave(){if(window.FusionStory?.active)return;if(window.FusionOnline?.ranked||window.FusionOnline?.duel)return;storage.set('fusion-game',{board,score,moves,won,continuing,meta:ruleState});storage.set('fusion-best-'+ruleState.mode,best);if(ruleState.mode==='classic')storage.set('fusion-best',best);}
 window.addEventListener('pagehide',flushSave);
 document.addEventListener('visibilitychange',()=>{touch=null;if(document.hidden){cancelAnimationFrame(comboFrame);if(audio?.state==='running')audio.suspend().catch(()=>{});}else{draw();if(comboUntil>performance.now())animateCombo();else resetCombo();}});
 window.addEventListener('pageshow',event=>{if(event.persisted){touch=null;draw();tickRules();}});
 function showEnd(win){resetCombo();$('end-title').textContent=win?'La consécration.':'Fin de la partie.';$('end-text').textContent=win?'2048 ! Le sommet est à toi. Et si tu allais plus loin ?':`${score.toLocaleString('fr-FR')} points. Une nouvelle étincelle t’attend.`;$('end-action').textContent=win?'Continuer ↗':'Rejouer ↗';$('overlay').hidden=false;$('announcement').textContent=$('end-title').textContent;sfx(win?'win':'over');}
-function newGame(withSound=true,mode=ruleState.mode){ruleState=modeRules.create(mode,Date.now());best=Number(storage.get('fusion-best-'+mode,mode==='classic'?storage.get('fusion-best',0):0))||0;generation++;resetCombo();locked=false;board=Array(16).fill(0);score=0;moves=0;won=false;continuing=false;$('overlay').hidden=true;$('particles').replaceChildren();$('score-add').textContent='';$('status').textContent='À toi de jouer';spawn();const added=spawn();draw([],added);tickRules();save();if(withSound){unlockAudio();sfx('start');}}
+function newGame(withSound=true,mode=ruleState.mode){window.FusionStory?.stop();ruleState=modeRules.create(mode,Date.now());best=Number(storage.get('fusion-best-'+mode,mode==='classic'?storage.get('fusion-best',0):0))||0;generation++;resetCombo();locked=false;board=Array(16).fill(0);score=0;moves=0;won=false;continuing=false;$('overlay').hidden=true;$('particles').replaceChildren();$('score-add').textContent='';$('status').textContent='À toi de jouer';spawn();const added=spawn();draw([],added);tickRules();save();if(withSound){unlockAudio();sfx('start');}}
 // Logical moves commit synchronously. Animation completion never gates input.
 function play(direction){
  if($('online-dialog').open)return;
+ if(window.FusionStory?.active){window.FusionStory.move(direction);return;}
  if(window.FusionOnline?.ranked||window.FusionOnline?.duel){window.FusionOnline.move(direction);return;}
  tickRules();if(ruleState.endedAt||!$('overlay').hidden)return;
  unlockAudio();const result=rules.move(board,direction);
@@ -121,7 +122,7 @@ function fusionFeedback(result){
  if(result.gain){const high=Math.max(...result.merges.map(i=>board[i]));const chain=advanceCombo();sfx('merge',high,chain);window.FusionSkins?.progress({score,combo:chain});result.merges.forEach(particles);$('status').textContent=high>=128?'Fusion survoltée !':'Belle fusion !';const el=$('score-add');el.textContent='+'+result.gain;cancelVisuals(el);if(!reduced)animateVisual(el,[{transform:'translateY(0)',opacity:1},{transform:'translateY(-30px)',opacity:0}],{duration:500,fill:'forwards'});}
  else $('status').textContent='Trouve la prochaine fusion';
 }
-$('restart').onclick=()=>{if(window.FusionOnline?.ranked||window.FusionOnline?.duel){window.FusionOnline.restart();return;}if(moves>0&&!confirm('Recommencer cette partie ? Ton record sera conservé.'))return;newGame();};$('end-action').onclick=()=>{unlockAudio();if(!ruleState.endedAt&&won&&!continuing){continuing=true;$('overlay').hidden=true;save();}else if(window.FusionOnline?.ranked)window.FusionOnline.restart();else newGame();};
+$('restart').onclick=()=>{if(window.FusionStory?.active){window.FusionStory.restart();return;}if(window.FusionOnline?.ranked||window.FusionOnline?.duel){window.FusionOnline.restart();return;}if(moves>0&&!confirm('Recommencer cette partie ? Ton record sera conservé.'))return;newGame();};$('end-action').onclick=()=>{unlockAudio();if(window.FusionStory?.active){window.FusionStory.action();return;}if(!ruleState.endedAt&&won&&!continuing){continuing=true;$('overlay').hidden=true;save();}else if(window.FusionOnline?.ranked)window.FusionOnline.restart();else newGame();};
 window.addEventListener('keydown',e=>{const directions={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',a:'left',d:'right',w:'up',s:'down',q:'left',z:'up'};if(e.ctrlKey||e.metaKey||e.altKey||e.target.closest('input,textarea,select')||$('online-dialog').open)return;if(directions[e.key]){e.preventDefault();play(directions[e.key]);}});
 let touch=null;
 function swipePoint(id,x,y){if(!touch||touch.id!==id||touch.used)return;const dx=x-touch.x,dy=y-touch.y;if(Math.max(Math.abs(dx),Math.abs(dy))<14)return;touch.used=true;play(Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up');}
@@ -152,6 +153,7 @@ function showModeEnd(){
  $('end-action').textContent='Rejouer ↗';$('announcement').textContent=$('end-title').textContent;
 }
 function tickRules(){
+ if(window.FusionStory?.active)return;
  const previous=ruleState.endedAt;modeRules.expire(ruleState,gameNow());
  const mode=modeRules.get(ruleState.mode);let label=mode.name+' · ';
  if(ruleState.endedAt)label+=ruleState.reason==='victory'?'Victoire !':ruleState.reason==='draw'?'Égalité':ruleState.reason==='combo'?'Combo perdu !':ruleState.reason==='target'?'Objectif atteint !':'Temps écoulé';
@@ -169,7 +171,7 @@ window.FusionUI={
  get canMove(){tickRules();return !ruleState.endedAt;},
  nextMeta(result,at){const meta={...ruleState};modeRules.expire(meta,at);if(!meta.endedAt){modeRules.fusion(meta,result,at);if(modeRules.get(meta.mode).race&&result.board.some(v=>v>=modeRules.get(meta.mode).target)){meta.endedAt=at;meta.reason='target';}}return meta;},
  remoteRule(meta){if(!meta)return;const previous=ruleState.mode;if(previous!==meta.mode){ruleState={...meta};resetCombo();}else{ruleState.endsAt=meta.endsAt;ruleState.comboDeadline=Math.max(ruleState.comboDeadline||0,meta.comboDeadline||0)||null;if(meta.endedAt){ruleState.endedAt=meta.endedAt;ruleState.reason=meta.reason;}}tickRules();},
- load(game){generation++;resetCombo();locked=false;board=[...game.board];score=game.score;moves=game.moves;won=!!game.won;continuing=true;ruleState=game.meta?{...game.meta}:modeRules.create('classic',gameNow());best=Number(storage.get('fusion-best-'+ruleState.mode,0))||0;$('overlay').hidden=true;draw();tickRules();if(ruleState.endedAt)showModeEnd();},
+ load(game){if(!game.meta?.storyId)window.FusionStory?.stop();generation++;resetCombo();locked=false;board=[...game.board];score=game.score;moves=game.moves;won=!!game.won;continuing=true;ruleState=game.meta?{...game.meta}:modeRules.create('classic',gameNow());best=Number(storage.get('fusion-best-'+ruleState.mode,0))||0;$('overlay').hidden=true;draw();tickRules();if(ruleState.endedAt)showModeEnd();},
  confirmScore(value){best=Math.max(best,value||0);setText('best',best);},
  animate(payload,{duel=false}={}){
   const {game,result,spawned}=payload;
