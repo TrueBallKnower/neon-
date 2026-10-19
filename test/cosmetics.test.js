@@ -35,3 +35,22 @@ test('server inventory, verified coins, atomic chests, legendary gold and exclus
   const persisted=(await a('cosmetics')).coins;await stop();instance=await createApp();await start();inv=await a('cosmetics');assert.equal(inv.coins,persisted);assert.equal(inv.selected,'dragon');assert.ok(inv.owned.includes('gold'));assert.ok(inv.owned.includes('porcelain'));assert.equal((await a('cosmetics/equip',{skin:'porcelain'})).selected,'porcelain');assert.equal((await a('cosmetics/open',request)).reward.skin,opened[0].reward.skin);assert.equal((await a('cosmetics')).coins,persisted);
  }finally{await stop();delete process.env.DATA_DIR;fs.rmSync(dir,{recursive:true,force:true});}
 });
+
+test('only the authenticated TrueBallKnower identity gets all editions, archives and King without altering ranking or persisted purchases',async()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'fusion-owner-skins-'));process.env.DATA_DIR=dir;const instance=await createApp(),server=instance.app.listen(0);await new Promise(r=>server.once('listening',r));const base='http://127.0.0.1:'+server.address().port;
+ function client(){let cookie='';return async(url,body)=>{const res=await fetch(base+'/api/'+url,{method:body===undefined?'GET':'POST',headers:{cookie,...(body===undefined?{}:{'Content-Type':'application/json'})},body:body===undefined?undefined:JSON.stringify(body)});if(res.headers.get('set-cookie'))cookie=res.headers.get('set-cookie').split(';')[0];return{status:res.status,...await res.json()};};}
+ const owner=client(),other=client(),lookalike=client(),guest=client(),{allSkins}=require('../public/skin-rules');
+ try{
+  for(const [name,c]of[['TrueBallKnower',owner],['OtherCollector',other],['TrueBallKnower2',lookalike]])assert.equal((await c('register',{username:name,password:'test-password-123',allSkinsAccess:true})).status,201);
+  const id=(await instance.db.one('SELECT id FROM users WHERE username_key=?',['trueballknower'])).id;
+  const inv=await owner('cosmetics');assert.equal(inv.allSkinsAccess,true);assert.equal(inv.isKing,false);assert.equal(inv.coins,0);assert.deepEqual(new Set(inv.owned),new Set(allSkins.map(s=>s.id)));assert.ok(!('storedOwned'in inv));
+  for(const skin of ['king','porcelain','gold','dojo'])assert.equal((await owner('cosmetics/equip',{skin})).selected,skin);
+  assert.equal((await owner('cosmetics/equip',{skin:'king'})).selected,'king');assert.equal((await owner('cosmetics')).selected,'king');
+  assert.equal((await instance.db.one('SELECT best FROM users WHERE id=?',[id])).best,0);
+  for(const c of[other,lookalike]){assert.equal((await c('cosmetics')).allSkinsAccess,false);assert.equal((await c('cosmetics/equip',{skin:'king',username:'TrueBallKnower',allSkinsAccess:true})).status,403);assert.deepEqual((await c('cosmetics')).owned,['original']);}assert.equal((await guest('cosmetics')).status,401);
+  await instance.db.transaction(async tx=>{await reward(tx,id,{moves:0,score:0},{moves:80,score:0});});
+  const opening=await owner('cosmetics/open',{chest:'wood',requestId:'owner-full-collection-01'});assert.equal(opening.reward.duplicate,true);assert.equal(opening.reward.refund,28);assert.equal(opening.inventory.coins,28);assert.equal(opening.inventory.owned.length,allSkins.length);
+  const stored=JSON.parse((await instance.db.one('SELECT state FROM cosmetics WHERE user_id=?',[id])).state);assert.deepEqual(stored.owned,['original'],'derived access must not be written into purchases');
+  await instance.db.run('UPDATE users SET username_key=? WHERE id=?',['revoked-owner-identity',id]);const revoked=await owner('cosmetics');assert.equal(revoked.allSkinsAccess,false);assert.deepEqual(revoked.owned,['original']);assert.equal(revoked.selected,'original');assert.equal((await owner('cosmetics/equip',{skin:'gold'})).status,403);
+ }finally{await new Promise(r=>server.close(r));await instance.close();delete process.env.DATA_DIR;fs.rmSync(dir,{recursive:true,force:true});}
+});

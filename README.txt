@@ -256,3 +256,11 @@ les six univers, les aperçus, la recherche Naruto/Dragon Ball, l’équipement,
 les coffres, les anciens reçus et les petits écrans. Les contrôles de glissement
 et de latence restent disponibles en développement. Safari sur appareil physique
 n’est pas disponible dans cet environnement.
+
+ACCÈS COMPLET DU CRÉATEUR
+Le compte authentifié dont username_key vaut exactement trueballknower possède
+un accès calculé à toutes les éditions, archives et King compris. Ce droit ne
+modifie pas sa place au classement, ses pièces ou les probabilités des coffres.
+Le serveur vérifie l’identité en base, sans accepter de drapeau fourni par le
+client. Les droits ne sont pas ajoutés aux achats persistés ; les autres comptes
+conservent leurs règles de déblocage et de révocation King.
