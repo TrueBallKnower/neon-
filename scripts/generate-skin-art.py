@@ -89,3 +89,56 @@ for name in names:
  for l in range(11):groups.append(f'<g transform="translate(0 {l*100})">'+pattern(name,l)+'</g>')
  attr=' shape-rendering="crispEdges"' if name=='ores' else ''
  (Path(__file__).resolve().parents[1] / 'public' / 'skin-art' / (name+'.svg')).write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 1100"'+attr+'><g fill="none" stroke="white" stroke-width=".85" stroke-linecap="round">'+''.join(groups)+'</g></svg>')
+
+# Extended atelier: each authored silhouette gets eleven illustrated evolutions.
+import json,hashlib,colorsys
+root=Path(__file__).resolve().parents[1]
+expansion=json.loads((root/'public/skin-expansion.json').read_text())
+(root/'public/skin-expansion.js').write_text('(function(root){const data='+json.dumps(expansion,ensure_ascii=False,separators=(',',':'))+';if(typeof module!=="undefined")module.exports=data;else root.FusionSkinExpansion=data;})(typeof window!=="undefined"?window:globalThis);\n')
+def material_frame(material,level,seed):
+ rng=random.Random(str(seed)+':'+str(level));s='';kind=seed%4
+ frames=['M2 12 12 2h76l10 10v76L88 98H12L2 88z','M3 3h94v94H3zM7 7h86v86H7z','M2 17Q2 2 17 2h66q15 0 15 15v66q0 15-15 15H17Q2 98 2 83z','M2 10 10 2h80l8 8v80l-8 8H10l-8-8zM8 16v68m84-68v68']
+ s+=path(frames[kind],stroke='white',width=.85)
+ if material in ['chrome','brass','carbon','engraved']:
+  for x in [7,93]:
+   for y in [8,30,70,92]:s+=circle(x,y,1.5,stroke='white')
+  s+=path('M3 36h8v28H3M97 36H89v28h8M36 3v8h28V3M36 97v-8h28v8',width=.8)
+  for n in range(1+level//2):s+=rect(38+n*4,7,2,3,'white',.65)+rect(38+n*4,90,2,3,'white',.65)
+ elif material in ['silk','canvas','velvet','fur','bone']:
+  for n in range(3,98,7):s+=path(f'M{n} 4l3 3M{n} 93l3 3M4 {n}l3 3M93 {n}l3 3',width=.55)
+  for n in range(2+level//3):s+=path(f'M{32+n*7} 5q4 8 8 0M{32+n*7} 95q4-8 8 0',width=.7)
+  if material=='bone':s+=path('M3 40l8 5-8 5 8 5-8 5M97 40l-8 5 8 5-8 5 8 5')
+  elif material=='fur':s+=path('M4 35l5 7-4 8 5 8-6 7M96 35l-5 7 4 8-5 8 6 7',width=1.3)
+ elif material in ['wood','stone','clay','sandstone','obsidian']:
+  for n in range(4):
+   y=8+n*3;s+=path(f'M31 {y}q15 {rng.randrange(-5,6)} 38 0M31 {100-y}q15 {rng.randrange(-5,6)} 38 0',width=.5)
+  s+=path('M3 34l7 8-4 14 5 9M97 34l-7 8 4 14-5 9M38 2l7 9 10-5 8 4M38 98l7-9 10 5 8-4',width=.7)
+  for n in range(level//3):s+=circle(40+n*8,94,1.2,'white')
+ elif material in ['glass','ice','crystal','pearl']:
+  s+=path('M2 2 17 13 35 2M65 2l18 11L98 2M2 98l15-11 18 11M65 98l18-11 15 11M2 35l11 15L2 65M98 35 87 50l11 15',width=.8)
+  for n in range(1+level//3):
+   x=36+n*8;s+=path(f'm{x} 4 3 4-3 4-3-4zM{x} 88l3 4-3 4-3-4z',width=.65)
+  if material=='pearl':s+=circle(8,50,3)+circle(92,50,3)
+ elif material=='pixel':
+  s+=path('M2 20h5v10h5M98 20h-5v10h-5M2 80h5V70h5M98 80h-5V70h-5M35 2v5h30V2M35 98v-5h30v5',width=1.3)
+  for n in range(2+level//2):s+=rect(35+n*5,8,3,3,'white',.7)
+ else:
+  s+=path('M3 34q15 8 0 16t0 16M97 34q-15 8 0 16t0 16M34 3q8 15 16 0t16 0M34 97q8-15 16 0t16 0',width=.75)
+  for n in range(1+level//3):s+=circle(35+n*9,95,1.5,'white')
+ return s
+for skin in expansion['skins']:
+ seed=int(hashlib.sha256(skin['id'].encode()).hexdigest()[:8],16);panels=[]
+ for level in range(11):
+  hue=skin['hues'][level];rgb=colorsys.hls_to_rgb((hue%360)/360,.75,.65);accent='#'+''.join(f'{int(c*255):02x}' for c in rgb)
+  icon=skin['icon'];s=material_frame(skin['material'],level,seed)
+  # Two individually authored emblems, extra inlays and a coronet at high values.
+  for x,y,angle in [(7,7,0),(66,66,180)]:
+   s+=f'<g transform="translate({x} {y}) scale(.75)"><path d="{icon}" fill="{accent}" fill-opacity=".12" stroke="{accent}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></g>'
+  if level>=3:
+   for x,y in [(76,6),(6,76)]:s+=f'<g transform="translate({x} {y}) scale(.45)"><path d="{icon}" fill="none" stroke="white" stroke-width="1.2"/></g>'
+  if level>=6:s+=path('M32 4l6 8 12-5 12 5 6-8M32 96l6-8 12 5 12-5 6 8',stroke=accent,width=.85)
+  if level>=9:s+=path('M33 17 50 11l17 6M33 83l17 6 17-6M17 33l-6 17 6 17M83 33l6 17-6 17',stroke='white',width=.65)
+  # A different number of inset jewels, matched to each level's hue.
+  for n in range(1+level%4):s+=circle(40+n*6,5,1,accent,accent,.5)
+  panels.append(f'<g transform="translate(0 {level*100})">'+s+'</g>')
+ (root/'public/skin-art'/(skin['art']+'.svg')).write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 1100"><g fill="none" stroke="white" stroke-width=".85">'+''.join(panels)+'</g></svg>')

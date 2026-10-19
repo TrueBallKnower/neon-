@@ -98,9 +98,8 @@ SKINS, PIÈCES ET COFFRES
 La collection est liée au compte et conservée en base. Les anciens déblocages
 locaux par combo/course sont remplacés par les coffres ; aucun skin payant
 n’existait dans cette version. Étincelle reste disponible sans compte.
-Commun : Jardin de jade, Circuit rétro. Rare : Aurore boréale, Forge solaire.
-Épique : Atlas cosmique, Vitrail royal. Légendaire : Dragon ancestral,
-Abysses vivants. Chaque collection a ses motifs SVG, ses formes, ses couleurs
+La collection contient 100 skins : 16 Communs, 26 Rares, 33 Épiques,
+23 Légendaires, Étincelle et King. Chaque collection a ses motifs SVG, ses formes, ses couleurs
 par valeur et sa transformation de fusion. Aucun effet continu sur le plateau.
 Or impérial est désormais Légendaire et disponible dans les coffres. Le seuil
 de score ne le débloque plus ; les propriétaires existants le conservent.
@@ -210,8 +209,7 @@ Contrôles navigateur : campagne complète, verrouillage, reprise, transitions
 entre modes, petits écrans et paysage. Les animations existantes sont réutilisées.
 
 COLLECTIONS ILLUSTRÉES
-21 skins, dont 19 dans les coffres : quatre Communs, quatre Rares,
-six Épiques et cinq Légendaires. Probabilités de rareté inchangées.
+100 skins, dont 98 dans les coffres. Probabilités de rareté inchangées.
 Nouveautés : Mines cubiques, Capsules de poche, Dōjō des éléments,
 Voie des sabres, Samouraï du sakura, Trésors du pharaon, Cité d’Atlantide,
 Confiserie céleste, Disco vinyle et Origami impérial.
@@ -226,3 +224,33 @@ Recréer ces dessins : python3 scripts/generate-skin-art.py (optionnel,
 les SVG sont déjà inclus ; le serveur n’utilise pas Python).
 Recherche Google et pages officielles tentées mais bloquées HTTP 403 dans
 cet environnement. Aucun asset distant n’a été récupéré ou copié.
+
+ATELIER 100 : ANIMATIONS ET AMBIANCES
+79 collections nouvelles complètent les 21 existantes ; tous les anciens
+identifiants et inventaires sont conservés. 24 hommages sont explicitement
+non officiels, notamment Zelda, Kirby, Mario, Sonic, Hollow Knight, Arcane,
+One Piece, Dragon Ball, Ghibli, Portal, Tetris, Transformers et Spider-Man.
+Les silhouettes sont dessinées dans skin-expansion.json : 79 emblèmes
+originaux, des cadres par matière et onze évolutions illustrées par collection.
+Le script de génération produit aussi skin-expansion.js pour le navigateur.
+La recherche ignore les accents. La collection est paginée à 12 cartes
+pour éviter de charger 100 cartes et leurs dessins sur un téléphone.
+Le coffre suit les phases charge > harmonisation > déverrouillage > onde
+> révélation. Durées, couleurs et sons dépendent du tirage confirmé par le
+serveur. Passer l’animation devient disponible après cette confirmation.
+Fermer le panneau ou réduire les animations termine la séquence visuelle
+sans changer la récompense ni le reçu d’achat.
+14 palettes de sons : braises, marées, givre, feuilles, impulsions, orage,
+prismes, orbites, ombres, rubans, sable, rouages, portails, alchimie.
+Les sons évoluent avec la valeur fusionnée et le combo, sous une limite
+globale de 32 voix. Les effets de barre sont réservés aux skins Rares et
+supérieurs : au plus 8 particules par fusion, nettoyées après 850 ms,
+sans boucle JavaScript supplémentaire. Le glissement reste à 180 ms.
+Effets légers et réduction des animations désactivent les particules.
+Validation : parcours mobile des 100 skins, pagination/recherche, sons
+rendus hors ligne (14 signaux distincts et non saturés, silence en mode muet),
+barres de feu/eau, ouverture par phases, passage, reprise après réponse perdue,
+révocation King, CPU ralenti 4x et huit formats mobiles émulés.
+Ces contrôles ne remplacent pas un test Safari sur appareil physique.
+Nouvelle recherche Google, Wikipedia, Minecraft et NASA tentée mais bloquée
+par le réseau (HTTP 403). Toutes les illustrations ont été produites localement.

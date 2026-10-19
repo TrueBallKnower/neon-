@@ -9,7 +9,7 @@ const storage={get(key,fallback){try{return JSON.parse(localStorage.getItem(key)
 let board=Array(16).fill(0),score=0,best=Number(storage.get('fusion-best',0))||0,moves=0,locked=false,won=false,continuing=false,generation=0;
 let comboCount=0,comboUntil=0,comboFrame=0;
 
-function resetCombo(){comboCount=0;comboUntil=0;cancelAnimationFrame(comboFrame);$('combo').hidden=true;}
+function resetCombo(){window.FusionSkins?.clearCombo();comboCount=0;comboUntil=0;cancelAnimationFrame(comboFrame);$('combo').hidden=true;}
 function animateCombo(){const left=Math.max(0,comboUntil-performance.now());$('combo-bar').style.transform='scaleX('+left/comboWindow()+')';if(left>0)comboFrame=requestAnimationFrame(animateCombo);else resetCombo();}
 function advanceCombo(){const now=performance.now();comboCount=now<comboUntil?comboCount+1:1;comboUntil=now+comboWindow();cancelAnimationFrame(comboFrame);$('combo').hidden=false;$('combo-label').textContent=comboCount>1?`COMBO ×${comboCount}`:'PREMIÈRE ÉTINCELLE';$('combo-hint').textContent=comboCount>=5?'EN FEU !':'ENCHAÎNE LES FUSIONS';$('combo').classList.toggle('hot',comboCount>=5);animateCombo();return comboCount;}
 let soundOn=storage.get('fusion-sound',true),audio;
@@ -19,11 +19,21 @@ function unlockAudio(){try{if(!audio||audio.state==='closed')audio=new(window.Au
 let voices=0;
 function tone(freq,time,duration,type='sine',volume=.08,slide){if(!audio||!soundOn||voices>=32)return;voices++;const osc=audio.createOscillator(),amp=audio.createGain();osc.type=type;osc.frequency.setValueAtTime(freq,time);if(slide)osc.frequency.exponentialRampToValueAtTime(slide,time+duration);amp.gain.setValueAtTime(.001,time);amp.gain.exponentialRampToValueAtTime(volume,time+.012);amp.gain.exponentialRampToValueAtTime(.001,time+duration);osc.connect(amp);amp.connect(audio.destination);osc.start(time);osc.stop(time+duration+.02);osc.onended=()=>{voices=Math.max(0,voices-1);osc.disconnect();amp.disconnect();};}
 function sfx(kind,value=2,chain=1){if(!soundOn||!audio)return;const t=audio.currentTime;
+ if(kind==='merge'){const profile=window.FusionSkins?.feedback(value,chain);if(profile?.rank>0){themedMerge(profile,chain);return;}}
  if(kind==='move'){tone(150,t,.09,'sine',.035,65);tone(750,t,.04,'triangle',.012,350);}
  if(kind==='merge'){const level=Math.log2(value),boost=Math.min(chain-1,12),f=196*2**((level%7+boost*2)/12);tone(f,t,.22,'triangle',.075);tone(f*1.5,t+.035,.22,'sine',.06);tone(f*2,t+.07,.3,'sine',.045);tone(85,t,.14,'sine',.1,40);if(value>=64||chain>1)tone(f*3,t+.11,.35,'sine',.035);if(chain>1){tone(f/2,t,.22,'sawtooth',Math.min(.012+boost*.004,.055));for(let n=0;n<Math.min(chain,6);n++)tone(f*2**(n/12),t+n*.045,.13,'triangle',.025+boost*.002);}if(chain>=5)tone(55,t,.3,'sine',.12,28);}
  if(kind==='start') [261.63,329.63,392].forEach((f,i)=>tone(f,t+i*.065,.22,'triangle',.045));
  if(kind==='win') [261.63,329.63,392,523.25,659.25,783.99].forEach((f,i)=>tone(f,t+i*.1,.45,'triangle',.055));
  if(kind==='over') [261.63,233.08,196,130.81].forEach((f,i)=>tone(f,t+i*.15,.35,'triangle',.05));
+}
+const soundPalettes={
+ fire:{wave:'sawtooth',ratios:[1,1.5,2],root:.8,tail:.18,slide:.55},water:{wave:'sine',ratios:[1,1.335,2.67],root:1.25,tail:.28,slide:1.45},ice:{wave:'triangle',ratios:[1,2.76,4.1],root:1.8,tail:.3},leaves:{wave:'triangle',ratios:[1,1.5,2.25],root:1.05,tail:.16},electric:{wave:'square',ratios:[1,1.26,2],root:1.3,tail:.1,slide:1.4},lightning:{wave:'sawtooth',ratios:[1,1.414,2.8],root:1.1,tail:.12,slide:1.9},crystal:{wave:'sine',ratios:[1,2.4,3.2],root:1.6,tail:.32},cosmic:{wave:'sine',ratios:[1,1.5,1.88],root:.95,tail:.4},shadow:{wave:'sine',ratios:[1,1.19,1.5],root:.65,tail:.25,slide:.75},ribbons:{wave:'triangle',ratios:[1,1.25,1.5],root:1.15,tail:.17},sand:{wave:'triangle',ratios:[1,1.33,1.66],root:.9,tail:.12,slide:.8},gears:{wave:'square',ratios:[1,2,3],root:1.1,tail:.09},portal:{wave:'sine',ratios:[1,1.414,2.12],root:1,tail:.3,slide:2},alchemy:{wave:'triangle',ratios:[1,1.2,1.6],root:1.4,tail:.22,slide:1.2}
+};
+function themedMerge(profile,chain=1){if(!audio||!soundOn)return;const p=soundPalettes[profile.sound]||soundPalettes.crystal,t=audio.currentTime,boost=Math.min(12,chain-1),f=165*p.root*2**((profile.level%7+boost*1.5)/12),volume=.034+Math.min(profile.rank,4)*.003;
+ p.ratios.forEach((ratio,i)=>tone(f*ratio,t+i*.035,p.tail,p.wave,volume/(1+i*.45),p.slide?f*ratio*p.slide:undefined));
+ tone(profile.sound==='fire'?70:95,t,.12,'sine',.045,45);
+ if(chain>1)for(let n=0;n<Math.min(3,1+Math.floor(chain/3));n++)tone(f*2**((n*2+boost)/12),t+.08+n*.045,.12,'triangle',.024);
+ if(profile.rank>=4&&profile.level>=6)tone(f*3,t+.13,.32,'sine',.018);
 }
 function soundLabel(){$('sound').innerHTML=`${soundOn?'♫':'♪'} <span>SON ${soundOn?'ACTIVÉ':'COUPÉ'}</span>`;$('sound').setAttribute('aria-pressed',String(soundOn));}
 $('sound').onclick=()=>{unlockAudio();soundOn=!soundOn;storage.set('fusion-sound',soundOn);soundLabel();if(soundOn)sfx('start');};soundLabel();
@@ -119,7 +129,7 @@ function play(direction){
  save();$('announcement').textContent=`Score ${score}. ${result.merges.length} fusion(s).`;
 }
 function fusionFeedback(result){
- if(result.gain){const high=Math.max(...result.merges.map(i=>board[i]));const chain=advanceCombo();sfx('merge',high,chain);window.FusionSkins?.progress({score,combo:chain});result.merges.forEach(particles);$('status').textContent=high>=128?'Fusion survoltée !':'Belle fusion !';const el=$('score-add');el.textContent='+'+result.gain;cancelVisuals(el);if(!reduced)animateVisual(el,[{transform:'translateY(0)',opacity:1},{transform:'translateY(-30px)',opacity:0}],{duration:500,fill:'forwards'});}
+ if(result.gain){const high=Math.max(...result.merges.map(i=>board[i]));const chain=advanceCombo();sfx('merge',high,chain);window.FusionSkins?.combo(high,chain);window.FusionSkins?.progress({score,combo:chain});result.merges.forEach(particles);$('status').textContent=high>=128?'Fusion survoltée !':'Belle fusion !';const el=$('score-add');el.textContent='+'+result.gain;cancelVisuals(el);if(!reduced)animateVisual(el,[{transform:'translateY(0)',opacity:1},{transform:'translateY(-30px)',opacity:0}],{duration:500,fill:'forwards'});}
  else $('status').textContent='Trouve la prochaine fusion';
 }
 $('restart').onclick=()=>{if(window.FusionStory?.active){window.FusionStory.restart();return;}if(window.FusionOnline?.ranked||window.FusionOnline?.duel){window.FusionOnline.restart();return;}if(moves>0&&!confirm('Recommencer cette partie ? Ton record sera conservé.'))return;newGame();};$('end-action').onclick=()=>{unlockAudio();if(window.FusionStory?.active){window.FusionStory.action();return;}if(!ruleState.endedAt&&won&&!continuing){continuing=true;$('overlay').hidden=true;save();}else if(window.FusionOnline?.ranked)window.FusionOnline.restart();else newGame();};
@@ -182,5 +192,10 @@ window.FusionUI={
   else if(!duel){if(ruleState.mode==='classic'&&game.won&&!won){won=true;continuing=false;showEnd(true);}else if(!rules.canMove(board))showEnd(false);}
   else if(!rules.canMove(board))$('status').textContent='Grille bloquée. Ton score reste en jeu !';
   tickRules();
- },chestSound(stage,rarity){if(!soundOn)return;unlockAudio();if(!audio)return;const t=audio.currentTime;if(stage==='charge'){[98,146.83,196,293.66].forEach((f,i)=>tone(f,t+i*.22,.3,'triangle',.045));tone(55,t,.7,'sine',.06,110);}else{const boost=rarity==='legendary'?1.5:rarity==='epic'?1.25:1;[261.63,329.63,392,523.25,659.25,783.99].forEach((f,i)=>tone(f*boost,t+i*.065,.42,'triangle',.055));tone(65,t,.35,'sine',.1,32);}},audio:unlockAudio,newGame
+ },previewCosmetic(id){unlockAudio();const p=window.FusionSkinRules.feedback(id,128,5);p.enabled=true;themedMerge(p,5);},chestSound(stage,rarity){if(!soundOn)return;unlockAudio();if(!audio)return;const t=audio.currentTime,rank={common:1,rare:2,epic:3,legendary:4}[rarity]||1;
+ if(stage==='charge'){[98,146.83,196].forEach((f,i)=>tone(f,t+i*.18,.23,'triangle',.035));tone(48,t,.5,'sine',.045,85);}
+ else if(stage==='resonate'){[196,246.94,293.66].slice(0,rank).forEach((f,i)=>tone(f*1.1**rank,t+i*.12,.28,'sine',.04));}
+ else if(stage==='unlock'){tone(110,t,.12,'triangle',.06,220);tone(440,t+.05,.15,'triangle',.035,880);tone(55,t,.22,'sine',.05,32);}
+ else{const notes=rank>=4?[261.63,329.63,392,523.25,659.25,783.99,1046.5,1318.5]:rank===3?[261.63,311.13,392,523.25,622.25,783.99]:rank===2?[293.66,369.99,440,587.33]:[261.63,329.63,392];notes.forEach((f,i)=>tone(f,t+i*.07,.32+rank*.035,rank>=3?'triangle':'sine',.042));tone(65,t,.28,'sine',.065,32);}
+ },audio:unlockAudio,newGame
 };
