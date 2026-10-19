@@ -1,13 +1,14 @@
 const crypto=require('node:crypto');
 const rules=require('./public/engine');
 const DURATION=5*60*1000,COUNTDOWN=3000;
-function addTile(board,seed,turn){const empty=board.map((v,i)=>v?-1:i).filter(i=>i>=0);if(!empty.length)return -1;const bytes=crypto.createHash('sha256').update(seed+':'+turn).digest();const index=empty[bytes.readUInt32BE(0)%empty.length];board[index]=bytes[4]<230?2:4;return index;}
+const spawnStream=require('./spawn-plan');
+const {addTile}=spawnStream;
 function player(id,name,seed){const board=Array(16).fill(0);addTile(board,seed,0);addTile(board,seed,1);return{id,name,board,score:0,moves:0,blocked:false};}
 function phase(state,now){if(state.forfeit)return'finished';if(!state.startsAt)return'waiting';if(now<state.startsAt)return'countdown';if(now>=state.endsAt)return'finished';return'playing';}
 function view(state,id,now=Date.now()){
  const me=state.players.find(p=>p.id===id),other=state.players.find(p=>p.id!==id),status=phase(state,now);
  let winner=null;if(status==='finished'){if(state.forfeit)winner=state.players.find(p=>p.id!==state.forfeit)?.id||null;else if(other&&me.score!==other.score)winner=me.score>other.score?me.id:other.id;}
- return{code:state.code,status,serverNow:now,startsAt:state.startsAt,endsAt:state.endsAt,duration:DURATION,me,opponent:other||null,winner,forfeit:!!state.forfeit};
+ return{code:state.code,status,serverNow:now,startsAt:state.startsAt,endsAt:state.endsAt,duration:DURATION,me:{...me,spawnPlan:spawnStream.plan(state.seed,me.moves)},opponent:other||null,winner,forfeit:!!state.forfeit};
 }
 function registerDuels({app,db,auth,route,rateLimit}){
  const invalid=res=>res.status(404).json({error:'Duel introuvable. Vérifie le code.'});
@@ -33,13 +34,18 @@ function registerDuels({app,db,auth,route,rateLimit}){
   if(!state.players.some(p=>p.id===req.user.id))return res.status(403).json({error:'Rejoins ce duel avec son code.'});res.json({duel:view(state,req.user.id)});
  }));
  app.post('/api/duels/:code/move',auth,route(async(req,res)=>{
-  const {direction}=req.body||{};if(!['left','right','up','down'].includes(direction))return res.status(400).json({error:'Direction invalide.'});
+  const directions=spawnStream.directions(req.body);if(!directions)return res.status(400).json({error:'Directions invalides.'});
   const payload=await db.transaction(async tx=>{
    const row=await locked(tx,req.params.code.toUpperCase());if(!row||Number(row.expires)<Date.now())return null;const state=JSON.parse(row.state),me=state.players.find(p=>p.id===req.user.id);
    if(!me)return{error:'Tu ne participes pas à ce duel.',status:403};
    const status=phase(state,Date.now());if(status!=='playing')return{error:status==='countdown'?'Le duel commence bientôt.':'Le duel est terminé ou attend un adversaire.',status:409,duel:view(state,req.user.id)};
-   const result=rules.move(me.board,direction);let spawned=-1;
-   if(result.changed){spawned=addTile(result.board,state.seed,me.moves+2);me.board=result.board;me.score+=result.gain;me.moves++;me.blocked=!rules.canMove(me.board);await save(tx,state);}
+   if(spawnStream.stale(req.body,me))return{error:'Partie resynchronisée.',status:409,duel:view(state,req.user.id)};
+   let result,spawned=-1;
+   for(const direction of directions){
+    result=rules.move(me.board,direction);spawned=-1;
+    if(result.changed){spawned=addTile(result.board,state.seed,me.moves+2);me.board=result.board;me.score+=result.gain;me.moves++;me.blocked=!rules.canMove(me.board);}
+   }
+   await save(tx,state);
    return{duel:view(state,req.user.id),game:{board:me.board,score:me.score,moves:me.moves,won:false},result,spawned};
   });if(!payload)return invalid(res);if(payload.error)return res.status(payload.status).json(payload);res.json(payload);
  }));

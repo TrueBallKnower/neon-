@@ -15,5 +15,10 @@
   return {board:next,gain,merges,transitions,changed:next.some((v,i)=>v!==board[i])};
  }
  function canMove(board){return board.includes(0)||['left','right','up','down'].some(d=>move(board,d).changed);}
- const api={move,canMove};if(typeof module!=='undefined')module.exports=api;else root.FusionRules=api;
+ function spawnTicket(board,ticket){
+  const empty=board.map((v,i)=>v?-1:i).filter(i=>i>=0);
+  if(!empty.length)return -1;
+  const index=empty[ticket.position%empty.length];board[index]=ticket.value;return index;
+ }
+ const api={move,canMove,spawnTicket};if(typeof module!=='undefined')module.exports=api;else root.FusionRules=api;
 })(typeof window!=='undefined'?window:globalThis);

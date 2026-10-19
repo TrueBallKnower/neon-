@@ -23,11 +23,28 @@ ou un rafraîchissement ne suspend pas le chrono ; le navigateur retrouve
 le duel sauvegardé à la reconnexion. Les salons expirent après 24 heures.
 Les tables sont créées automatiquement, sans configuration supplémentaire.
 
+RÉACTIVITÉ
+Les mouvements et les nouvelles tuiles sont calculés immédiatement sur
+l’appareil grâce à une réserve de tuiles fournie par le serveur. Les coups
+sont validés par lots en arrière-plan, sans attendre chaque réponse réseau.
+Le serveur recalcule les grilles, les points et le délai du duel. Les lots
+vérifient leur grille et compteur de départ pour éviter les doublons ; une
+réponse perdue déclenche une resynchronisation avec l’état officiel.
+Le tampon est borné à 32 coups ; une coupure prolongée peut donc suspendre
+la saisie ou demander de recharger la page. Les animations de déplacement
+durent 90 ms et les glissements tactiles répondent dès le franchissement
+du seuil, avant de relâcher le doigt. Effets visuels et audio allégés pour
+limiter les ralentissements sur les appareils moins puissants.
+Validation navigateur Chromium : clavier, tactile émulé, CPU ralenti 4x,
+800 ms de latence ajoutée, lots, retour à l’état serveur et réponse perdue.
+Ces simulations ne remplacent pas un test sur chaque appareil physique.
+
 DÉVELOPPEMENT
 Node.js >=22.13 (validé avec 24.19). npm ci puis npm start.
 Sans DATABASE_URL, SQLite conserve les données dans .data/ (ignoré par Git).
 DATA_DIR peut changer cet emplacement. npm test vérifie les règles,
-comptes, sessions, scores, requêtes concurrentes, persistance et duels.
+comptes, sessions, scores, requêtes concurrentes, persistance, duels et
+validation des lots de coups prédits (sans double comptage en cas de reprise).
 Le test utilise un dossier temporaire SQLite. Ne jamais lancer les tests
 avec DATABASE_URL pointant sur une base de production : ils créent des
 comptes et parties de test. Un PostgreSQL de test dédié est accepté.
