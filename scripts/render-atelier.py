@@ -30,7 +30,53 @@ def compose(skin,l):
  s='';ink='#f4e6c8';# A stable, different layout per skin; growing motifs and light per value.
  if name in ['planet','pulsar','comet','eclipse','supernova']:
   for k in range(16+n):s+=C((k*37+11)%97,(k*53+7)%97,.4+(k%3)*.25,h,o=.55)
- if name=='imperialgold':
+ if name=='minecraftores':
+  stone='#53565e' if l<9 else '#674738' if l==9 else '#34313b'
+  s+=R(0,0,100,100,stone)
+  for k in range(44):
+   x=((k*31+l*7)%24)*4;y=((k*17+l*3)%24)*4
+   s+=R(x,y,4+(k%3)*4,4+(k%2)*4,['#777981','#3d4148','#656871','#292d34'][k%4],o=.6)
+  for k,(x,y) in enumerate([(8,12),(32,8),(67,13),(83,32),(8,69),(24,83),(65,82),(84,68)]):
+   x+=(l+k)%3*2;y+=(l+k)%2*2
+   s+=R(x-2,y+2,12,12,'#22252c')+R(x,y,10,8,h)+R(x,y,4,4,'#fff5da',o=.65)+R(x+6,y+5,4,5,b)
+   if l>=6:s+=R(x+3,y-3,4,4,h)
+  if l==1:
+   for x,y in [(15,20),(37,14),(72,20),(30,90),(72,88)]:s+=R(x,y,5,4,'#63ae8e')
+  if l==9:
+   for y in [4,21,79,94]:s+=P(f'M4 {y}h92','none','#b18b77',3,.6)+P(f'M8 {y+4}h84','none','#382d2b',2)
+  if l==10:
+   s+=P('M4 4h92v92H4z','none','#a99aaf',3)+P('M8 8h84v84H8z','none','#5c4a66',1)
+   for x,y in [(8,8),(85,8),(8,85),(85,85)]:s+=R(x,y,7,7,'#d1b195')+R(x+2,y+2,3,3,'#fff1cc')
+ elif name=='pokecapsules':
+  caps=['#e64f52','#337ccc','#252d38','#f3eee1','#278d8d','#419ac8','#253f32','#232832','#eea9c2','#f2ede4','#8d56bd'];top=caps[l]
+  s+=R(0,0,100,100,'#192d45')+P('M4 4h92v92H4z','none','#7d9ab7',.8)
+  s+=C(50,50,42,'#f2eee4','#0a1727',2)
+  s+=P('M8 50a42 42 0 0 1 84 0z',top,'#0a1727',1)
+  if l==1:
+   s+=P('M18 24 26 16l13 23-9 4zM82 24 74 16 61 39l9 4z','#ef5358')
+  elif l==2:
+   s+=P('M19 23 28 16v22h12V11h22v27h11V16l9 7v22H19z','#efcf56')
+  elif l==3:s+=P('M12 49h76','none','#d14b49',3)
+  elif l==4:
+   for k in range(5):s+=P(f'M{8+k*17} 10l24 36M{18+k*17} 10l-24 36','none','#243f4b',1.4)
+  elif l==5:s+=P('M12 37q10-13 20 0t20 0 20 0 20 0','none','#a8dff3',3)+C(50,22,5,'#ef7270')
+  elif l==6:
+   for x,y in [(22,31),(40,18),(66,19),(80,36)]:s+=poly([(x,y-6),(x+6,y),(x,y+6),(x-6,y)],'#70c578')
+   s+=P('M10 49h80','none','#d68a45',3)
+  elif l==7:s+=P('M9 44h82M17 25q33-22 66 0','none','#e3bd61',2)+P('M10 51h80','none','#db4b4e',3)
+  elif l==8:
+   s+=P('M12 30q38-32 76 0','none','#f4d68a',3)+P('M44 20q-7-8-11 0q0 8 11 13q11-5 11-13q-4-8-11 0','#fff4dd')
+  elif l==9:
+   s+=P('M40 9h20v29H40z','#e6733f')+P('M48 13v16l8 5','none','#26374a',2)
+   s+=P('M10 44h80','none','#26374a',3)
+  elif l==10:
+   s+=E(20,32,9,12,'#db77ad')+E(80,32,9,12,'#db77ad')
+   s+=P('M39 30V16l11 9 11-9v14','none','#fff2e5',3)
+  s+=R(8,47,84,7,'#0d1b2d')+C(50,50,13,'#f4eee4','#0d1b2d',3)+C(50,50,7,'#d2dce3','#5c7087',1)
+  s+=E(30,22,9,3,'#fff5df',o=.3)
+  # A tiny league badge keeps the theme legible even at phone scale.
+  s+=C(87,87,9,'#182b40','#e9cd80',1)+star(87,87,6,'#e9cd80',5)
+ elif name=='imperialgold':
   # Bullion, minted sun seals and laurel; deliberately distinct from the royal regalia.
   s+=P('M2 2h96v96H2z','none',h,2)+P('M7 7h86v86H7z','none',h,.65)
   for x,y,w in [(0,0,44),(68,0,32),(0,83,38),(62,83,38)]:

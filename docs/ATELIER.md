@@ -172,3 +172,38 @@ Contrôles tactiles avant relâchement, reprise après 64 coups hors ligne et co
 d’un glissement interrompu (saut mesuré : 0 px) vérifiés. Huit formats mobiles et
 paysage vérifiés sans débordement. Ces mesures Chromium ne constituent pas une
 mesure sur un iPhone/Safari physique ; aucun appareil de ce type n’était accessible.
+
+## Mise à jour mobile Safari et hommages
+
+Priorité iPhone : le compteur de combo utilise désormais une animation native
+`transform` et une seule échéance, au lieu d’une boucle JavaScript à chaque image.
+Les règles restent fondées sur les horloges réelles : 1,5 s en classique, 2 s en
+mort subite. Les tuiles sont réutilisées dans un pool borné ; les silhouettes de
+fusion sont limitées à 16, avec annulation et recyclage propres. La glisse reste
+à 180 ms. Sur écran tactile, le geste se valide dès 10 px ; l’audio est préparé
+pendant une période inactive et sa reprise reste liée au geste iOS. Les événements
+de viewport identiques ne réécrivent plus les variables de page. Les textures ont
+une zone de peinture isolée ; les particules mobiles évitent les ombres coûteuses.
+
+La collection **HOMMAGES · JEUX** ajoute deux éditions dessinées pour Fusion :
+**Minecraft · Minerais** (Épique, onze minerais du charbon à la netherite) et
+**Pokémon · Ligue des Capsules** (Légendaire, onze capsules de Poké à Master).
+Elles sont disponibles dans les coffres aux probabilités habituelles ; les
+identifiants `ores` et `capsules` conservent les anciennes possessions. L’accès
+créateur inclut les deux éditions. Les douze collections originales de cinq skins
+restent présentes : 60 créations originales + 2 hommages, hors starter et champion.
+Les compteurs et la pagination prennent en charge les collections de taille variable.
+Les variantes au-dessus de 2048 affichent leur nombre sans revenir à un ancien minerai.
+
+Validation : 32 tests Node ; les 682 panneaux des éditions de coffre sont vérifiés ;
+aperçu des nouveaux dessins ; équipement et 60 coups rapides avec chacun des deux
+skins, sans métadonnées périmées après recyclage. La même séquence de 159 coups
+sur profil mobile crée 36 éléments de tuile contre 318 auparavant (-89 %) ; le
+maximum présent passe de 103 à 32 éléments. Un compteur de combo actif produit une
+seule écriture de style en 350 ms. Un geste de 11 px est validé avant relâchement.
+Le banc classé avec SOVEREIGN, CPU ×4 et réseau à 800 ms, termine quatre coups
+locaux en 165 ms et rejoint l’état serveur. Continuité de glisse (0 px de saut),
+reprise hors ligne, huit dimensions mobiles, atelier et victoire royale vérifiés.
+Ces mesures sont faites dans Chromium simulant un mobile. Le téléchargement du
+moteur WebKit disponible a échoué dans cet environnement ; aucun résultat Safari
+physique ou taux d’images garanti sur iPhone n’est revendiqué.

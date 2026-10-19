@@ -36,3 +36,7 @@ body[data-skin-world] #board{background:var(--world-background);border-color:var
 @media(prefers-reduced-motion:reduce){#royal-victory{animation:none}}
 
 .particle[data-effect="sovereign"]{border-radius:0;background:#f0cc83;clip-path:polygon(50% 0,65% 35%,100% 50%,65% 65%,50% 100%,35% 65%,0 50%,35% 35%)}
+
+/* Keep skin repaints inside each composited tile on mobile Safari. */
+.tile[data-atelier="true"] .tile-inner {contain:paint;isolation:isolate}
+@media(pointer:coarse){.particle{box-shadow:none}#combo-bar{will-change:transform}.tile-inner{text-shadow:none}}

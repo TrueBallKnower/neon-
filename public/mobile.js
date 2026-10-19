@@ -1,7 +1,7 @@
 // Keep Safari's keyboard and browser chrome changes out of the game layout.
 (()=>{
- const dialog=document.getElementById('online-dialog');let locked=false,scrollTop=0,frame;
- function updateViewport(){cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{const height=Math.round(window.visualViewport?.height||innerHeight);document.documentElement.style.setProperty('--visible-height',height+'px');document.documentElement.style.setProperty('--visual-top',Math.round(window.visualViewport?.offsetTop||0)+'px');});}
+ const dialog=document.getElementById('online-dialog');let locked=false,scrollTop=0,frame,lastHeight=-1,lastTop=-1;
+ function updateViewport(){cancelAnimationFrame(frame);frame=requestAnimationFrame(()=>{const height=Math.round(window.visualViewport?.height||innerHeight);const top=Math.round(window.visualViewport?.offsetTop||0);if(height!==lastHeight){lastHeight=height;document.documentElement.style.setProperty('--visible-height',height+'px');}if(top!==lastTop){lastTop=top;document.documentElement.style.setProperty('--visual-top',top+'px');}});}
  window.visualViewport?.addEventListener('resize',updateViewport,{passive:true});window.visualViewport?.addEventListener('scroll',updateViewport,{passive:true});window.addEventListener('resize',updateViewport,{passive:true});updateViewport();
  function modalState(){
   if(dialog.open&&!locked){scrollTop=window.scrollY;document.body.style.setProperty('--scroll-lock-top',-scrollTop+'px');document.body.classList.add('dialog-open');locked=true;}

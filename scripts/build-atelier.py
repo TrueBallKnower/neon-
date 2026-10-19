@@ -84,9 +84,14 @@ def blend(a,b,t):
  a=tuple(int(a[i:i+2],16) for i in [1,3,5]);b=tuple(int(b[i:i+2],16) for i in [1,3,5]);return '#'+''.join(f'{round(x+(y-x)*t):02x}' for x,y in zip(a,b))
 def luminance(c):
  a=[int(c[i:i+2],16)/255 for i in [1,3,5]];return sum(k*(v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4) for k,v in zip([.2126,.7152,.0722],a))
+worlds.append(('homages','HOMMAGES · JEUX','Des mines à la ligue','Deux souvenirs de jeu prennent vie : les minerais de Minecraft et les capsules de Pokémon. Des créations dessinées pour Fusion, avec onze étapes reconnaissables par thème.',['#142334','#535965','#e8bc60','#81d8dd','#de6e83'],'crystal','arcade','pixel','▣'))
+entries.extend([
+ ('ores','Minecraft · Minerais','homages','minecraftores',['#353842','#b2764b','#c7b395','#dbb74e','#ca4549','#3e71c0','#9a6fd0','#4ca568','#6ddad7','#73574c','#3b3341'],'epic','Du charbon à la netherite : onze strates de roche, de pépites et de cristaux. La mine devient ta grille.'),
+ ('capsules','Pokémon · Ligue des Capsules','homages','pokecapsules',['#df4e53','#4080c4','#d8b54e','#ece4d6','#4baaa4','#76a9d3','#509666','#2e303b','#e7a7be','#d37a45','#9257c1'],'legendary','Poké, Super, Hyper, Honor, Filet, Scuba, Sombre, Luxe, Soin, Chrono et Master : toute une ligue de captures.')])
 collections={}
 for id,name,motto,lore,palette,fx,merge,surface,icon in worlds:
  collections[id]=dict(id=id,name=name,motto=motto,hint=lore,color=palette[3],ground=palette[0],palette=palette,fx=fx,merge=merge,surface=surface,icon=icon,type='core',motifs=' · '.join({'cosmic':['Halos','poussière','orbites'],'botanic':['Rosée','nervures','pétales'],'liquid':['Ondes','nacre','bioluminescence'],'glass':['Reflets','lumière','verre'],'pixel':['Pixels','trames','écrans'],'mineral':['Facettes','runes','pierre'],'satin':['Crème','sucre','rubans'],'metal':['Gravures','rouages','alliages'],'enamel':['Ambre','ivoire','soleil'],'storm':['Vent','pluie','éclairs'],'hologram':['Données','fantômes','interférences']}[surface]))
+collections['homages']['type']='homage'
 skins=[]
 for k,(id,name,collection,composition,anchors,rarity,lore) in enumerate(entries):
  c=collections[collection];tiles=[]
@@ -106,6 +111,15 @@ for k,(id,name,collection,composition,anchors,rarity,lore) in enumerate(entries)
   skin['rarity']='legendary';skin['unlock']['requirement']='legendary';skin['material']='metal'
   skin['board']={'background':'#20170c','empty':'#342614','edge':'#856129','accent':'#f0cb71'}
   for level,t in enumerate(skin['tiles']):t.update(base=blend('#94631e','#f3cd6a',level/10),dark='#3a250e',center='#3a250e',light=blend('#ebbf59','#fff0bc',level/10),ink='#fff3ce',accent='#e8b74f',surface='metal')
+ if id in ['ores','capsules']:
+  skin['inspiration']='Minecraft' if id=='ores' else 'Pokémon'
+  skin['variants']=['Charbon','Cuivre','Fer','Or','Redstone','Lapis-lazuli','Améthyste','Émeraude','Diamant','Débris antiques','Netherite'] if id=='ores' else ['Poké Ball','Super Ball','Hyper Ball','Honor Ball','Filet Ball','Scuba Ball','Sombre Ball','Luxe Ball','Soin Ball','Chrono Ball','Master Ball']
+  skin['audio']={'wave':'square' if id=='ores' else 'triangle','root':.92 if id=='ores' else 1.42,'ratios':[1,2,3] if id=='ores' else [1,1.25,1.5],'tail':.13 if id=='ores' else .22,'rhythm':.026 if id=='ores' else .045,'volume':.7}
+  skin['style']='pixel' if id=='ores' else 'rounded';skin['material']='pixel' if id=='ores' else 'enamel'
+  skin['board']={'background':'#192025' if id=='ores' else '#132337','empty':'#30363b' if id=='ores' else '#263c53','edge':'#64715e' if id=='ores' else '#617b9c','accent':'#6ddad7' if id=='ores' else '#f0ca6e'}
+  for level,t in enumerate(skin['tiles']):
+   ore=['#3c3b41','#cf8b57','#e0c3a0','#f4ce54','#ee454b','#487de8','#bb82e7','#58d887','#8cf4ec','#b18b77','#a99aaf'][level]
+   t.update(base=anchors[level],dark='#262931' if id=='ores' else '#142235',center='#262931' if id=='ores' else '#142235',light=ore if id=='ores' else '#f4dfaa',ink='#fff9e9',accent=ore if id=='ores' else anchors[level],surface=skin['material'])
  skins.append(skin)
 for c in collections.values():c['samples']=[s['id'] for s in skins if s['collection']==c['id']][:3]
 # Future event collections are deliberately separate from the twelve core worlds.

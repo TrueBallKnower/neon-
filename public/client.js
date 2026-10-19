@@ -7,15 +7,26 @@ const gameNow=()=>window.FusionOnline?.now?.()||Date.now();
 const comboWindow=()=>modeRules.get(ruleState.mode).comboMs;
 const storage={get(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}},set(key,value){try{localStorage.setItem(key,JSON.stringify(value))}catch{}}};
 let board=Array(16).fill(0),score=0,best=Number(storage.get('fusion-best',0))||0,moves=0,locked=false,won=false,continuing=false,generation=0;
-let comboCount=0,comboUntil=0,comboFrame=0;
+let comboCount=0,comboUntil=0,comboAnimation=null,comboExpiry=0;
 
-function resetCombo(){window.FusionSkins?.clearCombo();comboCount=0;comboUntil=0;cancelAnimationFrame(comboFrame);$('combo').hidden=true;}
-function animateCombo(){const left=Math.max(0,comboUntil-performance.now());$('combo-bar').style.transform='scaleX('+left/comboWindow()+')';if(left>0)comboFrame=requestAnimationFrame(animateCombo);else resetCombo();}
-function advanceCombo(){const now=performance.now();comboCount=now<comboUntil?comboCount+1:1;comboUntil=now+comboWindow();cancelAnimationFrame(comboFrame);$('combo').hidden=false;$('combo-label').textContent=comboCount>1?`COMBO ×${comboCount}`:'PREMIÈRE ÉTINCELLE';$('combo-hint').textContent=comboCount>=5?'EN FEU !':'ENCHAÎNE LES FUSIONS';$('combo').classList.toggle('hot',comboCount>=5);animateCombo();return comboCount;}
+function resetCombo(){window.FusionSkins?.clearCombo();comboCount=0;comboUntil=0;comboAnimation?.cancel();comboAnimation=null;clearTimeout(comboExpiry);$('combo').hidden=true;}
+function animateCombo(){
+ comboAnimation?.cancel();clearTimeout(comboExpiry);
+ const left=Math.max(0,comboUntil-performance.now()),bar=$('combo-bar');
+ if(!left){resetCombo();return;}
+ const from='scaleX('+left/comboWindow()+')';bar.style.transform=from;
+ // Native transform animation: Safari's compositor drives the meter, not a JS callback every frame.
+ comboAnimation=bar.animate?.([{transform:from},{transform:'scaleX(0)'}],{duration:left,easing:'linear',fill:'forwards'})||null;
+ comboExpiry=setTimeout(()=>{if(performance.now()>=comboUntil)resetCombo();},left+5);
+}
+function advanceCombo(){const now=performance.now();comboCount=now<comboUntil?comboCount+1:1;comboUntil=now+comboWindow();comboAnimation?.cancel();$('combo').hidden=false;$('combo-label').textContent=comboCount>1?`COMBO ×${comboCount}`:'PREMIÈRE ÉTINCELLE';$('combo-hint').textContent=comboCount>=5?'EN FEU !':'ENCHAÎNE LES FUSIONS';$('combo').classList.toggle('hot',comboCount>=5);animateCombo();return comboCount;}
 let soundOn=storage.get('fusion-sound',true),sfxVolume=Math.min(1,Math.max(0,Number(storage.get('fusion-sfx-volume',.8))||0)),audio;
 const lightEffects=matchMedia('(pointer:coarse)').matches||(navigator.hardwareConcurrency||8)<=4;
 const motionPreference=matchMedia('(prefers-reduced-motion: reduce)');let reduced=motionPreference.matches;motionPreference.addEventListener?.('change',event=>{reduced=event.matches;if(reduced){document.getAnimations().forEach(a=>a.cancel());window.FusionSkins?.clearCombo();}});
-function unlockAudio(){try{if(!audio||audio.state==='closed')audio=new(window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});if(window.FusionSkins?.selected==='king')window.FusionRoyal?.prepareVoice(audio);if(audio.state!=='running')return audio.resume().catch(()=>{});}catch{}}
+function prepareAudio(){if(!soundOn||sfxVolume<=0||document.hidden)return;try{if(!audio||audio.state==='closed')audio=new(window.AudioContext||window.webkitAudioContext)({latencyHint:'interactive'});}catch{}}
+// Warm a suspended context at idle; a gesture still owns playback/resume on iOS.
+if(window.requestIdleCallback)requestIdleCallback(prepareAudio,{timeout:2000});else setTimeout(prepareAudio,350);
+function unlockAudio(){if(!soundOn||sfxVolume<=0)return;try{prepareAudio();if(!audio)return;if(window.FusionSkins?.selected==='king')window.FusionRoyal?.prepareVoice(audio);if(audio.state!=='running')return audio.resume().catch(()=>{});}catch{}}
 let voices=0;
 function tone(freq,time,duration,type='sine',volume=.08,slide){if(!audio||!soundOn||sfxVolume<=0||voices>=32)return;volume=Math.max(.0011,volume*sfxVolume);voices++;const osc=audio.createOscillator(),amp=audio.createGain();osc.type=type;osc.frequency.setValueAtTime(freq,time);if(slide)osc.frequency.exponentialRampToValueAtTime(slide,time+duration);amp.gain.setValueAtTime(.001,time);amp.gain.exponentialRampToValueAtTime(volume,time+.012);amp.gain.exponentialRampToValueAtTime(.001,time+duration);osc.connect(amp);amp.connect(audio.destination);osc.start(time);osc.stop(time+duration+.02);osc.onended=()=>{voices=Math.max(0,voices-1);osc.disconnect();amp.disconnect();};}
 function sfx(kind,value=2,chain=1){if(!soundOn||!audio)return;const t=audio.currentTime;
@@ -36,15 +47,18 @@ function themedMerge(profile,chain=1){if(!audio||!soundOn||sfxVolume<=0)return;c
  if(profile.rank>=4&&profile.level>=6)tone(f*3,t+.13,.32,'sine',.018);
 }
 function soundLabel(){$('sound').innerHTML=`${soundOn?'♫':'♪'} <span>SON ${soundOn?'ACTIVÉ':'COUPÉ'}</span>`;$('sound').setAttribute('aria-pressed',String(soundOn));}
-$('sound').onclick=()=>{unlockAudio();soundOn=!soundOn;storage.set('fusion-sound',soundOn);soundLabel();if(soundOn)sfx('start');else window.FusionRoyal?.stop();};soundLabel();
+$('sound').onclick=()=>{soundOn=!soundOn;if(soundOn)unlockAudio();storage.set('fusion-sound',soundOn);soundLabel();if(soundOn)sfx('start');else window.FusionRoyal?.stop();};soundLabel();
 for(let i=0;i<16;i++){const c=document.createElement('div');c.className='cell';$('cells').append(c);}
 function spawn(){const empty=board.map((v,i)=>v?null:i).filter(i=>i!==null);if(!empty.length)return -1;const i=empty[Math.floor(Math.random()*empty.length)];board[i]=Math.random()<.9?2:4;return i;}
 function cancelVisuals(el,known){for(const animation of known||el.getAnimations?.()||[])animation.cancel();}
 function animateVisual(el,frames,timing){if(reduced||typeof el.animate!=='function')return;try{return el.animate(frames,timing);}catch{}}
-let boardGeometry=null;const motion=new WeakMap();
+let boardGeometry=null;const motion=new WeakMap(),tilePool=[],pooledTiles=new WeakSet(),ghostTiles=new Set(),ghostExpiry=new WeakMap();
+function acquireTile(){const el=tilePool.pop();if(el){pooledTiles.delete(el);return el;}const tile=document.createElement('div'),inner=document.createElement('div');inner.className='tile-inner';tile.append(inner);return tile;}
+function releaseTile(el){if(pooledTiles.has(el))return;clearTimeout(ghostExpiry.get(el));ghostExpiry.delete(el);ghostTiles.delete(el);cancelVisuals(el);cancelVisuals(el.firstElementChild);motion.delete(el);el.remove();delete el.dataset.index;if(tilePool.length<32){pooledTiles.add(el);tilePool.push(el);}}
+
 function draw(merges=[],spawned=-1,result=null){
  const container=$('tiles'),old=new Map();
- if(!result)container.querySelectorAll('.tile-ghost').forEach(el=>el.remove());
+ if(!result)for(const el of ghostTiles)releaseTile(el);
  for(const el of container.children)if(!el.classList.contains('tile-ghost'))old.set(Number(el.dataset.index),el);
  const positions=new Map(),sources=new Map(),running=new Map();
  // ResizeObserver invalidates this cache; inputs never force a board layout.
@@ -68,13 +82,13 @@ function draw(merges=[],spawned=-1,result=null){
   const value=board[i];if(!value)continue;
   const source=result?sources.get(i):i;
   let el=source===undefined?null:old.get(source);
-  if(!el){el=document.createElement('div');const inner=document.createElement('div');inner.className='tile-inner';el.append(inner);}
+  const fresh=!el;if(fresh)el=acquireTile();
   used.add(el);
   const glide=motion.get(el),keepGliding=!!(result&&source===i&&glide&&glide.to.x===i%4*step&&glide.to.y===Math.floor(i/4)*step);
   if(!keepGliding)cancelVisuals(el,running.get(el)|| (glide?[glide.animation]:[]));
   const moved=el.dataset.index!==String(i),changed=el.dataset.value!==String(value),className='tile'+(merges.includes(i)?' merge':i===spawned?' spawn':'');
   if(el.className!==className)el.className=className;
-  if(changed){el.dataset.value=value;el.firstElementChild.textContent=value;window.FusionSkins?.paint(el,value);}
+  if(changed){el.dataset.value=value;el.firstElementChild.textContent=value;}if(changed||fresh)window.FusionSkins?.paint(el,value);
   if(moved){el.dataset.index=i;el.style.setProperty('--x',i%4);el.style.setProperty('--y',Math.floor(i/4));}
   if(moved||changed){el.setAttribute('role','gridcell');el.setAttribute('aria-label',`${value}, ligne ${Math.floor(i/4)+1}, colonne ${i%4+1}`);}if(!result)cancelVisuals(el.firstElementChild);
   if(el.parentNode!==container)container.append(el);
@@ -90,11 +104,12 @@ function draw(merges=[],spawned=-1,result=null){
   if(used.has(el))continue;
   const transition=result?.transitions.find(t=>t.from===index),from=positions.get(index);
   if(transition&&from){
-   cancelVisuals(el,running.get(el));el.className='tile tile-ghost';delete el.dataset.index;
+   while(ghostTiles.size>=16)releaseTile(ghostTiles.values().next().value);
+   cancelVisuals(el,running.get(el));ghostTiles.add(el);el.className='tile tile-ghost';delete el.dataset.index;
    el.style.setProperty('--x',transition.to%4);el.style.setProperty('--y',Math.floor(transition.to/4));
    animateVisual(el,[{transform:`translate3d(${from.x}px,${from.y}px,0)`,opacity:1},{transform:`translate3d(${transition.to%4*step}px,${Math.floor(transition.to/4)*step}px,0)`,opacity:0}],{duration:180,easing:'ease-out'});
-   if(el.parentNode!==container)container.append(el);setTimeout(()=>el.remove(),200);
-  }else el.remove();
+   if(el.parentNode!==container)container.append(el);ghostExpiry.set(el,setTimeout(()=>releaseTile(el),200));
+  }else releaseTile(el);
  }
  setText('score',score);setText('best',best);setText('moves',`${moves} MOUVEMENT${moves>1?'S':''}`);
 }
@@ -110,7 +125,7 @@ function particles(index){
 let saveTimer;function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{if(window.requestIdleCallback)requestIdleCallback(flushSave,{timeout:1500});else flushSave();},250);}
 function flushSave(){if(window.FusionStory?.active)return;if(window.FusionOnline?.ranked||window.FusionOnline?.duel)return;storage.set('fusion-game',{board,score,moves,won,continuing,meta:ruleState});storage.set('fusion-best-'+ruleState.mode,best);if(ruleState.mode==='classic')storage.set('fusion-best',best);}
 window.addEventListener('pagehide',flushSave);
-document.addEventListener('visibilitychange',()=>{touch=null;if(document.hidden){cancelAnimationFrame(comboFrame);if(audio?.state==='running')audio.suspend().catch(()=>{});}else{draw();if(comboUntil>performance.now())animateCombo();else resetCombo();}});
+document.addEventListener('visibilitychange',()=>{touch=null;if(document.hidden){comboAnimation?.cancel();clearTimeout(comboExpiry);if(audio?.state==='running')audio.suspend().catch(()=>{});}else{draw();if(comboUntil>performance.now())animateCombo();else resetCombo();}});
 window.addEventListener('pageshow',event=>{if(event.persisted){touch=null;draw();tickRules();}});
 function showEnd(win){resetCombo();$('end-title').textContent=win?'La consécration.':'Fin de la partie.';$('end-text').textContent=win?'2048 ! Le sommet est à toi. Et si tu allais plus loin ?':`${score.toLocaleString('fr-FR')} points. Une nouvelle étincelle t’attend.`;$('end-action').textContent=win?'Continuer ↗':'Rejouer ↗';$('overlay').hidden=false;$('announcement').textContent=$('end-title').textContent;sfx(win?'win':'over');}
 function newGame(withSound=true,mode=ruleState.mode){window.FusionStory?.stop();ruleState=modeRules.create(mode,Date.now());best=Number(storage.get('fusion-best-'+mode,mode==='classic'?storage.get('fusion-best',0):0))||0;generation++;resetCombo();locked=false;board=Array(16).fill(0);score=0;moves=0;won=false;continuing=false;$('overlay').hidden=true;$('particles').replaceChildren();$('score-add').textContent='';$('status').textContent='À toi de jouer';spawn();const added=spawn();draw([],added);tickRules();save();if(withSound){unlockAudio();sfx('start');}}
@@ -135,7 +150,7 @@ function fusionFeedback(result){
 $('restart').onclick=()=>{if(window.FusionStory?.active){window.FusionStory.restart();return;}if(window.FusionOnline?.ranked||window.FusionOnline?.duel){window.FusionOnline.restart();return;}if(moves>0&&!confirm('Recommencer cette partie ? Ton record sera conservé.'))return;newGame();};$('end-action').onclick=()=>{unlockAudio();if(window.FusionStory?.active){window.FusionStory.action();return;}if(!ruleState.endedAt&&won&&!continuing){continuing=true;$('overlay').hidden=true;save();}else if(window.FusionOnline?.ranked)window.FusionOnline.restart();else newGame();};
 window.addEventListener('keydown',e=>{const directions={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down',a:'left',d:'right',w:'up',s:'down',q:'left',z:'up'};if(e.ctrlKey||e.metaKey||e.altKey||e.target.closest('input,textarea,select')||$('online-dialog').open)return;if(directions[e.key]){e.preventDefault();play(directions[e.key]);}});
 let touch=null;
-function swipePoint(id,x,y){if(!touch||touch.id!==id||touch.used)return;const dx=x-touch.x,dy=y-touch.y;if(Math.max(Math.abs(dx),Math.abs(dy))<14)return;touch.used=true;play(Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up');}
+function swipePoint(id,x,y){if(!touch||touch.id!==id||touch.used)return;const dx=x-touch.x,dy=y-touch.y;if(Math.max(Math.abs(dx),Math.abs(dy))<(lightEffects?10:14))return;touch.used=true;play(Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up');}
 if(window.PointerEvent){
  $('board').addEventListener('pointerdown',e=>{if(!e.isPrimary||(e.pointerType==='mouse'&&e.button!==0)||touch)return;unlockAudio();touch={x:e.clientX,y:e.clientY,id:e.pointerId,used:false};try{$('board').setPointerCapture(e.pointerId);}catch{}});
  $('board').addEventListener('pointermove',e=>swipePoint(e.pointerId,e.clientX,e.clientY),{passive:true});
