@@ -4,9 +4,12 @@ const {catalog,allSkins,chests,pickRarity,available:skinAvailable}=require('./pu
 const privateCosmetics=require('./private-cosmetics');
 const FULL_COLLECTION_ACCOUNT=privateCosmetics.owner;
 const knownSkins=[...allSkins,...privateCosmetics.skins];
+const accountGifts=new Map([['amz',['capsules']]]);
 async function wallet(tx,id){
  await tx.run('INSERT INTO cosmetics(user_id,coins,state) VALUES(?,0,?) ON CONFLICT(user_id) DO NOTHING',[id,JSON.stringify({owned:['original'],selected:'original'})]);
  const row=await tx.one('SELECT c.coins,c.state,u.username_key FROM cosmetics c JOIN users u ON u.id=c.user_id WHERE c.user_id=?',[id]),state=JSON.parse(row.state),allSkinsAccess=row.username_key===FULL_COLLECTION_ACCOUNT;
+ let gifted=false;for(const skin of accountGifts.get(row.username_key)||[])if(!state.owned.includes(skin)){state.owned.push(skin);gifted=true;}
+ if(gifted)await tx.run('UPDATE cosmetics SET state=? WHERE user_id=?',[JSON.stringify(state),id]);
  return{coins:Number(row.coins),...state,storedOwned:state.owned,favorites:(state.favorites||[]).filter(s=>allSkinsAccess||!privateCosmetics.skins.some(p=>p.id===s)),owned:allSkinsAccess?knownSkins.map(s=>s.id):state.owned.filter(s=>!privateCosmetics.skins.some(p=>p.id===s)),allSkinsAccess};
 }
 async function save(tx,id,w){await tx.run('UPDATE cosmetics SET coins=?,state=? WHERE user_id=?',[w.coins,JSON.stringify({owned:w.allSkinsAccess?w.storedOwned:w.owned,selected:w.selected,storyRewards:w.storyRewards||[],favorites:w.favorites||[],previousSkin:w.previousSkin||'original'}),id]);}
