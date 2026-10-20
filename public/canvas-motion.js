@@ -7,12 +7,13 @@
   return 3*(1-x)*(1-x)*x*.7+3*(1-x)*x*x+x*x*x;
  }
  function pose(tile,now){
-  const p=tile.duration?clamp((now-tile.start)/tile.duration):1,e=ease(p);
+  const p=tile.duration?clamp((now-tile.start)/tile.duration):1,e=p===0?0:p===1?1:(tile.fromX===tile.toX&&tile.fromY===tile.toY)?0:ease(p);
   tile.x=tile.fromX+(tile.toX-tile.fromX)*e;tile.y=tile.fromY+(tile.toY-tile.fromY)*e;
   let active=p<1;tile.scale=1;tile.opacity=tile.ghost?1-p:1;
   if(tile.effect){const q=clamp((now-tile.effect.start)/tile.effect.duration);active=active||q<1;
-   if(tile.effect.kind==='spawn'){tile.scale=.85+.15*ease(q);tile.opacity=clamp(q*3);}
-   else tile.scale=q<.45?1+(tile.effect.peak-1)*Math.sin(q/.45*Math.PI/2):1+(tile.effect.peak-1)*Math.cos((q-.45)/.55*Math.PI/2);
+   if(q===1)tile.effect=null;
+   else if(tile.effect.kind==='spawn'){tile.scale=.85+.15*ease(q);tile.opacity=clamp(q*3);}
+   else tile.scale=q===0||q===1?1:q<.45?1+(tile.effect.peak-1)*Math.sin(q/.45*Math.PI/2):1+(tile.effect.peak-1)*Math.cos((q-.45)/.55*Math.PI/2);
   }
   return active;
  }

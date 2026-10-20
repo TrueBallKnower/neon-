@@ -68,6 +68,26 @@ const seedBoard = [2,0,0,0,0,0,0,0,8,0,0,0,0,0,0,0];
     assert.ok(trace.accessible.every(cell=>cell.label.includes('ligne')&&cell.row&&cell.column), 'grid cells retain readable positions');
     console.log('Canvas: synchronous input, no geometry reads, continuous interrupted slide (' + trace.continuity.toFixed(2) + 'px), native DPR 3 capped at ' + trace.finished.dpr + ', RAF idle stop.');
 
+    // Quality changes alter the drawing budget, never the logical state or slide duration.
+    const quality = await page.evaluate(async () => {
+      const initial = JSON.stringify(FusionUI.state), snapshots = [];
+      for (const value of ['fast','sharp','auto']) {
+        FusionUI.setRenderQuality(value);
+        await new Promise(resolve => setTimeout(resolve, 380));
+        snapshots.push(FusionUI.renderState());
+        if (JSON.stringify(FusionUI.state) !== initial) throw Error('Quality changed the game');
+      }
+      const before = FusionUI.renderState().paintBuilds;
+      FusionUI.load({board:[2,0,4,0,8,0,16,0,32,0,64,0,128,0,256,0],score:0,moves:0});
+      play('right'); await new Promise(resolve => setTimeout(resolve, 440));
+      return { snapshots, newPaintBuilds:FusionUI.renderState().paintBuilds-before };
+    });
+    assert.equal(quality.snapshots[0].dpr, 1.25, 'fast mode uses a smaller backing surface');
+    assert.equal(quality.snapshots[1].dpr, 2, 'sharp mode preserves bounded retina detail');
+    assert.equal(quality.newPaintBuilds, 0, 'prewarmed values never rasterize in an animation frame');
+    assert.ok(quality.snapshots.every(s => s.textureCount <= 32 && !s.running), 'quality settles without a persistent RAF');
+    console.log('Quality: fast/sharp/auto preserve the game; prepared tile textures need zero rebuilds during slides.');
+
     const cdp = await context.newCDPSession(page);
     await cdp.send('Emulation.setCPUThrottlingRate', { rate: 4 });
     await page.evaluate(initialBoard => FusionUI.load({ board: initialBoard, moves: 0, score: 0 }), seedBoard);

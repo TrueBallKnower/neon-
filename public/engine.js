@@ -14,7 +14,15 @@
   }
   return {board:next,gain,merges,transitions,changed:next.some((v,i)=>v!==board[i])};
  }
- function canMove(board){return board.includes(0)||['left','right','up','down'].some(d=>move(board,d).changed);}
+ function canMove(board){
+  // A full board can move only when equal tiles share an edge. Checking each
+  // edge once avoids constructing four move/transition snapshots after input.
+  for(let i=0;i<16;i++){
+   const value=board[i];
+   if(value===0||(i%4<3&&value===board[i+1])||(i<12&&value===board[i+4]))return true;
+  }
+  return false;
+ }
  function spawnTicket(board,ticket){
   const empty=board.map((v,i)=>v?-1:i).filter(i=>i>=0);
   if(!empty.length)return -1;

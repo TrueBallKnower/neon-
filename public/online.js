@@ -16,6 +16,7 @@
   onStatus:state=>{if(state==='offline')el('status').textContent='Hors ligne : tu peux continuer, reconnexion automatique…';else if(state==='retrying')el('status').textContent='Reconnexion automatique…';else if(/^(Hors ligne|Reconnexion)/.test(el('status').textContent))el('status').textContent='Connexion rétablie.';}
  });
  function resetPrediction(game){sync.configure(game);optimistic=null;}
+ Object.defineProperty(online,'duelFinished',{get:()=>current?.status==='finished'});
  Object.defineProperty(online,'syncState',{get:()=>({pending:sync.pending.length,sending:!!sync.task})});
  window.addEventListener('online',()=>sync.resume());
  window.addEventListener('pageshow',event=>{if(event.persisted)sync.resume();});

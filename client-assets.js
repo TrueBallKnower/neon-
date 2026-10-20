@@ -11,7 +11,7 @@ function clientAssets(){
  const bootstrap=read('boot.js').replaceAll('__SKINS_ASSET__',skinPath);
  const play=['mobile.js','engine.js','modes.js','canvas-motion.js','canvas-renderer.js','client.js','move-sync.js','royal.js','online.js','social.js','story-rules.js','story.js','install.js'].map(read).join('\n;\n')+'\n;\n'+bootstrap;
  const playPath=asset('/assets/play.'+hash(play)+'.js',play,'application/javascript; charset=utf-8');
- const css=read('style.css')+'\n'+read('atelier.css')+'\n'+read('install.css');
+ const css=read('style.css')+'\n'+read('atelier.css')+'\n'+read('install.css')+'\n'+read('mobile-polish.css');
  const cssPath=asset('/assets/app.'+hash(css)+'.css',css,'text/css; charset=utf-8');
  const html=read('index.html').replace(/<link rel="stylesheet"[^>]*>/g,'').replace(/<script src="[^\"]+"><\/script>/g,'').replace('</head>',`<link rel="stylesheet" href="${cssPath}"><script defer src="${playPath}"></script></head>`);
  asset('/',html,'text/html; charset=utf-8',false);
