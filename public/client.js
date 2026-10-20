@@ -90,7 +90,7 @@ function draw(merges=[],spawned=-1,result=null){
  if(!boardGeometry){
   const rect=$('board').getBoundingClientRect(),css=getComputedStyle($('board')),gap=parseFloat(getComputedStyle($('cells')).gap)||12;
   const left=parseFloat(css.borderLeftWidth),right=parseFloat(css.borderRightWidth),padding=parseFloat(css.paddingLeft);
-  boardGeometry={gap,width:rect.width,insetX:left+padding,insetY:parseFloat(css.borderTopWidth)+parseFloat(css.paddingTop),step:(rect.width-left-right-2*padding-3*gap)/4+gap};
+  boardGeometry={gap,width:rect.width,insetX:left+padding,insetY:parseFloat(css.borderTopWidth)+parseFloat(css.paddingTop),step:parseFloat(getComputedStyle($('cells')).gridTemplateColumns)+gap};
  }
  const step=boardGeometry.step;
  if(result&&!reduced&&old.size){
@@ -190,7 +190,7 @@ if(window.PointerEvent){
 }
 window.addEventListener('blur',()=>{touch=null;});
 let boardResizeFrame;
-function resizeBoard(){if(mobileRenderer){mobileRenderer.resize();return;}cancelAnimationFrame(boardResizeFrame);boardResizeFrame=requestAnimationFrame(()=>{const width=$('board').getBoundingClientRect().width;if(boardGeometry&&Math.abs(boardGeometry.width-width)>.5){touch=null;boardGeometry=null;draw();}});}
+function resizeBoard(){if(mobileRenderer){mobileRenderer.resize();return;}cancelAnimationFrame(boardResizeFrame);boardResizeFrame=requestAnimationFrame(()=>{if(boardGeometry){touch=null;boardGeometry=null;draw();}});}
 if(window.ResizeObserver)new ResizeObserver(resizeBoard).observe($('board'));else window.addEventListener('resize',resizeBoard);
 const saved=storage.get('fusion-game',null);if(saved&&Array.isArray(saved.board)&&saved.board.length===16&&saved.board.every(v=>Number.isSafeInteger(v)&&v>=0&&(v===0||(v>=2&&Number.isInteger(Math.log2(v)))))&&saved.board.some(v=>v)&&Number.isSafeInteger(saved.score)&&saved.score>=0&&Number.isSafeInteger(saved.moves)&&saved.moves>=0){board=saved.board;score=saved.score;moves=saved.moves;ruleState=saved.meta||modeRules.create('classic',Date.now());won=!!saved.won;continuing=!!saved.continuing;best=Math.max(best,score);draw();if(won&&!continuing)showEnd(true);else if(!rules.canMove(board))showEnd(false);}else newGame(false);
 

@@ -110,3 +110,14 @@ Avec `FUSION_PROFILE_SOUND=1`, le même scénario avec SFX actifs passe de
 10,6 ms à 3,8 ms de traitement médian (3,3 ms en fluidité maximale), et de
 17 ms à 10,1 ms au 95e percentile. Ces chiffres décrivent cette exécution locale,
 pas une promesse de fréquence ou de latence sur un téléphone physique.
+
+## Alignement de la grille et des dessins
+
+La grille du fond est positionnée à l’intérieur du carré, avec quatre lignes et
+quatre colonnes explicites : sa hauteur ne dépend plus d’un pourcentage susceptible
+de modifier le ratio du plateau dans Safari. Les déplacements DOM et Canvas
+utilisent la largeur calculée de ces mêmes colonnes, y compris avec un zoom
+fractionnaire. Les mesures restent mises en cache pendant les gestes.
+Les planches SVG remplissent leur fenêtre de découpage, sans bande vide ni morceau
+d’une autre valeur. `scripts/check-grid.cjs` vérifie 20 combinaisons de taille,
+moteur et zoom ainsi qu’un changement de bordure sans changement de largeur.

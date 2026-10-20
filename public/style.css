@@ -277,3 +277,9 @@ body.effects-lite .chest-orbit{animation:none!important;opacity:.2!important}@me
 #skins-list .skin-gallery .skin-sample{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:600px){#skin-collections:not([hidden]){grid-template-columns:repeat(2,minmax(0,1fr))}#skins-list{grid-template-columns:1fr}#skins-list .skin-card .skin-face{font-size:25px}#skins-list .skin-card .skin-swatch[data-value="2048"] .skin-face{font-size:21px}}
 [data-art="pulse"]{--skin-art:url('/skin-art/pulse.svg')}
+
+/* Absolute cells avoid percentage-height/aspect-ratio cycles in Safari. Both
+   renderers use this square content grid, including at fractional browser zoom. */
+#board{min-width:0;aspect-ratio:1 / 1}
+#cells{position:absolute;inset:var(--pad);height:auto;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr))}
+.tile{height:auto;aspect-ratio:1 / 1}

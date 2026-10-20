@@ -22,7 +22,7 @@ function clientAssets(){
   if(!['GET','HEAD'].includes(req.method))return next();
   const key=req.path==='/index.html'?'/':req.path;
   if(!assets.has(key)&&/^\/(atelier-art|skin-art)\/[a-z0-9-]+\.svg$/.test(key)){
-   try{asset(key,fs.readFileSync(path.join(root,key.slice(1))),'image/svg+xml',false);artKeys.push(key);if(artKeys.length>48)assets.delete(artKeys.shift());}catch(error){if(error.code!=='ENOENT')return next(error);}
+   try{asset(key,fs.readFileSync(path.join(root,key.slice(1)),'utf8').replace(/<svg\b([^>]*)>/,(_,attrs)=>'<svg'+attrs.replace(/\spreserveAspectRatio="[^"]*"/g,'')+' preserveAspectRatio="none">'),'image/svg+xml',false);artKeys.push(key);if(artKeys.length>48)assets.delete(artKeys.shift());}catch(error){if(error.code!=='ENOENT')return next(error);}
   }
   const item=assets.get(key);if(!item){
    const stale=/^\/assets\/(play|skins|app)\.[a-f0-9]{16}\.(js|css)$/.exec(key);

@@ -18,7 +18,7 @@ test('HTTP responses negotiate compression, support revalidation and compress un
   const html=await get('/',{'Accept-Encoding':'gzip'});assert.equal(html.headers['content-encoding'],'gzip');assert.match(zlib.gunzipSync(html.body).toString(),/<script defer/);assert.equal(html.headers['cache-control'],'no-cache');
   const play=await get(built.playPath,{'Accept-Encoding':'br'});assert.equal(play.headers['content-encoding'],'br');assert.deepEqual(zlib.brotliDecompressSync(play.body),built.assets.get(built.playPath).body);assert.match(play.headers['cache-control'],/immutable/);
   const cached=await get(built.playPath,{'If-None-Match':play.headers.etag});assert.equal(cached.status,304);assert.equal(cached.body.length,0);
-  const art=await get('/atelier-art/king.svg',{'Accept-Encoding':'br'});assert.equal(art.status,200);assert.match(zlib.brotliDecompressSync(art.body).toString(),/<svg/);assert.ok(art.body.length<15000);assert.equal(art.headers['cache-control'],'no-cache');
+  const art=await get('/atelier-art/king.svg',{'Accept-Encoding':'br'});assert.equal(art.status,200);assert.match(zlib.brotliDecompressSync(art.body).toString(),/<svg[^>]*preserveAspectRatio="none"/);assert.ok(art.body.length<15000);assert.equal(art.headers['cache-control'],'no-cache');
   const head=await get(built.playPath,{'Accept-Encoding':'br'},'HEAD');assert.equal(head.body.length,0);assert.equal(Number(head.headers['content-length']),play.body.length);
   const stale=await get('/assets/skins.0000000000000000.js');assert.equal(stale.status,302);assert.equal(stale.headers.location,built.skinPath);
   const worker=await get('/sw.js');assert.equal(worker.headers['service-worker-allowed'],'/');assert.equal(worker.headers['cache-control'],'no-cache');
