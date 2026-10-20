@@ -1,0 +1,9 @@
+{
+  "appId": "com.trueballknower.fusion2048",
+  "appName": "Fusion 2048",
+  "webDir": "native/www",
+  "backgroundColor": "#101014",
+  "server": { "hostname": "localhost", "iosScheme": "capacitor" },
+  "ios": { "contentInset": "never", "scrollEnabled": true, "backgroundColor": "#101014", "preferredContentMode": "mobile" },
+  "plugins": { "CapacitorHttp": { "enabled": false }, "CapacitorCookies": { "enabled": false } }
+}

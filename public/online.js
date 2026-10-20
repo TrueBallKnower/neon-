@@ -112,7 +112,7 @@
  el('duel-open').onclick=()=>{open('duel');if(!account)message('Connecte-toi via Mon compte pour créer ou rejoindre un duel.');};
  async function enter(create){if(busy)return;if(!account){open('account');message('Connecte-toi pour jouer en duel.');return;}busy=true;try{if(!await leave())return;resetPrediction();const data=await api(create?'duels':'duels/'+el('duel-code').value.trim().toUpperCase()+'/join',create?{mode:el('duel-mode').value}:{});updateDuel(data.duel,{load:true});if(!create)el('online-dialog').close();message(create?'Ton salon est prêt ! Partage le code ou le lien.':'');}catch(e){message(e.message);}finally{busy=false;}}
  el('duel-create').onclick=()=>enter(true);el('duel-join-form').onsubmit=e=>{e.preventDefault();enter(false);};el('duel-back').onclick=()=>el('online-dialog').close();
- el('duel-copy').onclick=async()=>{const url=new URL(location.href);url.search='';url.searchParams.set('duel',online.duel);try{await navigator.clipboard.writeText(url.toString());message('Lien copié !');}catch{message('Partage ce code : '+online.duel);}};
+ el('duel-copy').onclick=async()=>{const url=new URL(window.FusionNative?.publicUrl||location.href);url.search='';url.searchParams.set('duel',online.duel);try{await navigator.clipboard.writeText(url.toString());message('Lien copié !');}catch{message('Partage ce code : '+online.duel);}};
  el('duel-leave').onclick=async()=>{if(busy)return;busy=true;try{await leave();}catch(e){el('duel-result').textContent=e.message;}finally{busy=false;}};
  let following=false;
  async function followRematch(code){if(following)return;following=true;try{const {duel}=await api('duels/'+code);updateDuel(duel,{load:true});}catch(e){el('duel-result').textContent=e.message;}finally{following=false;}}

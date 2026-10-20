@@ -13,7 +13,7 @@
  function waitForQuiet(){clearTimeout(skinTimer);if(skinIdle&&window.cancelIdleCallback)cancelIdleCallback(skinIdle);skinTimer=setTimeout(()=>{if(window.requestIdleCallback)skinIdle=requestIdleCallback(()=>loadSkins().catch(()=>{}),{timeout:3000});else loadSkins().catch(()=>{});},1200);}
  function keyboardActivity(event){if(/^(Arrow(Up|Down|Left|Right)|[wasdWASD])$/.test(event.key))waitForQuiet();}
  board?.addEventListener('pointerdown',waitForQuiet,{passive:true});board?.addEventListener('pointermove',waitForQuiet,{passive:true});window.addEventListener('keydown',keyboardActivity,{passive:true});waitForQuiet();
- if('serviceWorker'in navigator&&(location.protocol==='https:'||['localhost','127.0.0.1'].includes(location.hostname))){
+ if(!window.FusionNative&&'serviceWorker'in navigator&&(location.protocol==='https:'||['localhost','127.0.0.1'].includes(location.hostname))){
   let registration=null,notice=null,worker=null,applying=false,reloaded=false,hadController=!!navigator.serviceWorker.controller,lastCheck=Date.now();
   function showUpdate(nextWorker){
    worker=nextWorker||null;

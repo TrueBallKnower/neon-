@@ -2,7 +2,7 @@
 // comes from the active worker, not a network indicator or a registration promise.
 (()=>{
  const help=document.getElementById('phone-install');
- if(!help)return;
+ if(!help)return;if(window.FusionNative){help.hidden=true;return;}
  const status=document.getElementById('install-status'),steps=document.getElementById('install-steps'),button=document.getElementById('install-app'),intro=document.getElementById('install-intro'),note=document.getElementById('install-safari-note');
  const standalone=matchMedia('(display-mode: standalone)');
  let cached=false,prompt=null,checking=null;

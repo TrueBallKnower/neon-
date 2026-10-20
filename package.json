@@ -6,13 +6,23 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "native:build": "node scripts/build-native.cjs",
+    "native:sync": "npm run native:build && cap sync ios",
+    "native:open": "cap open ios"
   },
   "engines": {
     "node": ">=22.13"
   },
   "dependencies": {
+    "@capacitor/app": "8.1.2",
+    "@capacitor/core": "8.5.3",
     "express": "^4.19.2",
     "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3",
+    "@capacitor/ios": "8.5.3",
+    "esbuild": "0.25.12"
   }
 }

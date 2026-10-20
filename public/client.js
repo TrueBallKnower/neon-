@@ -218,6 +218,7 @@ function tickRules(){
 }
 setInterval(tickRules,100);tickRules();
 window.FusionUI={
+ nativeVisibility(hidden){if(hidden){flushSave();touch=null;stopSfx();window.FusionRoyal?.stop();comboAnimation?.cancel();clearTimeout(comboExpiry);mobileRenderer?.visibility(true);if(audio?.state==='running')audio.suspend().catch(()=>{});}else{mobileRenderer?.visibility(false);tickRules();draw();if(comboUntil>performance.now())animateCombo();else resetCombo();}},
  saveNow:flushSave,get gameEnded(){return !!ruleState.endedAt;},get effectsBudget(){return renderQuality==='fast'?'minimal':'balanced';},get renderQuality(){return renderQuality;},setRenderQuality(value){if(!['auto','fast','sharp'].includes(value))return;renderQuality=value;storage.set('fusion-render-quality',value);document.body.dataset.renderQuality=value;mobileRenderer?.setQuality(value);window.FusionSkins?.clearCombo();},
  renderState(){return mobileRenderer?.inspect()||{renderer:'dom'};},refreshSkin(){mobileRenderer?.skinChanged();},
  get state(){return {board:[...board],score,moves};},

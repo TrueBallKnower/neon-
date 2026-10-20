@@ -223,3 +223,10 @@ python3 scripts/build-atelier.py
 python3 scripts/render-atelier.py
 
 Aucune dépendance n’a été ajoutée. Le serveur ne dépend pas de Python.
+
+APPLICATION IPHONE CAPACITOR (LE SITE EST CONSERVÉ)
+Le projet iOS est dans ios/App/App.xcodeproj. Sur Mac : npm ci,
+npm run native:sync, puis npm run native:open. Les fichiers du jeu sont intégrés
+à l'app ; les comptes et duels utilisent le même serveur HTTPS. Aucun changement
+d'adresse du site. Voir docs/CAPACITOR.md pour Xcode, la signature personnelle
+gratuite, les limites et les vérifications restant à faire sur iPhone.
