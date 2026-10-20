@@ -43,13 +43,13 @@ test('only the authenticated TrueBallKnower identity gets all editions, archives
  try{
   for(const [name,c]of[['TrueBallKnower',owner],['OtherCollector',other],['TrueBallKnower2',lookalike]])assert.equal((await c('register',{username:name,password:'test-password-123',allSkinsAccess:true})).status,201);
   const id=(await instance.db.one('SELECT id FROM users WHERE username_key=?',['trueballknower'])).id;
-  const inv=await owner('cosmetics');assert.equal(inv.allSkinsAccess,true);assert.equal(inv.isKing,false);assert.equal(inv.coins,0);assert.deepEqual(new Set(inv.owned),new Set(allSkins.map(s=>s.id)));assert.ok(!('storedOwned'in inv));
+  const inv=await owner('cosmetics');assert.equal(inv.allSkinsAccess,true);assert.equal(inv.isKing,false);assert.equal(inv.coins,0);assert.deepEqual(new Set(inv.owned),new Set([...allSkins.map(s=>s.id),'israel']));assert.ok(!('storedOwned'in inv));
   for(const skin of ['king','porcelain','gold','dojo'])assert.equal((await owner('cosmetics/equip',{skin})).selected,skin);
   assert.equal((await owner('cosmetics/equip',{skin:'king'})).selected,'king');assert.equal((await owner('cosmetics')).selected,'king');
   assert.equal((await instance.db.one('SELECT best FROM users WHERE id=?',[id])).best,0);
   for(const c of[other,lookalike]){assert.equal((await c('cosmetics')).allSkinsAccess,false);assert.equal((await c('cosmetics/equip',{skin:'king',username:'TrueBallKnower',allSkinsAccess:true})).status,403);assert.deepEqual((await c('cosmetics')).owned,['original']);}assert.equal((await guest('cosmetics')).status,401);
   await instance.db.transaction(async tx=>{await reward(tx,id,{moves:0,score:0},{moves:80,score:0});});
-  const opening=await owner('cosmetics/open',{chest:'wood',requestId:'owner-full-collection-01'});assert.equal(opening.reward.duplicate,true);assert.equal(opening.reward.refund,28);assert.equal(opening.inventory.coins,28);assert.equal(opening.inventory.owned.length,allSkins.length);
+  const opening=await owner('cosmetics/open',{chest:'wood',requestId:'owner-full-collection-01'});assert.equal(opening.reward.duplicate,true);assert.equal(opening.reward.refund,28);assert.equal(opening.inventory.coins,28);assert.equal(opening.inventory.owned.length,allSkins.length+1);
   const stored=JSON.parse((await instance.db.one('SELECT state FROM cosmetics WHERE user_id=?',[id])).state);assert.deepEqual(stored.owned,['original'],'derived access must not be written into purchases');
   await instance.db.run('UPDATE users SET username_key=? WHERE id=?',['revoked-owner-identity',id]);const revoked=await owner('cosmetics');assert.equal(revoked.allSkinsAccess,false);assert.deepEqual(revoked.owned,['original']);assert.equal(revoked.selected,'original');assert.equal((await owner('cosmetics/equip',{skin:'gold'})).status,403);
  }finally{await new Promise(r=>server.close(r));await instance.close();delete process.env.DATA_DIR;fs.rmSync(dir,{recursive:true,force:true});}

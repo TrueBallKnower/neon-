@@ -22,7 +22,7 @@
    size=(width-2*pad-3*gap)/4;step=size+gap;warmTextures(false,true);schedule();
   }
   function imageFor(skin){
-   if(!skin?.sprite)return null;const path=skin.atelier?'/atelier-art/'+skin.id+'.svg':'/skin-art/'+skin.id+'.svg',pixels=Math.max(1,Math.ceil(size*dpr)),key=path+':'+pixels;
+   if(!skin?.sprite)return null;const path=skin.artUrl||(skin.atelier?'/atelier-art/'+skin.id+'.svg':'/skin-art/'+skin.id+'.svg'),pixels=Math.max(1,Math.ceil(size*dpr)),key=path+':'+pixels;
    if(images.has(key))return images.get(key);
    const entry={ready:false,image:new Image()};images.set(key,entry);if(images.size>4)images.delete(images.keys().next().value);
    entry.image.onload=()=>{if(entry.url)URL.revokeObjectURL(entry.url);entry.ready=true;if(skinId===skin.id)warmTextures(true);};

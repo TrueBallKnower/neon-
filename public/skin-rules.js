@@ -38,6 +38,8 @@
  const chests=[{id:'wood',name:'Coffre d’explorateur',price:80,odds:{common:70,rare:24,epic:5,legendary:.9,mythic:.1}},{id:'royal',name:'Coffre royal',price:240,odds:{common:35,rare:45,epic:18,legendary:1.7,mythic:.3}},{id:'astral',name:'Coffre astral',price:800,odds:{common:0,rare:35,epic:50,legendary:13,mythic:2}}];
  function pickRarity(chest,roll){let upto=0;for(const [key,chance]of Object.entries(chest.odds)){upto+=chance*100;if(roll<upto)return key;}throw Error('Tirage invalide.');}
  const lookup=new Map(allSkins.map(s=>[s.id,s]));
+ const privateSkins=[];
+ function registerPrivate(skins=[]){for(const s of privateSkins)lookup.delete(s.id);privateSkins.length=0;for(const s of skins){if(!s.hidden||lookup.has(s.id))continue;privateSkins.push(s);lookup.set(s.id,s);}}
  const get=id=>lookup.get(id)||catalog[0];
  const effectNames={fire:'Braises',water:'Marées',ice:'Givre',leaves:'Feuillage',electric:'Impulsions',lightning:'Orage',crystal:'Prismes',cosmic:'Orbite',shadow:'Éclipse',ribbons:'Rubans',sand:'Sables',gears:'Rouages',portal:'Portails',alchemy:'Alchimie'};
  function feedback(id,value=2,chain=1){const skin=get(id),rank={starter:0,common:1,rare:2,epic:3,legendary:4,mythic:5,sovereign:6}[skin.rarity],level=Math.max(1,Math.floor(Math.log2(Math.max(2,value))));return{skinId:skin.id,audio:skin.audio,animation:skin.animation,phase:chain>=12?4:chain>=8?3:chain>=5?2:chain>=3?1:0,theme:skin.fx,sound:skin.sound,rarity:skin.rarity,color:skin.tiles?.[Math.min(10,level-1)]?.light||skin.color,intensity:Math.min(3,1+Math.floor((chain-1)/4)+Math.floor(rank/3)),rank,level,enabled:!!skin.atelier||rank>=2};}
@@ -46,5 +48,5 @@
  function frames(id,lite=false){const skin=get(id),a=skin.animation;if(!a||lite)return[{transform:'scale(1)'},{transform:lite?'scale(1.025)':skin.motion||'scale(1.08)',offset:.45},{transform:'scale(1)'}];const profile=mergeProfiles[a.profile]||mergeProfiles.cosmic;return[{transform:'scale(1)'},{transform:profile[0],offset:.22},{transform:profile[1]+(a.angle?' rotate('+a.angle+'deg)':''),offset:.48},{transform:'scale(1)'}];}
  function available(skin,now=Date.now()){return skin.unlock?.type!=='event'||activeEvents(now).some(e=>(e.skins||[]).includes(skin.id));}
  function activeEvents(now=Date.now()){return events.filter(e=>e.status==='active'&&(!e.startsAt||now>=Date.parse(e.startsAt))&&(!e.endsAt||now<Date.parse(e.endsAt)));}
- const api={catalog,archive,allSkins,collections,rarities,chests,pickRarity,tileStyle,get,feedback,effectNames,frames,events,activeEvents,available};if(typeof module!=='undefined')module.exports=api;else root.FusionSkinRules=api;
+ const api={catalog,archive,allSkins,privateSkins,registerPrivate,collections,rarities,chests,pickRarity,tileStyle,get,feedback,effectNames,frames,events,activeEvents,available};if(typeof module!=='undefined')module.exports=api;else root.FusionSkinRules=api;
 })(typeof window!=='undefined'?window:globalThis);
